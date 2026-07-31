@@ -19,7 +19,7 @@ export default async function GestionEvenementPage({
     where: { id },
     include: {
       inscriptions: {
-        include: { athlete: { select: { id: true, nom: true, ville: true, sport: true } } },
+        include: { athlete: { select: { id: true, nom: true, ville: true } } },
         orderBy: { createdAt: "asc" },
       },
       resultats: true,

@@ -10,17 +10,17 @@ export async function GET(req: NextRequest) {
   }
 
   const ville = req.nextUrl.searchParams.get("ville");
-  const sport = req.nextUrl.searchParams.get("sport");
-  if (!ville || !sport) {
+  const sportId = req.nextUrl.searchParams.get("sportId");
+  if (!ville || !sportId) {
     return NextResponse.json(
-      { error: "Paramètres ville et sport requis." },
+      { error: "Paramètres ville et sportId requis." },
       { status: 400 }
     );
   }
 
   const groupes = await prisma.seance.groupBy({
     by: ["athleteId"],
-    where: { athlete: { ville, sport } },
+    where: { athlete: { ville, sportPrincipalId: sportId } },
     _count: { _all: true },
     orderBy: { _count: { athleteId: "desc" } },
     take: 50,

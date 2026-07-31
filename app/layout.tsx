@@ -26,11 +26,13 @@ export const metadata: Metadata = {
 
 const LIENS_ATHLETE: NavLien[] = [
   { href: "/entrainement", label: "Entraînement", icon: "dumbbell" },
+  { href: "/fil", label: "Fil", icon: "fil" },
   { href: "/tournois", label: "Tournois", icon: "trophy" },
   { href: "/profil", label: "Profil", icon: "profil" },
 ];
 const LIENS_ORGANISATEUR: NavLien[] = [
   { href: "/organisateur", label: "Tableau de bord", icon: "dashboard" },
+  { href: "/fil", label: "Fil", icon: "fil" },
 ];
 
 export default async function RootLayout({

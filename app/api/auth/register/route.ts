@@ -17,12 +17,17 @@ export async function POST(req: NextRequest) {
   }
 
   if (role === "ATHLETE") {
-    const { dateNaissance, ville, sport } = body;
-    if (!dateNaissance || !ville || !sport) {
+    const { dateNaissance, ville, sportId } = body;
+    if (!dateNaissance || !ville || !sportId) {
       return NextResponse.json(
         { error: "Champs manquants pour un profil athlète." },
         { status: 400 }
       );
+    }
+
+    const sport = await prisma.sport.findUnique({ where: { id: sportId } });
+    if (!sport) {
+      return NextResponse.json({ error: "Sport invalide." }, { status: 400 });
     }
 
     const existant = await prisma.athlete.findUnique({ where: { email } });
@@ -40,7 +45,7 @@ export async function POST(req: NextRequest) {
         nom,
         dateNaissance: new Date(dateNaissance),
         ville,
-        sport,
+        sportPrincipalId: sportId,
       },
     });
 

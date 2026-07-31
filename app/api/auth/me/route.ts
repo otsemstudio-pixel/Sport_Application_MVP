@@ -11,7 +11,7 @@ export async function GET() {
   if (session.role === "ATHLETE") {
     const athlete = await prisma.athlete.findUnique({
       where: { id: session.athleteId },
-      include: { consentement: true },
+      include: { consentement: true, sportPrincipal: true },
     });
     if (!athlete) {
       return NextResponse.json({ error: "Introuvable." }, { status: 404 });
@@ -27,7 +27,8 @@ export async function GET() {
       nom: athlete.nom,
       dateNaissance: athlete.dateNaissance,
       ville: athlete.ville,
-      sport: athlete.sport,
+      sport: athlete.sportPrincipal.nom,
+      sportId: athlete.sportPrincipalId,
       mineur,
       consentementValide,
       consentement: athlete.consentement

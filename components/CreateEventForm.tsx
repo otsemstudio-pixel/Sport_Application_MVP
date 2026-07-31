@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Plus } from "lucide-react";
+import SportSelect from "@/components/SportSelect";
+
+const NIVEAUX = [
+  { value: "TOUS_NIVEAUX", label: "Tous niveaux" },
+  { value: "DEBUTANT", label: "Débutant" },
+  { value: "INTERMEDIAIRE", label: "Intermédiaire" },
+  { value: "AVANCE", label: "Avancé" },
+];
 
 export default function CreateEventForm() {
   const router = useRouter();
@@ -16,15 +24,28 @@ export default function CreateEventForm() {
     setChargement(true);
 
     const form = new FormData(e.currentTarget);
+    const nombre = (name: string) => {
+      const v = form.get(name);
+      return v ? Number(v) : undefined;
+    };
+
     const res = await fetch("/api/evenements", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nom: form.get("nom"),
-        sport: form.get("sport"),
+        sportId: form.get("sportId"),
         lieu: form.get("lieu"),
         date: form.get("date"),
-        placesMax: Number(form.get("placesMax")),
+        placesMax: nombre("placesMax"),
+        description: form.get("description"),
+        niveauRequis: form.get("niveauRequis"),
+        clubRequis: form.get("clubRequis") === "on",
+        ageMin: nombre("ageMin"),
+        ageMax: nombre("ageMax"),
+        nombreEquipesMax: nombre("nombreEquipesMax"),
+        equipementFourni: form.get("equipementFourni") || undefined,
+        fraisInscription: nombre("fraisInscription") ?? 0,
       }),
     });
     setChargement(false);
@@ -57,21 +78,61 @@ export default function CreateEventForm() {
       </label>
       <label className="field-label">
         Sport
-        <select name="sport" required defaultValue="basketball" className="input">
-          <option value="basketball">Basketball</option>
-        </select>
+        <SportSelect name="sportId" required />
+      </label>
+      <label className="field-label">
+        Description
+        <textarea name="description" required rows={3} className="input resize-none" />
       </label>
       <label className="field-label">
         Lieu / ville
         <input name="lieu" required className="input" />
       </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="field-label">
+          Date
+          <input name="date" type="date" required className="input" />
+        </label>
+        <label className="field-label">
+          Places maximum
+          <input name="placesMax" type="number" min={1} required className="input" />
+        </label>
+      </div>
       <label className="field-label">
-        Date
-        <input name="date" type="date" required className="input" />
+        Niveau requis
+        <select name="niveauRequis" required defaultValue="TOUS_NIVEAUX" className="input">
+          {NIVEAUX.map((n) => (
+            <option key={n.value} value={n.value}>
+              {n.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex items-center gap-2 text-sm">
+        <input name="clubRequis" type="checkbox" className="h-4 w-4" />
+        Club requis (décoche pour ouvrir aux athlètes sans club)
+      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="field-label">
+          Âge minimum (optionnel)
+          <input name="ageMin" type="number" min={0} className="input" />
+        </label>
+        <label className="field-label">
+          Âge maximum (optionnel)
+          <input name="ageMax" type="number" min={0} className="input" />
+        </label>
+      </div>
+      <label className="field-label">
+        Nombre d&apos;équipes maximum (optionnel, sports collectifs)
+        <input name="nombreEquipesMax" type="number" min={1} className="input" />
       </label>
       <label className="field-label">
-        Places maximum
-        <input name="placesMax" type="number" min={1} required className="input" />
+        Équipement fourni (optionnel)
+        <input name="equipementFourni" placeholder="Ex : ballons fournis, prévoir tenue de sport" className="input" />
+      </label>
+      <label className="field-label">
+        Frais d&apos;inscription (FCFA)
+        <input name="fraisInscription" type="number" min={0} defaultValue={0} className="input" />
       </label>
       {erreur && (
         <p className="chip chip-danger self-start">

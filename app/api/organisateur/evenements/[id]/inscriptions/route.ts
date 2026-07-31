@@ -21,7 +21,7 @@ export async function GET(
 
   const inscriptions = await prisma.inscription.findMany({
     where: { evenementId },
-    include: { athlete: { select: { nom: true, ville: true, sport: true } } },
+    include: { athlete: { select: { nom: true, ville: true, sportPrincipal: { select: { nom: true } } } } },
     orderBy: { createdAt: "asc" },
   });
 
@@ -31,7 +31,7 @@ export async function GET(
       athleteId: i.athleteId,
       nom: i.athlete.nom,
       ville: i.athlete.ville,
-      sport: i.athlete.sport,
+      sport: i.athlete.sportPrincipal.nom,
       statut: i.statut,
     }))
   );

@@ -9,15 +9,34 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CategoriePerformance {
+  EXPLOSIVITE_PUISSANCE
+  ENDURANCE
+  COLLECTIF_TACTIQUE
+  COMBAT
+}
+
+model Sport {
+  id                   String               @id @default(cuid())
+  nom                  String               @unique
+  categoriePerformance CategoriePerformance
+  createdAt            DateTime             @default(now())
+
+  athletes   Athlete[]
+  defis      Defi[]
+  evenements Evenement[]
+}
+
 model Athlete {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  nom           String
-  dateNaissance DateTime
-  ville         String
-  sport         String
-  createdAt     DateTime @default(now())
+  id               String   @id @default(cuid())
+  email            String   @unique
+  passwordHash     String
+  nom              String
+  dateNaissance    DateTime
+  ville            String
+  sportPrincipalId String
+  sportPrincipal   Sport    @relation(fields: [sportPrincipalId], references: [id])
+  createdAt        DateTime @default(now())
 
   consentement    ConsentementParental?
   seances         Seance[]
@@ -39,12 +58,14 @@ model ConsentementParental {
 }
 
 model Defi {
-  id          String   @id @default(cuid())
-  sport       String
-  nom         String   @unique
-  description String
-  unite       String
-  createdAt   DateTime @default(now())
+  id                   String                @id @default(cuid())
+  sportId              String?
+  sport                Sport?                @relation(fields: [sportId], references: [id])
+  categoriePerformance CategoriePerformance?
+  nom                  String                @unique
+  description          String
+  unite                String
+  createdAt            DateTime              @default(now())
 
   seances Seance[]
 }
@@ -93,16 +114,32 @@ model Organisateur {
   sessions   Session[]
 }
 
+enum NiveauRequis {
+  DEBUTANT
+  INTERMEDIAIRE
+  AVANCE
+  TOUS_NIVEAUX
+}
+
 model Evenement {
-  id             String   @id @default(cuid())
-  organisateurId String
-  organisateur   Organisateur @relation(fields: [organisateurId], references: [id])
-  nom            String
-  sport          String
-  lieu           String
-  date           DateTime
-  placesMax      Int
-  createdAt      DateTime @default(now())
+  id                String       @id @default(cuid())
+  organisateurId    String
+  organisateur      Organisateur @relation(fields: [organisateurId], references: [id])
+  nom               String
+  sportId           String
+  sport             Sport        @relation(fields: [sportId], references: [id])
+  lieu              String
+  date              DateTime
+  placesMax         Int
+  description       String
+  niveauRequis      NiveauRequis
+  clubRequis        Boolean      @default(false)
+  ageMin            Int?
+  ageMax            Int?
+  nombreEquipesMax  Int?
+  equipementFourni  String?
+  fraisInscription  Int          @default(0)
+  createdAt         DateTime     @default(now())
 
   inscriptions Inscription[]
   resultats    Resultat[]
@@ -145,13 +182,46 @@ enum RoleSession {
 }
 
 model Session {
-  id             String       @id @default(cuid())
-  token          String       @unique
+  id             String        @id @default(cuid())
+  token          String        @unique
   role           RoleSession
   athleteId      String?
-  athlete        Athlete?     @relation(fields: [athleteId], references: [id])
+  athlete        Athlete?      @relation(fields: [athleteId], references: [id])
   organisateurId String?
   organisateur   Organisateur? @relation(fields: [organisateurId], references: [id])
   expiresAt      DateTime
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime      @default(now())
+}
+
+model Post {
+  id        String      @id @default(cuid())
+  auteurId  String
+  auteurType RoleSession
+  contenu   String
+  imageUrl  String?
+  createdAt DateTime    @default(now())
+
+  likes        PostLike[]
+  commentaires PostCommentaire[]
+}
+
+model PostLike {
+  id         String      @id @default(cuid())
+  postId     String
+  post       Post        @relation(fields: [postId], references: [id])
+  auteurId   String
+  auteurType RoleSession
+  createdAt  DateTime    @default(now())
+
+  @@unique([postId, auteurId, auteurType])
+}
+
+model PostCommentaire {
+  id         String      @id @default(cuid())
+  postId     String
+  post       Post        @relation(fields: [postId], references: [id])
+  auteurId   String
+  auteurType RoleSession
+  contenu    String
+  createdAt  DateTime    @default(now())
 }

@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dumbbell, LayoutDashboard, Trophy, UserRound, type LucideIcon } from "lucide-react";
+import { Dumbbell, LayoutDashboard, Rss, Trophy, UserRound, type LucideIcon } from "lucide-react";
 
-export type IconKey = "dumbbell" | "trophy" | "profil" | "dashboard";
+export type IconKey = "dumbbell" | "trophy" | "profil" | "dashboard" | "fil";
 
 const ICONS: Record<IconKey, LucideIcon> = {
   dumbbell: Dumbbell,
   trophy: Trophy,
   profil: UserRound,
   dashboard: LayoutDashboard,
+  fil: Rss,
 };
 
 export type NavLien = { href: string; label: string; icon: IconKey };

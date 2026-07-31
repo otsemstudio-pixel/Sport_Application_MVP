@@ -10,7 +10,7 @@ export async function GET() {
 
   const evenements = await prisma.evenement.findMany({
     where: { organisateurId: session.organisateurId },
-    include: { _count: { select: { inscriptions: true } } },
+    include: { sport: { select: { nom: true } }, _count: { select: { inscriptions: true } } },
     orderBy: { date: "asc" },
   });
 
@@ -18,7 +18,7 @@ export async function GET() {
     evenements.map((e) => ({
       id: e.id,
       nom: e.nom,
-      sport: e.sport,
+      sport: e.sport.nom,
       lieu: e.lieu,
       date: e.date,
       placesMax: e.placesMax,

@@ -10,15 +10,24 @@ export default async function EntrainementPage() {
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: session.athleteId },
+    include: { sportPrincipal: true },
   });
   if (!athlete) redirect("/connexion");
 
   const [defis, badges, groupes, totalSeances] = await Promise.all([
-    prisma.defi.findMany({ where: { sport: athlete.sport }, orderBy: { nom: "asc" } }),
+    prisma.defi.findMany({
+      where: {
+        OR: [
+          { sportId: athlete.sportPrincipalId },
+          { categoriePerformance: athlete.sportPrincipal.categoriePerformance },
+        ],
+      },
+      orderBy: { nom: "asc" },
+    }),
     prisma.badge.findMany({ orderBy: { seuilSeances: "asc" } }),
     prisma.seance.groupBy({
       by: ["athleteId"],
-      where: { athlete: { ville: athlete.ville, sport: athlete.sport } },
+      where: { athlete: { ville: athlete.ville, sportPrincipalId: athlete.sportPrincipalId } },
       _count: { _all: true },
       orderBy: { _count: { athleteId: "desc" } },
       take: 20,
@@ -50,7 +59,7 @@ export default async function EntrainementPage() {
       <div>
         <h1 className="text-2xl font-bold">Entraînement</h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>
-          {athlete.sport.charAt(0).toUpperCase() + athlete.sport.slice(1)} · {athlete.ville}
+          {athlete.sportPrincipal.nom} · {athlete.ville}
         </p>
       </div>
 

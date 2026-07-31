@@ -9,14 +9,15 @@ export async function GET(req: NextRequest) {
   }
 
   const ville = req.nextUrl.searchParams.get("ville") ?? undefined;
-  const sport = req.nextUrl.searchParams.get("sport") ?? undefined;
+  const sportId = req.nextUrl.searchParams.get("sportId") ?? undefined;
 
   const evenements = await prisma.evenement.findMany({
     where: {
       lieu: ville ? { contains: ville } : undefined,
-      sport: sport ? { equals: sport } : undefined,
+      sportId: sportId ? { equals: sportId } : undefined,
     },
     include: {
+      sport: { select: { nom: true } },
       organisateur: { select: { nom: true, verifie: true } },
       _count: { select: { inscriptions: true } },
     },
@@ -27,13 +28,22 @@ export async function GET(req: NextRequest) {
     evenements.map((e) => ({
       id: e.id,
       nom: e.nom,
-      sport: e.sport,
+      sport: e.sport.nom,
+      sportId: e.sportId,
       lieu: e.lieu,
       date: e.date,
       placesMax: e.placesMax,
       placesRestantes: e.placesMax - e._count.inscriptions,
       organisateur: e.organisateur.nom,
       organisateurVerifie: e.organisateur.verifie,
+      description: e.description,
+      niveauRequis: e.niveauRequis,
+      clubRequis: e.clubRequis,
+      ageMin: e.ageMin,
+      ageMax: e.ageMax,
+      nombreEquipesMax: e.nombreEquipesMax,
+      equipementFourni: e.equipementFourni,
+      fraisInscription: e.fraisInscription,
     }))
   );
 }
@@ -44,8 +54,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 403 });
   }
 
-  const { nom, sport, lieu, date, placesMax } = await req.json();
-  if (!nom || !sport || !lieu || !date || !placesMax) {
+  const {
+    nom,
+    sportId,
+    lieu,
+    date,
+    placesMax,
+    description,
+    niveauRequis,
+    clubRequis,
+    ageMin,
+    ageMax,
+    nombreEquipesMax,
+    equipementFourni,
+    fraisInscription,
+  } = await req.json();
+
+  if (!nom || !sportId || !lieu || !date || !placesMax || !description || !niveauRequis) {
     return NextResponse.json({ error: "Champs manquants." }, { status: 400 });
   }
   if (typeof placesMax !== "number" || placesMax <= 0) {
@@ -54,15 +79,32 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+  const NIVEAUX_VALIDES = ["DEBUTANT", "INTERMEDIAIRE", "AVANCE", "TOUS_NIVEAUX"];
+  if (!NIVEAUX_VALIDES.includes(niveauRequis)) {
+    return NextResponse.json({ error: "Niveau requis invalide." }, { status: 400 });
+  }
+
+  const sport = await prisma.sport.findUnique({ where: { id: sportId } });
+  if (!sport) {
+    return NextResponse.json({ error: "Sport invalide." }, { status: 400 });
+  }
 
   const evenement = await prisma.evenement.create({
     data: {
       organisateurId: session.organisateurId,
       nom,
-      sport,
+      sportId,
       lieu,
       date: new Date(date),
       placesMax,
+      description,
+      niveauRequis,
+      clubRequis: typeof clubRequis === "boolean" ? clubRequis : false,
+      ageMin: typeof ageMin === "number" ? ageMin : null,
+      ageMax: typeof ageMax === "number" ? ageMax : null,
+      nombreEquipesMax: typeof nombreEquipesMax === "number" ? nombreEquipesMax : null,
+      equipementFourni: equipementFourni || null,
+      fraisInscription: typeof fraisInscription === "number" ? fraisInscription : 0,
     },
   });
 

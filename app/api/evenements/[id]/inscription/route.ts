@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession, isMineur } from "@/lib/auth";
+import { getSession, estBloquePourConsentement } from "@/lib/auth";
 
 export async function POST(
   _req: Request,
@@ -20,9 +20,7 @@ export async function POST(
     return NextResponse.json({ error: "Introuvable." }, { status: 404 });
   }
 
-  const mineurNonConsenti =
-    isMineur(athlete.dateNaissance) && !athlete.consentement?.codeValide;
-  if (mineurNonConsenti) {
+  if (estBloquePourConsentement(athlete)) {
     return NextResponse.json(
       {
         error:

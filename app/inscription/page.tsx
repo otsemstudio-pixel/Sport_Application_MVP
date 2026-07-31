@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
-
-const SPORTS = [{ value: "basketball", label: "Basketball" }];
+import SportSelect from "@/components/SportSelect";
 
 export default function InscriptionPage() {
   const router = useRouter();
@@ -28,7 +27,7 @@ export default function InscriptionPage() {
     if (role === "ATHLETE") {
       body.dateNaissance = form.get("dateNaissance");
       body.ville = form.get("ville");
-      body.sport = form.get("sport");
+      body.sportId = form.get("sportId");
     }
 
     const res = await fetch("/api/auth/register", {
@@ -86,13 +85,7 @@ export default function InscriptionPage() {
               <Champ label="Ville" name="ville" required />
               <label className="field-label">
                 Sport
-                <select name="sport" required className="input">
-                  {SPORTS.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
+                <SportSelect name="sportId" required />
               </label>
             </>
           )}

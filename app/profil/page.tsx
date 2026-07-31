@@ -10,7 +10,7 @@ export default async function ProfilPage() {
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: session.athleteId },
-    include: { consentement: true },
+    include: { consentement: true, sportPrincipal: true },
   });
   if (!athlete) redirect("/connexion");
 
@@ -30,7 +30,7 @@ export default async function ProfilPage() {
         <div className="min-w-0">
           <h1 className="truncate text-xl font-bold">{athlete.nom}</h1>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            {athlete.sport.charAt(0).toUpperCase() + athlete.sport.slice(1)} · {athlete.ville}
+            {athlete.sportPrincipal.nom} · {athlete.ville}
           </p>
           {mineur && (
             <span className={`chip mt-2 ${consentementValide ? "chip-success" : "chip-danger"}`}>
@@ -49,7 +49,7 @@ export default async function ProfilPage() {
           valeur={new Date(athlete.dateNaissance).toLocaleDateString("fr-FR")}
         />
         <InfoLigne icon={MapPin} label="Ville" valeur={athlete.ville} />
-        <InfoLigne icon={Activity} label="Sport" valeur={athlete.sport} />
+        <InfoLigne icon={Activity} label="Sport" valeur={athlete.sportPrincipal.nom} />
       </div>
 
       {mineur && !consentementValide && (

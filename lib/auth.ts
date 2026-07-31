@@ -86,3 +86,12 @@ export function isMineur(dateNaissance: Date): boolean {
   }
   return age < 18;
 }
+
+// Un athlète mineur reste bloqué pour toute action (inscription, post, like,
+// commentaire) tant que le consentement parental n'a pas été validé.
+export function estBloquePourConsentement(athlete: {
+  dateNaissance: Date;
+  consentement?: { codeValide: boolean } | null;
+}): boolean {
+  return isMineur(athlete.dateNaissance) && athlete.consentement?.codeValide !== true;
+}
