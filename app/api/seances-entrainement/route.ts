@@ -119,13 +119,17 @@ export async function POST(req: NextRequest) {
 
   const nouveauxBadges = await evaluerBadges(session.athleteId);
 
-  const nouveauxRecords: { exerciceId: string; valeur: number }[] = [];
-  for (const exerciceId of new Set(idsExercices)) {
-    const resultat = await recalculerRecordPersonnel(session.athleteId, exerciceId);
-    if (resultat?.estNouveauRecord) {
-      nouveauxRecords.push({ exerciceId, valeur: resultat.record.valeur });
-    }
-  }
+  // Exercices indépendants les uns des autres : recalcul en parallèle plutôt
+  // qu'une boucle séquentielle d'appels réseau vers la base de données.
+  const idsExercicesUniques = [...new Set(idsExercices)];
+  const resultats = await Promise.all(
+    idsExercicesUniques.map((exerciceId) => recalculerRecordPersonnel(session.athleteId, exerciceId))
+  );
+  const nouveauxRecords = resultats
+    .map((resultat, index) =>
+      resultat?.estNouveauRecord ? { exerciceId: idsExercicesUniques[index], valeur: resultat.record.valeur } : null
+    )
+    .filter((r): r is { exerciceId: string; valeur: number } => r !== null);
 
   return NextResponse.json({ seance, nouveauxBadges, nouveauxRecords }, { status: 201 });
 }

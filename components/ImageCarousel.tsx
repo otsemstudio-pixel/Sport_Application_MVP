@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ImageCarousel({ images }: { images: string[] }) {
@@ -10,20 +11,17 @@ export default function ImageCarousel({ images }: { images: string[] }) {
 
   if (images.length === 1) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={images[0]} alt="" className="w-full rounded-xl object-cover" style={{ maxHeight: 480 }} />
+      <div className="relative h-[480px] w-full overflow-hidden rounded-xl">
+        <Image src={images[0]} alt="" fill sizes="(max-width: 640px) 100vw, 600px" className="object-cover" />
+      </div>
     );
   }
 
   return (
     <div className="relative">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={images[index]}
-        alt=""
-        className="w-full rounded-xl object-cover"
-        style={{ maxHeight: 480 }}
-      />
+      <div className="relative h-[480px] w-full overflow-hidden rounded-xl">
+        <Image src={images[index]} alt="" fill sizes="(max-width: 640px) 100vw, 600px" className="object-cover" />
+      </div>
       <button
         type="button"
         onClick={() => setIndex((i) => (i === 0 ? images.length - 1 : i - 1))}

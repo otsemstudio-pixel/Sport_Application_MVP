@@ -120,6 +120,8 @@ model SeanceEntrainement {
 
   exercicesRealises ExerciceRealise[]
   postsPartages     Post[]
+
+  @@index([athleteId, date])
 }
 
 model ExerciceRealise {
@@ -286,6 +288,8 @@ model Evenement {
   inscriptions Inscription[]
   resultats    Resultat[]
   images       EvenementImage[]
+
+  @@index([date])
 }
 
 model EvenementImage {
@@ -358,6 +362,9 @@ model Post {
   commentaires PostCommentaire[]
   images       PostImage[]
   vues         PostVue[]
+
+  @@index([createdAt])
+  @@index([auteurId, auteurType])
 }
 
 model PostImage {
@@ -415,4 +422,5 @@ model Abonnement {
   createdAt   DateTime    @default(now())
 
   @@unique([suiveurId, suiveurType, suiviId, suiviType])
+  @@index([suiviId, suiviType])
 }

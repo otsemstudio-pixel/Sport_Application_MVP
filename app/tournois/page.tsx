@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -106,8 +107,9 @@ export default async function TournoisPage({
             <div key={e.id} className="card flex flex-col overflow-hidden">
               <Link href={`/evenements/${e.id}`} className="flex flex-col gap-3">
                 {couverture ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={couverture} alt="" className="h-40 w-full object-cover" />
+                  <div className="relative h-40 w-full">
+                    <Image src={couverture} alt="" fill sizes="(max-width: 640px) 100vw, 400px" className="object-cover" />
+                  </div>
                 ) : (
                   <div
                     className="flex h-40 w-full items-center justify-center"

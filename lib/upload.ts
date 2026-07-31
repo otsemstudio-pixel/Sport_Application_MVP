@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 export const TAILLE_MAX_FICHIER = 5 * 1024 * 1024; // 5 Mo
 export const NOMBRE_MAX_IMAGES = 4;
-const LARGEUR_MAX = 1600;
+const LARGEUR_MAX = 1200;
 
 // Compresse/redimensionne l'image puis l'envoie sur Vercel Blob.
 export async function comprimerEtUploaderImage(

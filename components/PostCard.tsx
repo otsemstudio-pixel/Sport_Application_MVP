@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
@@ -53,15 +54,17 @@ function GrillePhotos({ images }: { images: string[] }) {
   if (images.length === 0) return null;
   if (images.length === 1) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={images[0]} alt="" className="max-h-96 w-full rounded-xl object-cover" />
+      <div className="relative h-96 w-full overflow-hidden rounded-xl">
+        <Image src={images[0]} alt="" fill sizes="(max-width: 640px) 100vw, 600px" className="object-cover" />
+      </div>
     );
   }
   return (
     <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-xl">
       {images.map((url) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img key={url} src={url} alt="" className="h-36 w-full object-cover" />
+        <div key={url} className="relative h-36 w-full">
+          <Image src={url} alt="" fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />
+        </div>
       ))}
     </div>
   );
