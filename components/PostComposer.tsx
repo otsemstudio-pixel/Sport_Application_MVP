@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, ImagePlus, Send } from "lucide-react";
+import { AlertCircle, Send } from "lucide-react";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function PostComposer() {
   const router = useRouter();
   const [contenu, setContenu] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [afficherImage, setAfficherImage] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
 
@@ -21,7 +21,7 @@ export default function PostComposer() {
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contenu, imageUrl: imageUrl || undefined }),
+      body: JSON.stringify({ contenu, images }),
     });
     setChargement(false);
 
@@ -32,8 +32,7 @@ export default function PostComposer() {
     }
 
     setContenu("");
-    setImageUrl("");
-    setAfficherImage(false);
+    setImages([]);
     router.refresh();
   }
 
@@ -47,29 +46,14 @@ export default function PostComposer() {
         rows={3}
         className="input resize-none"
       />
-      {afficherImage && (
-        <input
-          type="url"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="URL d'une image (optionnel)"
-          className="input"
-        />
-      )}
+      <ImageUploader dossier="posts" value={images} onChange={setImages} />
       {erreur && (
         <p className="chip chip-danger self-start">
           <AlertCircle size={14} />
           {erreur}
         </p>
       )}
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setAfficherImage((v) => !v)}
-          className="btn btn-ghost !px-2"
-        >
-          <ImagePlus size={17} />
-        </button>
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-3">
           <span className="text-xs" style={{ color: "var(--muted)" }}>
             {contenu.length}/500

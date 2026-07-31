@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
+import { auteurIdSession, resoudreNomsAuteurs } from "@/lib/posts";
 
 export async function GET(
   _req: Request,
@@ -17,25 +18,7 @@ export async function GET(
     orderBy: { createdAt: "asc" },
   });
 
-  const athleteIds = commentaires.filter((c) => c.auteurType === "ATHLETE").map((c) => c.auteurId);
-  const organisateurIds = commentaires
-    .filter((c) => c.auteurType === "ORGANISATEUR")
-    .map((c) => c.auteurId);
-
-  const [athletes, organisateurs] = await Promise.all([
-    athleteIds.length
-      ? prisma.athlete.findMany({ where: { id: { in: athleteIds } }, select: { id: true, nom: true } })
-      : Promise.resolve([]),
-    organisateurIds.length
-      ? prisma.organisateur.findMany({
-          where: { id: { in: organisateurIds } },
-          select: { id: true, nom: true },
-        })
-      : Promise.resolve([]),
-  ]);
-  const noms = new Map<string, string>();
-  athletes.forEach((a) => noms.set(`ATHLETE:${a.id}`, a.nom));
-  organisateurs.forEach((o) => noms.set(`ORGANISATEUR:${o.id}`, o.nom));
+  const noms = await resoudreNomsAuteurs(commentaires);
 
   return NextResponse.json(
     commentaires.map((c) => ({
@@ -90,11 +73,22 @@ export async function POST(
   const commentaire = await prisma.postCommentaire.create({
     data: {
       postId,
-      auteurId: session.role === "ATHLETE" ? session.athleteId : session.organisateurId,
+      auteurId: auteurIdSession(session),
       auteurType: session.role,
       contenu: contenu.trim(),
     },
   });
 
-  return NextResponse.json(commentaire, { status: 201 });
+  const noms = await resoudreNomsAuteurs([commentaire]);
+
+  return NextResponse.json(
+    {
+      id: commentaire.id,
+      auteurType: commentaire.auteurType,
+      auteurNom: noms.get(`${commentaire.auteurType}:${commentaire.auteurId}`) ?? "Utilisateur",
+      contenu: commentaire.contenu,
+      createdAt: commentaire.createdAt,
+    },
+    { status: 201 }
+  );
 }

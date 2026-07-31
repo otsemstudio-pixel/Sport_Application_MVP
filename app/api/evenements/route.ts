@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -19,6 +20,7 @@ export async function GET(req: NextRequest) {
     include: {
       sport: { select: { nom: true } },
       organisateur: { select: { nom: true, verifie: true } },
+      images: { select: { url: true }, orderBy: { ordre: "asc" } },
       _count: { select: { inscriptions: true } },
     },
     orderBy: { date: "asc" },
@@ -44,6 +46,7 @@ export async function GET(req: NextRequest) {
       nombreEquipesMax: e.nombreEquipesMax,
       equipementFourni: e.equipementFourni,
       fraisInscription: e.fraisInscription,
+      imageCouverture: e.images[0]?.url ?? null,
     }))
   );
 }
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest) {
     nombreEquipesMax,
     equipementFourni,
     fraisInscription,
+    images,
   } = await req.json();
 
   if (!nom || !sportId || !lieu || !date || !placesMax || !description || !niveauRequis) {
@@ -89,6 +93,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Sport invalide." }, { status: 400 });
   }
 
+  const urlsImages: string[] = Array.isArray(images) ? images.slice(0, NOMBRE_MAX_IMAGES) : [];
+
   const evenement = await prisma.evenement.create({
     data: {
       organisateurId: session.organisateurId,
@@ -105,7 +111,11 @@ export async function POST(req: NextRequest) {
       nombreEquipesMax: typeof nombreEquipesMax === "number" ? nombreEquipesMax : null,
       equipementFourni: equipementFourni || null,
       fraisInscription: typeof fraisInscription === "number" ? fraisInscription : 0,
+      images: {
+        create: urlsImages.map((url, index) => ({ url, ordre: index })),
+      },
     },
+    include: { images: true },
   });
 
   return NextResponse.json(evenement, { status: 201 });

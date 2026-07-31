@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import LikeButton from "@/components/LikeButton";
 
 export type Post = {
   id: string;
   auteurType: "ATHLETE" | "ORGANISATEUR";
   auteurNom: string;
   contenu: string;
-  imageUrl: string | null;
+  images: string[];
   createdAt: string;
   nombreLikes: number;
   nombreCommentaires: number;
@@ -25,29 +26,32 @@ type Commentaire = {
   createdAt: string;
 };
 
+function GrillePhotos({ images }: { images: string[] }) {
+  if (images.length === 0) return null;
+  if (images.length === 1) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={images[0]} alt="" className="max-h-96 w-full rounded-xl object-cover" />
+    );
+  }
+  return (
+    <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-xl">
+      {images.map((url) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={url} src={url} alt="" className="h-36 w-full object-cover" />
+      ))}
+    </div>
+  );
+}
+
 export default function PostCard({ post }: { post: Post }) {
   const router = useRouter();
-  const [liked, setLiked] = useState(post.likeParMoi);
-  const [nbLikes, setNbLikes] = useState(post.nombreLikes);
   const [nbCommentaires, setNbCommentaires] = useState(post.nombreCommentaires);
   const [afficherCommentaires, setAfficherCommentaires] = useState(false);
   const [commentaires, setCommentaires] = useState<Commentaire[] | null>(null);
   const [nouveauCommentaire, setNouveauCommentaire] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [supprime, setSupprime] = useState(false);
-
-  async function toggleLike() {
-    const prochainEtat = !liked;
-    setLiked(prochainEtat);
-    setNbLikes((n) => n + (prochainEtat ? 1 : -1));
-    const res = await fetch(`/api/posts/${post.id}/like`, { method: "POST" });
-    if (!res.ok) {
-      setLiked(!prochainEtat);
-      setNbLikes((n) => n - (prochainEtat ? 1 : -1));
-      const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
-    }
-  }
 
   async function ouvrirCommentaires() {
     setAfficherCommentaires((v) => !v);
@@ -78,7 +82,8 @@ export default function PostCard({ post }: { post: Post }) {
     setNouveauCommentaire("");
   }
 
-  async function supprimerPost() {
+  async function supprimerPost(e: React.MouseEvent) {
+    e.stopPropagation();
     const res = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
     if (res.ok) {
       setSupprime(true);
@@ -90,61 +95,56 @@ export default function PostCard({ post }: { post: Post }) {
 
   return (
     <div className="card flex flex-col gap-3 p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
-            style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-          >
-            {post.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold">{post.auteurNom}</span>
-              <span className={`chip ${post.auteurType === "ORGANISATEUR" ? "chip-gold" : "chip-neutral"}`}>
-                {post.auteurType === "ORGANISATEUR" ? (
-                  <ShieldCheck size={11} />
-                ) : (
-                  <UserRound size={11} />
-                )}
-                {post.auteurType === "ORGANISATEUR" ? "Organisateur" : "Athlète"}
+      <div
+        onClick={() => router.push(`/posts/${post.id}`)}
+        className="flex cursor-pointer flex-col gap-3"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
+              style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+            >
+              {post.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold">{post.auteurNom}</span>
+                <span className={`chip ${post.auteurType === "ORGANISATEUR" ? "chip-gold" : "chip-neutral"}`}>
+                  {post.auteurType === "ORGANISATEUR" ? (
+                    <ShieldCheck size={11} />
+                  ) : (
+                    <UserRound size={11} />
+                  )}
+                  {post.auteurType === "ORGANISATEUR" ? "Organisateur" : "Athlète"}
+                </span>
+              </div>
+              <span className="text-xs" style={{ color: "var(--muted)" }}>
+                {new Date(post.createdAt).toLocaleDateString("fr-FR", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
             </div>
-            <span className="text-xs" style={{ color: "var(--muted)" }}>
-              {new Date(post.createdAt).toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "short",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
           </div>
+          {post.auteurCestMoi && (
+            <button onClick={supprimerPost} aria-label="Supprimer" className="btn btn-ghost !p-1.5">
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
-        {post.auteurCestMoi && (
-          <button onClick={supprimerPost} aria-label="Supprimer" className="btn btn-ghost !p-1.5">
-            <Trash2 size={15} />
-          </button>
-        )}
+
+        <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.contenu}</p>
+
+        <GrillePhotos images={post.images} />
       </div>
-
-      <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.contenu}</p>
-
-      {post.imageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={post.imageUrl} alt="" className="max-h-80 w-full rounded-xl object-cover" />
-      )}
 
       {erreur && <p className="chip chip-danger self-start">{erreur}</p>}
 
       <div className="flex items-center gap-4 border-t pt-3" style={{ borderColor: "var(--border)" }}>
-        <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm">
-          <Heart
-            size={17}
-            fill={liked ? "var(--primary)" : "none"}
-            style={{ color: liked ? "var(--primary)" : "var(--muted)" }}
-          />
-          <span style={{ color: liked ? "var(--primary)" : "var(--muted)" }}>{nbLikes}</span>
-        </button>
+        <LikeButton postId={post.id} likeInitial={post.likeParMoi} nombreInitial={post.nombreLikes} />
         <button onClick={ouvrirCommentaires} className="flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
           <MessageCircle size={17} />
           {nbCommentaires}

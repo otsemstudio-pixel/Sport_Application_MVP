@@ -1,0 +1,42 @@
+"use client";
+
+import { useState } from "react";
+import { Heart } from "lucide-react";
+
+export default function LikeButton({
+  postId,
+  likeInitial,
+  nombreInitial,
+  size = 17,
+}: {
+  postId: string;
+  likeInitial: boolean;
+  nombreInitial: number;
+  size?: number;
+}) {
+  const [liked, setLiked] = useState(likeInitial);
+  const [nombre, setNombre] = useState(nombreInitial);
+
+  async function toggleLike(e: React.MouseEvent) {
+    e.stopPropagation();
+    const prochainEtat = !liked;
+    setLiked(prochainEtat);
+    setNombre((n) => n + (prochainEtat ? 1 : -1));
+    const res = await fetch(`/api/posts/${postId}/like`, { method: "POST" });
+    if (!res.ok) {
+      setLiked(!prochainEtat);
+      setNombre((n) => n - (prochainEtat ? 1 : -1));
+    }
+  }
+
+  return (
+    <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm">
+      <Heart
+        size={size}
+        fill={liked ? "var(--primary)" : "none"}
+        style={{ color: liked ? "var(--primary)" : "var(--muted)" }}
+      />
+      <span style={{ color: liked ? "var(--primary)" : "var(--muted)" }}>{nombre}</span>
+    </button>
+  );
+}

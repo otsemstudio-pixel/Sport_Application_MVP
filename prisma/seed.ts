@@ -199,22 +199,28 @@ async function reinitialiserPostsDemo(athletes: { id: string }[], organisateurs:
   const idsAnciens = anciensPosts.map((p) => p.id);
   await prisma.postCommentaire.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postLike.deleteMany({ where: { postId: { in: idsAnciens } } });
+  await prisma.postImage.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.post.deleteMany({ where: { id: { in: idsAnciens } } });
 
   const [mamadou, modou, aicha, chinedu, ibrahim] = athletes;
   const [clubBasket, fedLutte, academieLagos] = organisateurs;
 
-  const contenus: { auteur: (typeof auteurs)[number]; contenu: string; likes: (typeof auteurs)[number][]; commentaires?: { auteur: (typeof auteurs)[number]; contenu: string }[] }[] = [
+  const contenus: { auteur: (typeof auteurs)[number]; contenu: string; likes: (typeof auteurs)[number][]; commentaires?: { auteur: (typeof auteurs)[number]; contenu: string }[]; images?: string[] }[] = [
     {
       auteur: { id: mamadou.id, type: "ATHLETE" },
       contenu: "Séance de tirs ce matin à Dakar, 18/20 sur les lancers ! On continue de progresser 🏀",
       likes: [{ id: modou.id, type: "ATHLETE" }, { id: aicha.id, type: "ATHLETE" }, { id: clubBasket.id, type: "ORGANISATEUR" }],
       commentaires: [{ auteur: { id: clubBasket.id, type: "ORGANISATEUR" }, contenu: "Excellent Mamadou, continue comme ça !" }],
+      images: [
+        "https://picsum.photos/seed/basket-seance-1/900/700",
+        "https://picsum.photos/seed/basket-seance-2/900/700",
+      ],
     },
     {
       auteur: { id: clubBasket.id, type: "ORGANISATEUR" },
       contenu: "Le Tournoi Quartier Basketball ouvre ses inscriptions ! Ouvert à tous, débutants bienvenus, sans club requis.",
       likes: [{ id: mamadou.id, type: "ATHLETE" }, { id: chinedu.id, type: "ATHLETE" }],
+      images: ["https://picsum.photos/seed/tournoi-quartier/900/700"],
     },
     {
       auteur: { id: modou.id, type: "ATHLETE" },
@@ -223,6 +229,11 @@ async function reinitialiserPostsDemo(athletes: { id: string }[], organisateurs:
       commentaires: [
         { auteur: { id: fedLutte.id, type: "ORGANISATEUR" }, contenu: "Beau travail, on te suit pour la sélection nationale." },
         { auteur: { id: ibrahim.id, type: "ATHLETE" }, contenu: "Respect grand frère 💪" },
+      ],
+      images: [
+        "https://picsum.photos/seed/lutte-1/900/700",
+        "https://picsum.photos/seed/lutte-2/900/700",
+        "https://picsum.photos/seed/lutte-3/900/700",
       ],
     },
     {
@@ -268,6 +279,9 @@ async function reinitialiserPostsDemo(athletes: { id: string }[], organisateurs:
     const post = await prisma.post.create({
       data: { auteurId: c.auteur.id, auteurType: c.auteur.type, contenu: c.contenu },
     });
+    for (const [index, url] of (c.images ?? []).entries()) {
+      await prisma.postImage.create({ data: { postId: post.id, url, ordre: index } });
+    }
     for (const like of c.likes) {
       await prisma.postLike.create({
         data: { postId: post.id, auteurId: like.id, auteurType: like.type },
@@ -298,6 +312,7 @@ async function reinitialiserEvenementsDemo(
   const idsAnciens = anciensEvenements.map((e) => e.id);
   await prisma.resultat.deleteMany({ where: { evenementId: { in: idsAnciens } } });
   await prisma.inscription.deleteMany({ where: { evenementId: { in: idsAnciens } } });
+  await prisma.evenementImage.deleteMany({ where: { evenementId: { in: idsAnciens } } });
   await prisma.evenement.deleteMany({ where: { id: { in: idsAnciens } } });
 
   const [clubBasket, fedLutte, academieLagos] = organisateurs;
@@ -317,6 +332,12 @@ async function reinitialiserEvenementsDemo(
       clubRequis: false,
       fraisInscription: 0,
       equipementFourni: "Ballons fournis, prévoir tenue de sport",
+      images: {
+        create: [
+          { url: "https://picsum.photos/seed/evenement-basket-1/1000/700", ordre: 0 },
+          { url: "https://picsum.photos/seed/evenement-basket-2/1000/700", ordre: 1 },
+        ],
+      },
     },
   });
 
@@ -334,6 +355,9 @@ async function reinitialiserEvenementsDemo(
       clubRequis: true,
       ageMin: 18,
       fraisInscription: 5000,
+      images: {
+        create: [{ url: "https://picsum.photos/seed/evenement-lutte-1/1000/700", ordre: 0 }],
+      },
     },
   });
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Plus } from "lucide-react";
 import SportSelect from "@/components/SportSelect";
+import ImageUploader from "@/components/ImageUploader";
 
 const NIVEAUX = [
   { value: "TOUS_NIVEAUX", label: "Tous niveaux" },
@@ -17,6 +18,7 @@ export default function CreateEventForm() {
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
   const [ouvert, setOuvert] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,6 +48,7 @@ export default function CreateEventForm() {
         nombreEquipesMax: nombre("nombreEquipesMax"),
         equipementFourni: form.get("equipementFourni") || undefined,
         fraisInscription: nombre("fraisInscription") ?? 0,
+        images,
       }),
     });
     setChargement(false);
@@ -57,6 +60,7 @@ export default function CreateEventForm() {
     }
 
     (e.target as HTMLFormElement).reset();
+    setImages([]);
     setOuvert(false);
     router.refresh();
   }
@@ -134,6 +138,10 @@ export default function CreateEventForm() {
         Frais d&apos;inscription (FCFA)
         <input name="fraisInscription" type="number" min={0} defaultValue={0} className="input" />
       </label>
+      <div className="field-label">
+        Images (jusqu&apos;à 4)
+        <ImageUploader dossier="evenements" value={images} onChange={setImages} />
+      </div>
       {erreur && (
         <p className="chip chip-danger self-start">
           <AlertCircle size={14} />

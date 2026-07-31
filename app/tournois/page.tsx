@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import InscriptionButton from "@/components/InscriptionButton";
 import SportSelect from "@/components/SportSelect";
-import { Calendar, GraduationCap, MapPin, Search, ShieldAlert, Users } from "lucide-react";
+import { Calendar, GraduationCap, MapPin, Search, ShieldAlert, Trophy, Users } from "lucide-react";
 
 export default async function TournoisPage({
   searchParams,
@@ -34,6 +35,7 @@ export default async function TournoisPage({
     include: {
       sport: { select: { nom: true } },
       organisateur: { select: { nom: true } },
+      images: { select: { url: true }, orderBy: { ordre: "asc" }, take: 1 },
       _count: { select: { inscriptions: true } },
     },
     orderBy: { date: "asc" },
@@ -97,71 +99,90 @@ export default async function TournoisPage({
             Math.round((e._count.inscriptions / e.placesMax) * 100)
           );
           const ouvertDebutants = e.niveauRequis === "DEBUTANT" || e.niveauRequis === "TOUS_NIVEAUX";
+          const couverture = e.images[0]?.url ?? null;
           return (
-            <div key={e.id} className="card flex flex-col gap-3 p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="font-semibold">{e.nom}</h3>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
-                    {e.sport.nom} · Organisé par {e.organisateur.nom}
-                  </p>
+            <div key={e.id} className="card flex flex-col overflow-hidden">
+              <Link href={`/evenements/${e.id}`} className="flex flex-col gap-3">
+                {couverture ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={couverture} alt="" className="h-40 w-full object-cover" />
+                ) : (
+                  <div
+                    className="flex h-40 w-full items-center justify-center"
+                    style={{ background: "linear-gradient(135deg, var(--primary-soft), var(--gold-soft))" }}
+                  >
+                    <Trophy size={36} style={{ color: "var(--primary)" }} />
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3 px-5 pt-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold">{e.nom}</h3>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                      {e.sport.nom} · Organisé par {e.organisateur.nom}
+                    </p>
+                  </div>
+                  <span className={`chip shrink-0 ${complet ? "chip-danger" : "chip-primary"}`}>
+                    {complet ? "Complet" : `${placesRestantes} places`}
+                  </span>
                 </div>
-                <span className={`chip shrink-0 ${complet ? "chip-danger" : "chip-primary"}`}>
-                  {complet ? "Complet" : `${placesRestantes} places`}
-                </span>
-              </div>
 
-              {(ouvertDebutants || !e.clubRequis) && (
-                <div className="flex flex-wrap gap-1.5">
-                  {ouvertDebutants && (
-                    <span className="chip chip-success">
-                      <GraduationCap size={12} />
-                      Ouvert aux débutants
-                    </span>
-                  )}
-                  {!e.clubRequis && <span className="chip chip-success">Sans club requis</span>}
+                {(ouvertDebutants || !e.clubRequis) && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {ouvertDebutants && (
+                      <span className="chip chip-success">
+                        <GraduationCap size={12} />
+                        Ouvert aux débutants
+                      </span>
+                    )}
+                    {!e.clubRequis && <span className="chip chip-success">Sans club requis</span>}
+                  </div>
+                )}
+
+                <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+                  {e.description}
+                </p>
+
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm" style={{ color: "var(--muted)" }}>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin size={14} />
+                    {e.lieu}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Calendar size={14} />
+                    {new Date(e.date).toLocaleDateString("fr-FR")}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Users size={14} />
+                    {e._count.inscriptions}/{e.placesMax} inscrits
+                  </span>
+                  {e.fraisInscription > 0 && <span>{e.fraisInscription} FCFA</span>}
                 </div>
-              )}
 
-              <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-                {e.description}
-              </p>
-
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm" style={{ color: "var(--muted)" }}>
-                <span className="flex items-center gap-1.5">
-                  <MapPin size={14} />
-                  {e.lieu}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Calendar size={14} />
-                  {new Date(e.date).toLocaleDateString("fr-FR")}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Users size={14} />
-                  {e._count.inscriptions}/{e.placesMax} inscrits
-                </span>
-                {e.fraisInscription > 0 && <span>{e.fraisInscription} FCFA</span>}
-              </div>
-
-              <div
-                className="h-1.5 w-full overflow-hidden rounded-full"
-                style={{ background: "var(--surface-hover)" }}
-              >
                 <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${progression}%`,
-                    background: complet ? "var(--danger)" : "var(--primary)",
-                  }}
+                  className="h-1.5 w-full overflow-hidden rounded-full"
+                  style={{ background: "var(--surface-hover)" }}
+                >
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${progression}%`,
+                      background: complet ? "var(--danger)" : "var(--primary)",
+                    }}
+                  />
+                </div>
+                </div>
+              </Link>
+
+              <div className="px-5 pb-5 pt-3">
+                <InscriptionButton
+                  evenementId={e.id}
+                  complet={complet}
+                  bloque={mineurNonConsenti}
+                  statutInscription={statutInscription}
                 />
               </div>
-
-              <InscriptionButton
-                evenementId={e.id}
-                complet={complet}
-                bloque={mineurNonConsenti}
-                statutInscription={statutInscription}
-              />
             </div>
           );
         })}

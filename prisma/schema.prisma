@@ -143,6 +143,16 @@ model Evenement {
 
   inscriptions Inscription[]
   resultats    Resultat[]
+  images       EvenementImage[]
+}
+
+model EvenementImage {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id])
+  url         String
+  ordre       Int
+  createdAt   DateTime  @default(now())
 }
 
 enum StatutInscription {
@@ -198,11 +208,20 @@ model Post {
   auteurId  String
   auteurType RoleSession
   contenu   String
-  imageUrl  String?
   createdAt DateTime    @default(now())
 
   likes        PostLike[]
   commentaires PostCommentaire[]
+  images       PostImage[]
+}
+
+model PostImage {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  url       String
+  ordre     Int
+  createdAt DateTime @default(now())
 }
 
 model PostLike {
