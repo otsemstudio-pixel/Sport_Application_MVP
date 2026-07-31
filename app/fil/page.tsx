@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 import PostComposer from "@/components/PostComposer";
 import FilFeed from "@/components/FilFeed";
-import { formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
 
 const PAGE_SIZE = 15;
 
@@ -18,10 +18,7 @@ export default async function FilPage() {
   const posts = await prisma.post.findMany({
     take: PAGE_SIZE,
     orderBy: { createdAt: "desc" },
-    include: {
-      images: { select: { url: true, ordre: true } },
-      _count: { select: { likes: true, commentaires: true } },
-    },
+    include: INCLUDE_POST_RELATIONS,
   });
 
   const noms = await resoudreNomsAuteurs(posts);
@@ -30,7 +27,11 @@ export default async function FilPage() {
 
   const postsFormates = posts.map((p) => {
     const post = formaterPost(p, noms, idsLikesParMoi, session, fallbackNom);
-    return { ...post, createdAt: post.createdAt.toISOString() };
+    return {
+      ...post,
+      createdAt: post.createdAt.toISOString(),
+      seance: post.seance ? { ...post.seance, date: post.seance.date.toISOString() } : null,
+    };
   });
 
   return (

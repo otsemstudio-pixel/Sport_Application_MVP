@@ -70,13 +70,40 @@
     "nombreSeances": "{n} séances",
     "toi": "(toi)",
     "athleteFallback": "Athlète",
-    "defi": "Défi",
-    "aucunDefi": "Aucun défi disponible pour ce sport.",
+    "demarrerSeance": "Démarrer une séance",
+    "ajouterExercice": "Ajouter l'exercice",
     "valeurMesuree": "Valeur mesurée",
+    "seriesOptionnel": "Séries (optionnel)",
+    "retirer": "Retirer",
+    "noteOptionnelleLabel": "Note (optionnel)",
+    "noteOptionnellePlaceholder": "Ex : bonne séance, ressenti positif",
+    "terminerEtEnregistrer": "Terminer et enregistrer",
     "enregistrementEnCours": "Enregistrement…",
-    "enregistrerLaSeance": "Enregistrer la séance",
     "seanceEnregistree": "Séance enregistrée !",
-    "seanceEnregistreeAvecBadges": "Séance enregistrée ! Nouveau(x) badge(s) débloqué(s) : {badges}"
+    "seanceEnregistreeAvecBadges": "Séance enregistrée ! Nouveau(x) badge(s) débloqué(s) : {badges}",
+    "resumeIntro": "Séance terminée :",
+    "resumeAutoGenere": "Résumé (modifiable avant publication)",
+    "partagerSeance": "Partager cette séance",
+    "partageEnCours": "Partage…",
+    "nePasPartager": "Ne pas partager",
+    "seancePartagee": "Séance partagée dans le fil !",
+    "chargementEnCours": "Chargement…",
+    "unites": {
+      "REPETITIONS": "répétitions",
+      "DUREE_SECONDES": "secondes",
+      "DISTANCE_METRES": "mètres",
+      "SERIES_X_REPETITIONS": "séries"
+    }
+  },
+  "statistiques": {
+    "titre": "Statistiques",
+    "jour": "Jour",
+    "semaine": "Semaine",
+    "mois": "Mois",
+    "aucuneSeanceJour": "Aucune séance sur cette période.",
+    "nombreSeancesLabel": "{n} séances",
+    "totalParExercice": "Total par exercice",
+    "pasAssezDeDonnees": "Pas assez de données"
   },
   "evenement": {
     "titreTournois": "Tournois",
@@ -132,7 +159,8 @@
     "ajouterCommentaire": "Ajouter un commentaire…",
     "commentairesTitre": "Commentaires ({n})",
     "aucunCommentaire": "Aucun commentaire pour l'instant.",
-    "retourFil": "Retour au fil"
+    "retourFil": "Retour au fil",
+    "seancePartageeTitre": "Séance d'entraînement"
   },
   "organisateur": {
     "titreTableauDeBord": "Tableau de bord",
@@ -203,7 +231,6 @@
     "aucunFichier": "Aucun fichier reçu.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} dépasse la taille maximale de 5 Mo.",
-    "fichierPasImage": "{nom} n'est pas une image.",
-    "defiIntrouvable": "Défi introuvable."
+    "fichierPasImage": "{nom} n'est pas une image."
   }
 }

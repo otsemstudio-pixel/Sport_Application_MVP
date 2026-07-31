@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const groupes = await prisma.seance.groupBy({
+  const groupes = await prisma.seanceEntrainement.groupBy({
     by: ["athleteId"],
     where: { athlete: { ville, sportPrincipalId: sportId } },
     _count: { _all: true },

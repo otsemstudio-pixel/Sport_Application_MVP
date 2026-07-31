@@ -70,13 +70,40 @@
     "nombreSeances": "{n} sessions",
     "toi": "(you)",
     "athleteFallback": "Athlete",
-    "defi": "Challenge",
-    "aucunDefi": "No challenge available for this sport.",
+    "demarrerSeance": "Start a session",
+    "ajouterExercice": "Add exercise",
     "valeurMesuree": "Measured value",
+    "seriesOptionnel": "Sets (optional)",
+    "retirer": "Remove",
+    "noteOptionnelleLabel": "Note (optional)",
+    "noteOptionnellePlaceholder": "E.g. good session, felt strong",
+    "terminerEtEnregistrer": "Finish and save",
     "enregistrementEnCours": "Saving…",
-    "enregistrerLaSeance": "Log session",
     "seanceEnregistree": "Session logged!",
-    "seanceEnregistreeAvecBadges": "Session logged! New badge(s) unlocked: {badges}"
+    "seanceEnregistreeAvecBadges": "Session logged! New badge(s) unlocked: {badges}",
+    "resumeIntro": "Session complete:",
+    "resumeAutoGenere": "Summary (editable before sharing)",
+    "partagerSeance": "Share this session",
+    "partageEnCours": "Sharing…",
+    "nePasPartager": "Don't share",
+    "seancePartagee": "Session shared to the feed!",
+    "chargementEnCours": "Loading…",
+    "unites": {
+      "REPETITIONS": "reps",
+      "DUREE_SECONDES": "seconds",
+      "DISTANCE_METRES": "meters",
+      "SERIES_X_REPETITIONS": "sets"
+    }
+  },
+  "statistiques": {
+    "titre": "Statistics",
+    "jour": "Day",
+    "semaine": "Week",
+    "mois": "Month",
+    "aucuneSeanceJour": "No sessions in this period.",
+    "nombreSeancesLabel": "{n} sessions",
+    "totalParExercice": "Total per exercise",
+    "pasAssezDeDonnees": "Not enough data"
   },
   "evenement": {
     "titreTournois": "Tournaments",
@@ -132,7 +159,8 @@
     "ajouterCommentaire": "Add a comment…",
     "commentairesTitre": "Comments ({n})",
     "aucunCommentaire": "No comments yet.",
-    "retourFil": "Back to feed"
+    "retourFil": "Back to feed",
+    "seancePartageeTitre": "Training session"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -203,7 +231,6 @@
     "aucunFichier": "No file received.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} exceeds the maximum size of 5 MB.",
-    "fichierPasImage": "{nom} is not an image.",
-    "defiIntrouvable": "Challenge not found."
+    "fichierPasImage": "{nom} is not an image."
   }
 }

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 // Évalue les paliers de séances et débloque les badges manquants pour un athlète.
 export async function evaluerBadges(athleteId: string) {
-  const nbSeances = await prisma.seance.count({ where: { athleteId } });
+  const nbSeances = await prisma.seanceEntrainement.count({ where: { athleteId } });
 
   const badgesEligibles = await prisma.badge.findMany({
     where: { seuilSeances: { lte: nbSeances } },

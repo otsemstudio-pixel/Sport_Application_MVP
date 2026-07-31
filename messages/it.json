@@ -70,13 +70,40 @@
     "nombreSeances": "{n} sedute",
     "toi": "(tu)",
     "athleteFallback": "Atleta",
-    "defi": "Sfida",
-    "aucunDefi": "Nessuna sfida disponibile per questo sport.",
+    "demarrerSeance": "Inizia una seduta",
+    "ajouterExercice": "Aggiungi l'esercizio",
     "valeurMesuree": "Valore misurato",
+    "seriesOptionnel": "Serie (opzionale)",
+    "retirer": "Rimuovi",
+    "noteOptionnelleLabel": "Nota (opzionale)",
+    "noteOptionnellePlaceholder": "Es. buona seduta, sensazioni positive",
+    "terminerEtEnregistrer": "Termina e registra",
     "enregistrementEnCours": "Salvataggio…",
-    "enregistrerLaSeance": "Registra la seduta",
     "seanceEnregistree": "Seduta registrata!",
-    "seanceEnregistreeAvecBadges": "Seduta registrata! Nuovo/i badge sbloccato/i: {badges}"
+    "seanceEnregistreeAvecBadges": "Seduta registrata! Nuovo/i badge sbloccato/i: {badges}",
+    "resumeIntro": "Seduta completata:",
+    "resumeAutoGenere": "Riepilogo (modificabile prima della condivisione)",
+    "partagerSeance": "Condividi questa seduta",
+    "partageEnCours": "Condivisione…",
+    "nePasPartager": "Non condividere",
+    "seancePartagee": "Seduta condivisa nel feed!",
+    "chargementEnCours": "Caricamento…",
+    "unites": {
+      "REPETITIONS": "ripetizioni",
+      "DUREE_SECONDES": "secondi",
+      "DISTANCE_METRES": "metri",
+      "SERIES_X_REPETITIONS": "serie"
+    }
+  },
+  "statistiques": {
+    "titre": "Statistiche",
+    "jour": "Giorno",
+    "semaine": "Settimana",
+    "mois": "Mese",
+    "aucuneSeanceJour": "Nessuna seduta in questo periodo.",
+    "nombreSeancesLabel": "{n} sedute",
+    "totalParExercice": "Totale per esercizio",
+    "pasAssezDeDonnees": "Dati insufficienti"
   },
   "evenement": {
     "titreTournois": "Tornei",
@@ -132,7 +159,8 @@
     "ajouterCommentaire": "Aggiungi un commento…",
     "commentairesTitre": "Commenti ({n})",
     "aucunCommentaire": "Ancora nessun commento.",
-    "retourFil": "Torna alla bacheca"
+    "retourFil": "Torna alla bacheca",
+    "seancePartageeTitre": "Seduta di allenamento"
   },
   "organisateur": {
     "titreTableauDeBord": "Pannello di controllo",
@@ -203,7 +231,6 @@
     "aucunFichier": "Nessun file ricevuto.",
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 5 MB.",
-    "fichierPasImage": "{nom} non è un'immagine.",
-    "defiIntrouvable": "Sfida non trovata."
+    "fichierPasImage": "{nom} non è un'immagine."
   }
 }

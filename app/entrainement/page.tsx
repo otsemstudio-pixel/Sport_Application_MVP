@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
-import SeanceForm from "@/components/SeanceForm";
+import SeanceEntrainementForm from "@/components/SeanceEntrainementForm";
+import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
 import { Flame, Lock, Medal, Trophy } from "lucide-react";
 
 export default async function EntrainementPage() {
@@ -17,25 +18,25 @@ export default async function EntrainementPage() {
 
   const t = await getTranslations("entrainement");
 
-  const [defis, badges, groupes, totalSeances] = await Promise.all([
-    prisma.defi.findMany({
+  const [exercices, badges, groupes, totalSeances] = await Promise.all([
+    prisma.exercice.findMany({
       where: {
         OR: [
-          { sportId: athlete.sportPrincipalId },
           { categoriePerformance: athlete.sportPrincipal.categoriePerformance },
+          { categoriePerformance: "RENFORCEMENT_GENERAL" },
         ],
       },
       orderBy: { nom: "asc" },
     }),
     prisma.badge.findMany({ orderBy: { seuilSeances: "asc" } }),
-    prisma.seance.groupBy({
+    prisma.seanceEntrainement.groupBy({
       by: ["athleteId"],
       where: { athlete: { ville: athlete.ville, sportPrincipalId: athlete.sportPrincipalId } },
       _count: { _all: true },
       orderBy: { _count: { athleteId: "desc" } },
       take: 20,
     }),
-    prisma.seance.count({ where: { athleteId: athlete.id } }),
+    prisma.seanceEntrainement.count({ where: { athleteId: athlete.id } }),
   ]);
 
   const badgesObtenus = await prisma.athleteBadge.findMany({
@@ -74,8 +75,10 @@ export default async function EntrainementPage() {
 
       <section className="card flex flex-col gap-4 p-5">
         <h2 className="font-semibold">{t("enregistrerSeance")}</h2>
-        <SeanceForm defis={defis} />
+        <SeanceEntrainementForm exercices={exercices} />
       </section>
+
+      <StatistiquesEntrainement />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-semibold">{t("badges")}</h2>

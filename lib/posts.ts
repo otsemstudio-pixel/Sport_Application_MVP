@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import type { SessionInfo } from "@/lib/auth";
 
+// Relations communes à charger pour afficher un post (liste ou détail),
+// y compris l'éventuel récapitulatif de séance partagée.
+export const INCLUDE_POST_RELATIONS = {
+  images: { select: { url: true, ordre: true } },
+  _count: { select: { likes: true, commentaires: true } },
+  seanceEntrainement: {
+    include: { exercicesRealises: { include: { exercice: true } } },
+  },
+} as const;
+
 type Auteur = { auteurId: string; auteurType: "ATHLETE" | "ORGANISATEUR" };
 
 export async function resoudreNomsAuteurs(entites: Auteur[]) {
@@ -50,6 +60,17 @@ export async function idsPostsLikesParSession(postIds: string[], session: Sessio
   return new Set(mesLikes.map((l) => l.postId));
 }
 
+type SeanceRecapSource = {
+  id: string;
+  date: Date;
+  exercicesRealises: {
+    id: string;
+    valeur: number;
+    series: number | null;
+    exercice: { nom: string; uniteMesure: string };
+  }[];
+} | null;
+
 export function formaterPost(
   post: {
     id: string;
@@ -59,6 +80,7 @@ export function formaterPost(
     createdAt: Date;
     images: { url: string; ordre: number }[];
     _count: { likes: number; commentaires: number };
+    seanceEntrainement?: SeanceRecapSource;
   },
   noms: Map<string, string>,
   idsLikesParMoi: Set<string>,
@@ -77,5 +99,18 @@ export function formaterPost(
     nombreCommentaires: post._count.commentaires,
     likeParMoi: idsLikesParMoi.has(post.id),
     auteurCestMoi: `${post.auteurType}:${post.auteurId}` === cleAuteurSession(session),
+    seance: post.seanceEntrainement
+      ? {
+          id: post.seanceEntrainement.id,
+          date: post.seanceEntrainement.date,
+          exercices: post.seanceEntrainement.exercicesRealises.map((er) => ({
+            id: er.id,
+            nom: er.exercice.nom,
+            uniteMesure: er.exercice.uniteMesure,
+            valeur: er.valeur,
+            series: er.series,
+          })),
+        }
+      : null,
   };
 }

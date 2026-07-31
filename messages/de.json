@@ -70,13 +70,40 @@
     "nombreSeances": "{n} Einheiten",
     "toi": "(du)",
     "athleteFallback": "Athlet",
-    "defi": "Herausforderung",
-    "aucunDefi": "Keine Herausforderung für diese Sportart verfügbar.",
+    "demarrerSeance": "Einheit starten",
+    "ajouterExercice": "Übung hinzufügen",
     "valeurMesuree": "Gemessener Wert",
+    "seriesOptionnel": "Sätze (optional)",
+    "retirer": "Entfernen",
+    "noteOptionnelleLabel": "Notiz (optional)",
+    "noteOptionnellePlaceholder": "Z. B. gute Einheit, gutes Gefühl",
+    "terminerEtEnregistrer": "Abschließen und speichern",
     "enregistrementEnCours": "Wird gespeichert…",
-    "enregistrerLaSeance": "Einheit speichern",
     "seanceEnregistree": "Einheit gespeichert!",
-    "seanceEnregistreeAvecBadges": "Einheit gespeichert! Neue(s) Abzeichen freigeschaltet: {badges}"
+    "seanceEnregistreeAvecBadges": "Einheit gespeichert! Neue(s) Abzeichen freigeschaltet: {badges}",
+    "resumeIntro": "Einheit abgeschlossen:",
+    "resumeAutoGenere": "Zusammenfassung (vor dem Teilen bearbeitbar)",
+    "partagerSeance": "Diese Einheit teilen",
+    "partageEnCours": "Wird geteilt…",
+    "nePasPartager": "Nicht teilen",
+    "seancePartagee": "Einheit im Feed geteilt!",
+    "chargementEnCours": "Wird geladen…",
+    "unites": {
+      "REPETITIONS": "Wiederholungen",
+      "DUREE_SECONDES": "Sekunden",
+      "DISTANCE_METRES": "Meter",
+      "SERIES_X_REPETITIONS": "Sätze"
+    }
+  },
+  "statistiques": {
+    "titre": "Statistiken",
+    "jour": "Tag",
+    "semaine": "Woche",
+    "mois": "Monat",
+    "aucuneSeanceJour": "Keine Einheiten in diesem Zeitraum.",
+    "nombreSeancesLabel": "{n} Einheiten",
+    "totalParExercice": "Gesamt pro Übung",
+    "pasAssezDeDonnees": "Nicht genügend Daten"
   },
   "evenement": {
     "titreTournois": "Turniere",
@@ -132,7 +159,8 @@
     "ajouterCommentaire": "Kommentar hinzufügen…",
     "commentairesTitre": "Kommentare ({n})",
     "aucunCommentaire": "Noch keine Kommentare.",
-    "retourFil": "Zurück zum Feed"
+    "retourFil": "Zurück zum Feed",
+    "seancePartageeTitre": "Trainingseinheit"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -203,7 +231,6 @@
     "aucunFichier": "Keine Datei empfangen.",
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 5 MB.",
-    "fichierPasImage": "{nom} ist kein Bild.",
-    "defiIntrouvable": "Herausforderung nicht gefunden."
+    "fichierPasImage": "{nom} ist kein Bild."
   }
 }

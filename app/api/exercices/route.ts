@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
-// Défis pertinents pour l'athlète connecté : liés directement à son sport,
-// ou à la catégorie de performance de son sport (défis réutilisables).
+// Exercices pertinents pour l'athlète connecté : ceux de la catégorie de
+// performance de son sport, plus les exercices de renforcement général
+// (utilisables par tous les sports).
 export async function GET() {
   const session = await getSession();
   if (!session || session.role !== "ATHLETE") {
@@ -18,15 +19,15 @@ export async function GET() {
     return NextResponse.json({ error: "Introuvable." }, { status: 404 });
   }
 
-  const defis = await prisma.defi.findMany({
+  const exercices = await prisma.exercice.findMany({
     where: {
       OR: [
-        { sportId: athlete.sportPrincipalId },
         { categoriePerformance: athlete.sportPrincipal.categoriePerformance },
+        { categoriePerformance: "RENFORCEMENT_GENERAL" },
       ],
     },
     orderBy: { nom: "asc" },
   });
 
-  return NextResponse.json(defis);
+  return NextResponse.json(exercices);
 }

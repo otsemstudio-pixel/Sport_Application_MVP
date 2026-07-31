@@ -3,10 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
-import { formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
 import CommentairesDetail from "@/components/CommentairesDetail";
+import RecapSeance from "@/components/RecapSeance";
 import { ArrowLeft, ShieldCheck, UserRound } from "lucide-react";
 
 export default async function PostDetailPage({
@@ -20,10 +21,7 @@ export default async function PostDetailPage({
 
   const post = await prisma.post.findUnique({
     where: { id },
-    include: {
-      images: { select: { url: true, ordre: true } },
-      _count: { select: { likes: true, commentaires: true } },
-    },
+    include: INCLUDE_POST_RELATIONS,
   });
   if (!post) notFound();
 
@@ -89,6 +87,8 @@ export default async function PostDetailPage({
         </div>
 
         <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{postFormate.contenu}</p>
+
+        {postFormate.seance && <RecapSeance exercices={postFormate.seance.exercices} />}
 
         <ImageCarousel images={postFormate.images} />
 

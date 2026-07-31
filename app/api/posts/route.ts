@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
-import { auteurIdSession, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, auteurIdSession, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
 import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
 
 const PAGE_SIZE = 15;
@@ -21,10 +21,7 @@ export async function GET(req: NextRequest) {
     take: PAGE_SIZE,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     orderBy: { createdAt: "desc" },
-    include: {
-      images: { select: { url: true, ordre: true } },
-      _count: { select: { likes: true, commentaires: true } },
-    },
+    include: INCLUDE_POST_RELATIONS,
   });
 
   const noms = await resoudreNomsAuteurs(posts);

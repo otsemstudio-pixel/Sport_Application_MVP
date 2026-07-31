@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
 
 export async function GET(
   _req: Request,
@@ -18,10 +18,7 @@ export async function GET(
 
   const post = await prisma.post.findUnique({
     where: { id },
-    include: {
-      images: { select: { url: true, ordre: true } },
-      _count: { select: { likes: true, commentaires: true } },
-    },
+    include: INCLUDE_POST_RELATIONS,
   });
   if (!post) {
     return NextResponse.json({ error: t("postIntrouvable") }, { status: 404 });

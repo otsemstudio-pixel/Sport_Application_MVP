@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
+import RecapSeance from "@/components/RecapSeance";
 
 export type Post = {
   id: string;
@@ -17,6 +18,11 @@ export type Post = {
   nombreCommentaires: number;
   likeParMoi: boolean;
   auteurCestMoi: boolean;
+  seance: {
+    id: string;
+    date: string;
+    exercices: { id: string; nom: string; uniteMesure: string; valeur: number; series: number | null }[];
+  } | null;
 };
 
 type Commentaire = {
@@ -141,6 +147,8 @@ export default function PostCard({ post }: { post: Post }) {
         </div>
 
         <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.contenu}</p>
+
+        {post.seance && <RecapSeance exercices={post.seance.exercices} />}
 
         <GrillePhotos images={post.images} />
       </div>

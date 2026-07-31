@@ -48,35 +48,38 @@ async function seedReferentiels() {
     (await prisma.sport.findMany()).map((s) => [s.nom, s])
   );
 
-  const defis: {
+  const EXERCICES: {
     nom: string;
     description: string;
-    unite: string;
-    sportId?: string;
-    categoriePerformance?: string;
+    categoriePerformance: string;
+    uniteMesure: string;
   }[] = [
-    // Défis sport-spécifiques (basketball, déjà existants dans le MVP initial)
-    { nom: "Dribbles en continu", description: "Enchaîner des dribbles sans perdre le ballon", unite: "dribbles", sportId: sportParNom.get("Basketball")!.id },
-    { nom: "Tirs réussis", description: "Nombre de tirs réussis sur 20 tentatives", unite: "tirs", sportId: sportParNom.get("Basketball")!.id },
-    { nom: "Sprint navette", description: "Temps sur un sprint navette 20m", unite: "secondes", sportId: sportParNom.get("Basketball")!.id },
-    { nom: "Passes précises", description: "Passes réussies sur une cible sur 15 tentatives", unite: "passes", sportId: sportParNom.get("Basketball")!.id },
-    // Nouveaux défis sport-spécifiques pour les athlètes de démo
-    { nom: "Déséquilibres réussis", description: "Nombre de déséquilibres réussis à l'entraînement", unite: "déséquilibres", sportId: sportParNom.get("Lutte sénégalaise")!.id },
-    { nom: "5 km chronométré", description: "Temps sur une distance de 5 km", unite: "minutes", sportId: sportParNom.get("Athlétisme (fond/demi-fond)")!.id },
-    { nom: "Tirs au but réussis", description: "Tirs au but réussis sur 15 tentatives", unite: "tirs", sportId: sportParNom.get("Handball")!.id },
-    { nom: "Rounds tenus", description: "Nombre de rounds tenus à l'entraînement", unite: "rounds", sportId: sportParNom.get("Dambe (boxe traditionnelle nigériane)")!.id },
-    // Défis réutilisables au niveau d'une catégorie de performance
-    { nom: "Sprint 40m chronométré", description: "Temps sur un sprint de 40m, défi commun aux sports explosifs", unite: "secondes", categoriePerformance: "EXPLOSIVITE_PUISSANCE" },
-    { nom: "Test Cooper 12 minutes", description: "Distance parcourue en 12 minutes, défi commun aux sports d'endurance", unite: "mètres", categoriePerformance: "ENDURANCE" },
-    { nom: "Match d'application", description: "Séance de match réduit pour travailler le collectif", unite: "séances", categoriePerformance: "COLLECTIF_TACTIQUE" },
-    { nom: "Enchaînement technique noté", description: "Enchaînement technique jugé par un coach, défi commun aux sports de combat", unite: "points", categoriePerformance: "COMBAT" },
+    // Renforcement général (utilisable par tous les sports)
+    { nom: "Squats", description: "Squats au poids du corps", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "SERIES_X_REPETITIONS" },
+    { nom: "Pompes", description: "Pompes au poids du corps", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "SERIES_X_REPETITIONS" },
+    { nom: "Tractions", description: "Tractions à la barre", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "SERIES_X_REPETITIONS" },
+    { nom: "Abdominaux", description: "Crunchs ou relevés de buste", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS" },
+    { nom: "Fentes", description: "Fentes avant alternées", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "SERIES_X_REPETITIONS" },
+    { nom: "Gainage", description: "Gainage ventral (planche)", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES" },
+    { nom: "Burpees", description: "Burpees complets", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS" },
+    { nom: "Planche latérale", description: "Gainage latéral, de chaque côté", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES" },
+    // Explosivité / puissance
+    { nom: "Sprint 30m chronométré", description: "Temps sur un sprint de 30m", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DUREE_SECONDES" },
+    { nom: "Sauts en longueur", description: "Distance du meilleur saut en longueur sans élan", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DISTANCE_METRES" },
+    { nom: "Corde à sauter", description: "Nombre de sauts à la corde sans interruption", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "REPETITIONS" },
+    // Endurance
+    { nom: "10 km chronométré", description: "Temps sur une distance de 10 km", categoriePerformance: "ENDURANCE", uniteMesure: "DUREE_SECONDES" },
+    { nom: "Course en durée (distance parcourue)", description: "Distance parcourue sur un temps fixe (ex. 12 minutes)", categoriePerformance: "ENDURANCE", uniteMesure: "DISTANCE_METRES" },
+    // Combat
+    { nom: "Mouvements de lutte au sol chronométrés", description: "Enchaînement de mouvements au sol contre la montre", categoriePerformance: "COMBAT", uniteMesure: "DUREE_SECONDES" },
+    { nom: "Enchaînement technique combat noté", description: "Enchaînement technique jugé par un coach", categoriePerformance: "COMBAT", uniteMesure: "REPETITIONS" },
   ];
 
-  for (const defi of defis) {
-    await prisma.defi.upsert({
-      where: { nom: defi.nom },
+  for (const exercice of EXERCICES) {
+    await prisma.exercice.upsert({
+      where: { nom: exercice.nom },
       update: {},
-      create: defi as never,
+      create: exercice as never,
     });
   }
 
@@ -186,7 +189,114 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
   return athletes;
 }
 
-async function reinitialiserPostsDemo(athletes: { id: string }[], organisateurs: { id: string }[]) {
+function joursAvant(n: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+async function reinitialiserSeancesDemo(athletes: { id: string }[]) {
+  const [mamadou, modou, aicha] = athletes;
+
+  const idsDemo = [mamadou.id, modou.id, aicha.id];
+  const anciennesSeances = await prisma.seanceEntrainement.findMany({
+    where: { athleteId: { in: idsDemo } },
+    select: { id: true },
+  });
+  const idsAnciennes = anciennesSeances.map((s) => s.id);
+  await prisma.post.updateMany({
+    where: { seanceEntrainementId: { in: idsAnciennes } },
+    data: { seanceEntrainementId: null },
+  });
+  await prisma.exerciceRealise.deleteMany({ where: { seanceId: { in: idsAnciennes } } });
+  await prisma.seanceEntrainement.deleteMany({ where: { id: { in: idsAnciennes } } });
+
+  const exerciceParNom = new Map(
+    (await prisma.exercice.findMany()).map((e) => [e.nom, e])
+  );
+
+  async function creerSeance(
+    athleteId: string,
+    date: Date,
+    exercices: { nom: string; valeur: number; series?: number }[]
+  ) {
+    return prisma.seanceEntrainement.create({
+      data: {
+        athleteId,
+        date,
+        exercicesRealises: {
+          create: exercices.map((e) => ({
+            exerciceId: exerciceParNom.get(e.nom)!.id,
+            valeur: e.valeur,
+            series: e.series ?? null,
+          })),
+        },
+      },
+      include: { exercicesRealises: { include: { exercice: true } } },
+    });
+  }
+
+  const seanceAujourdhuiMamadou = await creerSeance(mamadou.id, joursAvant(0), [
+    { nom: "Squats", valeur: 15, series: 3 },
+    { nom: "Sprint 30m chronométré", valeur: 4.8 },
+    { nom: "Corde à sauter", valeur: 100 },
+  ]);
+  await creerSeance(mamadou.id, joursAvant(2), [
+    { nom: "Pompes", valeur: 20, series: 3 },
+    { nom: "Abdominaux", valeur: 50 },
+  ]);
+  await creerSeance(mamadou.id, joursAvant(5), [
+    { nom: "Dribbles en continu", valeur: 15 },
+    { nom: "Tirs réussis", valeur: 14 },
+  ]);
+  await creerSeance(mamadou.id, joursAvant(10), [
+    { nom: "Burpees", valeur: 30 },
+    { nom: "Gainage", valeur: 60 },
+  ]);
+  await creerSeance(mamadou.id, joursAvant(35), [{ nom: "Squats", valeur: 12, series: 3 }]);
+
+  await creerSeance(aicha.id, joursAvant(0), [
+    { nom: "10 km chronométré", valeur: 2700 },
+    { nom: "Course en durée (distance parcourue)", valeur: 2400 },
+  ]);
+  await creerSeance(aicha.id, joursAvant(3), [{ nom: "5 km chronométré", valeur: 1500 }]);
+  await creerSeance(aicha.id, joursAvant(9), [
+    { nom: "Planche latérale", valeur: 90 },
+    { nom: "Abdominaux", valeur: 40 },
+  ]);
+  await creerSeance(aicha.id, joursAvant(40), [{ nom: "10 km chronométré", valeur: 2800 }]);
+
+  await creerSeance(modou.id, joursAvant(0), [
+    { nom: "Mouvements de lutte au sol chronométrés", valeur: 300 },
+    { nom: "Déséquilibres réussis", valeur: 8 },
+  ]);
+  await creerSeance(modou.id, joursAvant(4), [
+    { nom: "Enchaînement technique combat noté", valeur: 7 },
+    { nom: "Tractions", valeur: 8, series: 3 },
+  ]);
+
+  const resume = seanceAujourdhuiMamadou.exercicesRealises
+    .map((er) =>
+      er.series
+        ? `${er.series}x${er.valeur} ${er.exercice.nom}`
+        : `${er.valeur} ${er.exercice.uniteMesure === "DUREE_SECONDES" ? "secondes" : er.exercice.uniteMesure === "DISTANCE_METRES" ? "mètres" : "répétitions"} de ${er.exercice.nom}`
+    )
+    .join(", ");
+
+  return {
+    seancePartageable: {
+      id: seanceAujourdhuiMamadou.id,
+      auteurId: mamadou.id,
+      contenu: `Séance du jour : ${resume} 💪`,
+    },
+  };
+}
+
+async function reinitialiserPostsDemo(
+  athletes: { id: string }[],
+  organisateurs: { id: string }[],
+  seancePartageable: { id: string; auteurId: string; contenu: string }
+) {
   const auteurs = [
     ...athletes.map((a) => ({ id: a.id, type: "ATHLETE" as const })),
     ...organisateurs.map((o) => ({ id: o.id, type: "ORGANISATEUR" as const })),
@@ -298,6 +408,27 @@ async function reinitialiserPostsDemo(athletes: { id: string }[], organisateurs:
       });
     }
   }
+
+  // Post "séance partagée" : illustre la fonctionnalité de partage avec encart structuré.
+  const postSeancePartagee = await prisma.post.create({
+    data: {
+      auteurId: seancePartageable.auteurId,
+      auteurType: "ATHLETE",
+      contenu: seancePartageable.contenu,
+      seanceEntrainementId: seancePartageable.id,
+    },
+  });
+  await prisma.postLike.create({
+    data: { postId: postSeancePartagee.id, auteurId: modou.id, auteurType: "ATHLETE" },
+  });
+  await prisma.postCommentaire.create({
+    data: {
+      postId: postSeancePartagee.id,
+      auteurId: clubBasket.id,
+      auteurType: "ORGANISATEUR",
+      contenu: "Belle intensité, continue comme ça !",
+    },
+  });
 }
 
 async function reinitialiserEvenementsDemo(
@@ -399,7 +530,8 @@ async function main() {
   const organisateurs = await seedOrganisateurs();
   const athletes = await seedAthletes(sportParNom);
 
-  await reinitialiserPostsDemo(athletes, organisateurs);
+  const { seancePartageable } = await reinitialiserSeancesDemo(athletes);
+  await reinitialiserPostsDemo(athletes, organisateurs, seancePartageable);
   await reinitialiserEvenementsDemo(organisateurs, athletes, sportParNom);
 
   console.log("Seed de démonstration terminé.");

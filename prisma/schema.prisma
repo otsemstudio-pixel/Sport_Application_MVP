@@ -14,6 +14,14 @@ enum CategoriePerformance {
   ENDURANCE
   COLLECTIF_TACTIQUE
   COMBAT
+  RENFORCEMENT_GENERAL
+}
+
+enum UniteMesure {
+  REPETITIONS
+  DUREE_SECONDES
+  DISTANCE_METRES
+  SERIES_X_REPETITIONS
 }
 
 model Sport {
@@ -23,7 +31,6 @@ model Sport {
   createdAt            DateTime             @default(now())
 
   athletes   Athlete[]
-  defis      Defi[]
   evenements Evenement[]
 }
 
@@ -38,12 +45,12 @@ model Athlete {
   sportPrincipal   Sport    @relation(fields: [sportPrincipalId], references: [id])
   createdAt        DateTime @default(now())
 
-  consentement    ConsentementParental?
-  seances         Seance[]
-  athleteBadges   AthleteBadge[]
-  inscriptions    Inscription[]
-  resultats       Resultat[]
-  sessions        Session[]
+  consentement        ConsentementParental?
+  seancesEntrainement SeanceEntrainement[]
+  athleteBadges       AthleteBadge[]
+  inscriptions        Inscription[]
+  resultats           Resultat[]
+  sessions            Session[]
 }
 
 model ConsentementParental {
@@ -57,27 +64,38 @@ model ConsentementParental {
   createdAt       DateTime  @default(now())
 }
 
-model Defi {
-  id                   String                @id @default(cuid())
-  sportId              String?
-  sport                Sport?                @relation(fields: [sportId], references: [id])
-  categoriePerformance CategoriePerformance?
-  nom                  String                @unique
+model Exercice {
+  id                   String               @id @default(cuid())
+  nom                  String               @unique
+  categoriePerformance CategoriePerformance
+  uniteMesure          UniteMesure
   description          String
-  unite                String
-  createdAt            DateTime              @default(now())
+  createdAt            DateTime             @default(now())
 
-  seances Seance[]
+  exercicesRealises ExerciceRealise[]
 }
 
-model Seance {
-  id            String   @id @default(cuid())
-  athleteId     String
-  athlete       Athlete  @relation(fields: [athleteId], references: [id])
-  defiId        String
-  defi          Defi     @relation(fields: [defiId], references: [id])
-  valeurMesuree Float
-  date          DateTime @default(now())
+model SeanceEntrainement {
+  id              String   @id @default(cuid())
+  athleteId       String
+  athlete         Athlete  @relation(fields: [athleteId], references: [id])
+  date            DateTime @default(now())
+  noteOptionnelle String?
+  createdAt       DateTime @default(now())
+
+  exercicesRealises ExerciceRealise[]
+  postsPartages     Post[]
+}
+
+model ExerciceRealise {
+  id         String             @id @default(cuid())
+  seanceId   String
+  seance     SeanceEntrainement @relation(fields: [seanceId], references: [id])
+  exerciceId String
+  exercice   Exercice           @relation(fields: [exerciceId], references: [id])
+  valeur     Float
+  series     Int?
+  createdAt  DateTime           @default(now())
 }
 
 model Badge {
@@ -204,11 +222,13 @@ model Session {
 }
 
 model Post {
-  id        String      @id @default(cuid())
-  auteurId  String
-  auteurType RoleSession
-  contenu   String
-  createdAt DateTime    @default(now())
+  id                   String              @id @default(cuid())
+  auteurId             String
+  auteurType           RoleSession
+  contenu              String
+  seanceEntrainementId String?
+  seanceEntrainement   SeanceEntrainement? @relation(fields: [seanceEntrainementId], references: [id])
+  createdAt            DateTime            @default(now())
 
   likes        PostLike[]
   commentaires PostCommentaire[]
