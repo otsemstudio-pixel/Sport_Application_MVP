@@ -1,0 +1,157 @@
+// Schema Prisma du MVP de scouting sportif gamifié
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Athlete {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  nom           String
+  dateNaissance DateTime
+  ville         String
+  sport         String
+  createdAt     DateTime @default(now())
+
+  consentement    ConsentementParental?
+  seances         Seance[]
+  athleteBadges   AthleteBadge[]
+  inscriptions    Inscription[]
+  resultats       Resultat[]
+  sessions        Session[]
+}
+
+model ConsentementParental {
+  id              String    @id @default(cuid())
+  athleteId       String    @unique
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+  telephoneParent String
+  code            String
+  codeValide      Boolean   @default(false)
+  dateValidation  DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model Defi {
+  id          String   @id @default(cuid())
+  sport       String
+  nom         String   @unique
+  description String
+  unite       String
+  createdAt   DateTime @default(now())
+
+  seances Seance[]
+}
+
+model Seance {
+  id            String   @id @default(cuid())
+  athleteId     String
+  athlete       Athlete  @relation(fields: [athleteId], references: [id])
+  defiId        String
+  defi          Defi     @relation(fields: [defiId], references: [id])
+  valeurMesuree Float
+  date          DateTime @default(now())
+}
+
+model Badge {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  nom           String
+  description   String
+  seuilSeances  Int
+  createdAt     DateTime @default(now())
+
+  athleteBadges AthleteBadge[]
+}
+
+model AthleteBadge {
+  id        String   @id @default(cuid())
+  athleteId String
+  athlete   Athlete  @relation(fields: [athleteId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  obtenuLe  DateTime @default(now())
+
+  @@unique([athleteId, badgeId])
+}
+
+model Organisateur {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  nom          String
+  verifie      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  evenements Evenement[]
+  sessions   Session[]
+}
+
+model Evenement {
+  id             String   @id @default(cuid())
+  organisateurId String
+  organisateur   Organisateur @relation(fields: [organisateurId], references: [id])
+  nom            String
+  sport          String
+  lieu           String
+  date           DateTime
+  placesMax      Int
+  createdAt      DateTime @default(now())
+
+  inscriptions Inscription[]
+  resultats    Resultat[]
+}
+
+enum StatutInscription {
+  EN_ATTENTE
+  CONFIRME
+  REFUSE
+}
+
+model Inscription {
+  id          String            @id @default(cuid())
+  evenementId String
+  evenement   Evenement         @relation(fields: [evenementId], references: [id])
+  athleteId   String
+  athlete     Athlete           @relation(fields: [athleteId], references: [id])
+  statut      StatutInscription @default(EN_ATTENTE)
+  createdAt   DateTime          @default(now())
+
+  @@unique([evenementId, athleteId])
+}
+
+model Resultat {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id])
+  athleteId   String
+  athlete     Athlete   @relation(fields: [athleteId], references: [id])
+  classement  Int
+  score       Float
+  createdAt   DateTime  @default(now())
+
+  @@unique([evenementId, athleteId])
+}
+
+enum RoleSession {
+  ATHLETE
+  ORGANISATEUR
+}
+
+model Session {
+  id             String       @id @default(cuid())
+  token          String       @unique
+  role           RoleSession
+  athleteId      String?
+  athlete        Athlete?     @relation(fields: [athleteId], references: [id])
+  organisateurId String?
+  organisateur   Organisateur? @relation(fields: [organisateurId], references: [id])
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+}
