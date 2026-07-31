@@ -15,15 +15,18 @@ Application web responsive (mobile-first) qui structure le parcours d'un athlèt
 
 - Next.js 16 (App Router) + TypeScript
 - Routes API Next.js (REST interne) sous `app/api/`
-- Prisma ORM 7, SQLite en local (`prisma/dev.db`)
+- Prisma ORM 7 avec adaptateur `@prisma/adapter-pg`, PostgreSQL hébergé sur Supabase
 - Auth maison : mot de passe hashé avec `bcryptjs`, session stockée en base et cookie `httpOnly`
 - Tailwind CSS pour le style utilitaire mobile-first
 
 ## Lancer le projet en local
 
+1. Copie tes identifiants de connexion Supabase dans `.env` (`DATABASE_URL` = pooler en mode transaction, port 6543 ; `DIRECT_URL` = pooler en mode session, port 5432, utilisé par les migrations). Remplace `[YOUR-PASSWORD]` par le mot de passe de la base.
+2. Installe et lance :
+
 ```bash
 npm install
-npx prisma migrate dev   # crée la base SQLite locale à partir du schéma
+npx prisma migrate dev   # applique le schéma sur la base Supabase (via DIRECT_URL)
 npx prisma db seed       # ajoute les défis et badges basketball de base
 npm run dev
 ```
@@ -35,14 +38,6 @@ Aucun compte n'est préchargé : crée un compte athlète et un compte organisat
 ### Tester le consentement parental
 
 Le SMS n'est pas réellement envoyé : le code à 6 chiffres est affiché dans la console où tourne `npm run dev` (ligne `[SMS simulé] ...`). Crée un athlète avec une date de naissance de moins de 18 ans, va sur `/profil`, saisis un téléphone parent, puis récupère le code dans la console pour le valider.
-
-## Passer à PostgreSQL
-
-Le schéma Prisma (`prisma/schema.prisma`) utilise SQLite par défaut pour un démarrage immédiat sans configuration. Pour utiliser PostgreSQL :
-
-1. Dans `prisma/schema.prisma`, change `provider = "sqlite"` en `provider = "postgresql"` dans le bloc `datasource db`.
-2. Dans `.env`, remplace `DATABASE_URL` par l'URL de connexion PostgreSQL (`postgresql://user:password@host:5432/dbname`).
-3. Relance `npx prisma migrate dev` pour recréer les migrations sur ce moteur.
 
 ## Structure du projet
 
@@ -56,7 +51,7 @@ app/
   tournois/       liste filtrable des tournois + inscription
   organisateur/   tableau de bord organisateur (créer événement, gérer inscriptions, saisir résultats)
 lib/
-  prisma.ts       client Prisma (adaptateur SQLite)
+  prisma.ts       client Prisma (adaptateur PostgreSQL, connexion poolée Supabase)
   auth.ts         sessions, hash de mot de passe, calcul de la majorité
   badges.ts       évaluation des paliers de badges après chaque séance
 prisma/
