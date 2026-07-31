@@ -27,6 +27,7 @@ export async function GET(
   return NextResponse.json(
     commentaires.map((c) => ({
       id: c.id,
+      auteurId: c.auteurId,
       auteurType: c.auteurType,
       auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
       contenu: c.contenu,
@@ -85,6 +86,7 @@ export async function POST(
   return NextResponse.json(
     {
       id: commentaire.id,
+      auteurId: commentaire.auteurId,
       auteurType: commentaire.auteurType,
       auteurNom: noms.get(`${commentaire.auteurType}:${commentaire.auteurId}`) ?? fallbackNom,
       contenu: commentaire.contenu,

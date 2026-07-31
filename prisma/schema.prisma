@@ -357,6 +357,7 @@ model Post {
   likes        PostLike[]
   commentaires PostCommentaire[]
   images       PostImage[]
+  vues         PostVue[]
 }
 
 model PostImage {
@@ -387,4 +388,31 @@ model PostCommentaire {
   auteurType RoleSession
   contenu    String
   createdAt  DateTime    @default(now())
+}
+
+// Une vue est enregistrée à l'ouverture de la vue détaillée d'un post
+// uniquement (pas au défilement dans le fil) ; l'unicité empêche un même
+// compte de faire grimper le compteur en rouvrant le post plusieurs fois.
+model PostVue {
+  id             String      @id @default(cuid())
+  postId         String
+  post           Post        @relation(fields: [postId], references: [id])
+  spectateurId   String
+  spectateurType RoleSession
+  vuLe           DateTime    @default(now())
+
+  @@unique([postId, spectateurId, spectateurType])
+}
+
+// Le blocage de l'auto-abonnement est vérifié en application (route API),
+// pas par une contrainte SQL.
+model Abonnement {
+  id          String      @id @default(cuid())
+  suiveurId   String
+  suiveurType RoleSession
+  suiviId     String
+  suiviType   RoleSession
+  createdAt   DateTime    @default(now())
+
+  @@unique([suiveurId, suiveurType, suiviId, suiviType])
 }

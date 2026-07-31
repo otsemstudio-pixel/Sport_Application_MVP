@@ -3,12 +3,13 @@ import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
-import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs, auteurIdSession } from "@/lib/posts";
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
 import CommentairesDetail from "@/components/CommentairesDetail";
 import RecapSeance from "@/components/RecapSeance";
-import { ArrowLeft, ShieldCheck, UserRound } from "lucide-react";
+import { hrefProfil } from "@/lib/routes";
+import { ArrowLeft, Eye, ShieldCheck, UserRound } from "lucide-react";
 
 export default async function PostDetailPage({
   params,
@@ -24,6 +25,21 @@ export default async function PostDetailPage({
     include: INCLUDE_POST_RELATIONS,
   });
   if (!post) notFound();
+
+  // Enregistre une vue à l'ouverture de la vue détaillée (pas au simple
+  // défilement dans le fil) ; contrainte d'unicité en base, un même compte
+  // ne fait donc pas grimper le compteur en rouvrant plusieurs fois.
+  await prisma.postVue.upsert({
+    where: {
+      postId_spectateurId_spectateurType: {
+        postId: post.id,
+        spectateurId: auteurIdSession(session),
+        spectateurType: session.role,
+      },
+    },
+    update: {},
+    create: { postId: post.id, spectateurId: auteurIdSession(session), spectateurType: session.role },
+  });
 
   const locale = await getLocale();
   const t = await getTranslations("fil");
@@ -41,6 +57,7 @@ export default async function PostDetailPage({
 
   const commentairesFormates = commentaires.map((c) => ({
     id: c.id,
+    auteurId: c.auteurId,
     auteurType: c.auteurType,
     auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
     contenu: c.contenu,
@@ -56,15 +73,19 @@ export default async function PostDetailPage({
 
       <div className="card flex flex-col gap-4 p-5">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-11 w-11 items-center justify-center rounded-full text-base font-bold"
-            style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-          >
-            {postFormate.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-          </div>
+          <Link href={hrefProfil(postFormate.auteurType, postFormate.auteurId)}>
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-full text-base font-bold"
+              style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+            >
+              {postFormate.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
+            </div>
+          </Link>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold">{postFormate.auteurNom}</span>
+              <Link href={hrefProfil(postFormate.auteurType, postFormate.auteurId)} className="font-semibold hover:underline">
+                {postFormate.auteurNom}
+              </Link>
               <span className={`chip ${postFormate.auteurType === "ORGANISATEUR" ? "chip-gold" : "chip-neutral"}`}>
                 {postFormate.auteurType === "ORGANISATEUR" ? (
                   <ShieldCheck size={11} />
@@ -92,13 +113,17 @@ export default async function PostDetailPage({
 
         <ImageCarousel images={postFormate.images} />
 
-        <div className="border-t pt-3" style={{ borderColor: "var(--border)" }}>
+        <div className="flex items-center justify-between border-t pt-3" style={{ borderColor: "var(--border)" }}>
           <LikeButton
             postId={postFormate.id}
             likeInitial={postFormate.likeParMoi}
             nombreInitial={postFormate.nombreLikes}
             size={20}
           />
+          <span className="flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
+            <Eye size={16} />
+            {t("nombreVues", { n: postFormate.nombreVues })}
+          </span>
         </div>
       </div>
 

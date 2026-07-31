@@ -815,6 +815,79 @@ async function reinitialiserMensurationsDemo(athletes: { id: string }[]) {
   }
 }
 
+// Quelques relations d'abonnement entre comptes démo, mélangeant athlètes et
+// organisateurs, pour peupler les compteurs abonnés/abonnements.
+async function reinitialiserAbonnementsDemo(
+  athletes: { id: string }[],
+  organisateurs: { id: string }[]
+) {
+  const [mamadou, modou, aicha, chinedu] = athletes;
+  const [clubBasket, fedLutte, academieLagos] = organisateurs;
+
+  const comptes = [
+    ...athletes.map((a) => ({ id: a.id, type: "ATHLETE" as const })),
+    ...organisateurs.map((o) => ({ id: o.id, type: "ORGANISATEUR" as const })),
+  ];
+  await prisma.abonnement.deleteMany({
+    where: { OR: comptes.map((c) => ({ suiveurId: c.id, suiveurType: c.type })) },
+  });
+
+  const relations: { suiveur: { id: string; type: "ATHLETE" | "ORGANISATEUR" }; suivi: { id: string; type: "ATHLETE" | "ORGANISATEUR" } }[] = [
+    { suiveur: { id: mamadou.id, type: "ATHLETE" }, suivi: { id: modou.id, type: "ATHLETE" } },
+    { suiveur: { id: mamadou.id, type: "ATHLETE" }, suivi: { id: aicha.id, type: "ATHLETE" } },
+    { suiveur: { id: mamadou.id, type: "ATHLETE" }, suivi: { id: clubBasket.id, type: "ORGANISATEUR" } },
+    { suiveur: { id: aicha.id, type: "ATHLETE" }, suivi: { id: mamadou.id, type: "ATHLETE" } },
+    { suiveur: { id: aicha.id, type: "ATHLETE" }, suivi: { id: fedLutte.id, type: "ORGANISATEUR" } },
+    { suiveur: { id: modou.id, type: "ATHLETE" }, suivi: { id: mamadou.id, type: "ATHLETE" } },
+    { suiveur: { id: chinedu.id, type: "ATHLETE" }, suivi: { id: mamadou.id, type: "ATHLETE" } },
+    { suiveur: { id: chinedu.id, type: "ATHLETE" }, suivi: { id: academieLagos.id, type: "ORGANISATEUR" } },
+    { suiveur: { id: clubBasket.id, type: "ORGANISATEUR" }, suivi: { id: mamadou.id, type: "ATHLETE" } },
+    { suiveur: { id: fedLutte.id, type: "ORGANISATEUR" }, suivi: { id: modou.id, type: "ATHLETE" } },
+  ];
+
+  for (const r of relations) {
+    await prisma.abonnement.create({
+      data: {
+        suiveurId: r.suiveur.id,
+        suiveurType: r.suiveur.type,
+        suiviId: r.suivi.id,
+        suiviType: r.suivi.type,
+      },
+    });
+  }
+}
+
+// Quelques vues sur les posts démo pour que le compteur de vues ne soit pas
+// à zéro pendant une démo.
+async function reinitialiserVuesDemo(
+  athletes: { id: string }[],
+  organisateurs: { id: string }[]
+) {
+  const comptes = [
+    ...athletes.map((a) => ({ id: a.id, type: "ATHLETE" as const })),
+    ...organisateurs.map((o) => ({ id: o.id, type: "ORGANISATEUR" as const })),
+  ];
+
+  const posts = await prisma.post.findMany({
+    where: { OR: comptes.map((c) => ({ auteurId: c.id, auteurType: c.type })) },
+    select: { id: true },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
+  const idsPosts = posts.map((p) => p.id);
+  await prisma.postVue.deleteMany({ where: { postId: { in: idsPosts } } });
+
+  for (const [index, post] of posts.entries()) {
+    // Un nombre de spectateurs qui varie d'un post à l'autre (3 à 8).
+    const spectateurs = comptes.slice(0, Math.min(comptes.length, 3 + index));
+    for (const spectateur of spectateurs) {
+      await prisma.postVue.create({
+        data: { postId: post.id, spectateurId: spectateur.id, spectateurType: spectateur.type },
+      });
+    }
+  }
+}
+
 async function main() {
   const sportParNom = await seedReferentiels();
   const { programmesParNom, seancesParCle } = await seedProgrammes();
@@ -825,6 +898,8 @@ async function main() {
   await reinitialiserPostsDemo(athletes, organisateurs, seancePartageable);
   await reinitialiserEvenementsDemo(organisateurs, athletes, sportParNom);
   await reinitialiserMensurationsDemo(athletes);
+  await reinitialiserAbonnementsDemo(athletes, organisateurs);
+  await reinitialiserVuesDemo(athletes, organisateurs);
 
   console.log("Seed de démonstration terminé.");
   console.log(`Comptes démo (mot de passe partagé : ${MOT_DE_PASSE_DEMO}) :`);

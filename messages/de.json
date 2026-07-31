@@ -171,6 +171,16 @@
     "semaineNumero": "Woche {n}",
     "jourNumero": "Tag {n}"
   },
+  "profilPublic": {
+    "retour": "Zurück",
+    "sabonner": "Folgen",
+    "seDesabonner": "Entfolgen",
+    "abonnes": "Follower",
+    "abonnements": "Folgt",
+    "likesRecus": "Gefällt mir",
+    "commentairesRecus": "Kommentare",
+    "vuesRecues": "Aufrufe"
+  },
   "evenement": {
     "titreTournois": "Turniere",
     "filtrerVille": "Nach Stadt filtern",
@@ -226,7 +236,11 @@
     "commentairesTitre": "Kommentare ({n})",
     "aucunCommentaire": "Noch keine Kommentare.",
     "retourFil": "Zurück zum Feed",
-    "seancePartageeTitre": "Trainingseinheit"
+    "seancePartageeTitre": "Trainingseinheit",
+    "filtreTout": "Alle",
+    "filtreAbonnements": "Abonniert",
+    "aucunPostAbonnements": "Noch keine Beiträge von Konten, denen du folgst.",
+    "nombreVues": "{n} Aufrufe"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",

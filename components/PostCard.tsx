@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
 import RecapSeance from "@/components/RecapSeance";
+import { hrefProfil } from "@/lib/routes";
 
 export type Post = {
   id: string;
+  auteurId: string;
   auteurType: "ATHLETE" | "ORGANISATEUR";
   auteurNom: string;
   contenu: string;
@@ -39,6 +42,7 @@ export type Post = {
 
 type Commentaire = {
   id: string;
+  auteurId: string;
   auteurType: "ATHLETE" | "ORGANISATEUR";
   auteurNom: string;
   contenu: string;
@@ -122,16 +126,20 @@ export default function PostCard({ post }: { post: Post }) {
         className="flex cursor-pointer flex-col gap-3"
       >
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
-              style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-            >
-              {post.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-            </div>
+          <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
+            <Link href={hrefProfil(post.auteurType, post.auteurId)}>
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
+                style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+              >
+                {post.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
+              </div>
+            </Link>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-semibold">{post.auteurNom}</span>
+                <Link href={hrefProfil(post.auteurType, post.auteurId)} className="text-sm font-semibold hover:underline">
+                  {post.auteurNom}
+                </Link>
                 <span className={`chip ${post.auteurType === "ORGANISATEUR" ? "chip-gold" : "chip-neutral"}`}>
                   {post.auteurType === "ORGANISATEUR" ? (
                     <ShieldCheck size={11} />
@@ -184,7 +192,13 @@ export default function PostCard({ post }: { post: Post }) {
           )}
           {commentaires?.map((c) => (
             <div key={c.id} className="text-sm">
-              <span className="font-semibold">{c.auteurNom}</span>{" "}
+              <Link
+                href={hrefProfil(c.auteurType, c.auteurId)}
+                onClick={(e) => e.stopPropagation()}
+                className="font-semibold hover:underline"
+              >
+                {c.auteurNom}
+              </Link>{" "}
               <span style={{ color: "var(--foreground)" }}>{c.contenu}</span>
             </div>
           ))}

@@ -5,7 +5,7 @@ import type { SessionInfo } from "@/lib/auth";
 // y compris l'éventuel récapitulatif de séance partagée.
 export const INCLUDE_POST_RELATIONS = {
   images: { select: { url: true, ordre: true } },
-  _count: { select: { likes: true, commentaires: true } },
+  _count: { select: { likes: true, commentaires: true, vues: true } },
   seanceEntrainement: {
     include: {
       exercicesRealises: {
@@ -89,7 +89,7 @@ export function formaterPost(
     contenu: string;
     createdAt: Date;
     images: { url: string; ordre: number }[];
-    _count: { likes: number; commentaires: number };
+    _count: { likes: number; commentaires: number; vues: number };
     seanceEntrainement?: SeanceRecapSource;
   },
   noms: Map<string, string>,
@@ -107,6 +107,7 @@ export function formaterPost(
     createdAt: post.createdAt,
     nombreLikes: post._count.likes,
     nombreCommentaires: post._count.commentaires,
+    nombreVues: post._count.vues,
     likeParMoi: idsLikesParMoi.has(post.id),
     auteurCestMoi: `${post.auteurType}:${post.auteurId}` === cleAuteurSession(session),
     seance: post.seanceEntrainement

@@ -171,6 +171,16 @@
     "semaineNumero": "Week {n}",
     "jourNumero": "Day {n}"
   },
+  "profilPublic": {
+    "retour": "Back",
+    "sabonner": "Follow",
+    "seDesabonner": "Unfollow",
+    "abonnes": "Followers",
+    "abonnements": "Following",
+    "likesRecus": "Likes",
+    "commentairesRecus": "Comments",
+    "vuesRecues": "Views"
+  },
   "evenement": {
     "titreTournois": "Tournaments",
     "filtrerVille": "Filter by city",
@@ -226,7 +236,11 @@
     "commentairesTitre": "Comments ({n})",
     "aucunCommentaire": "No comments yet.",
     "retourFil": "Back to feed",
-    "seancePartageeTitre": "Training session"
+    "seancePartageeTitre": "Training session",
+    "filtreTout": "All",
+    "filtreAbonnements": "Following",
+    "aucunPostAbonnements": "No posts yet from accounts you follow.",
+    "nombreVues": "{n} views"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",

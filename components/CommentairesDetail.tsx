@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, Send } from "lucide-react";
+import { hrefProfil } from "@/lib/routes";
 
 type Commentaire = {
   id: string;
+  auteurId: string;
   auteurType: "ATHLETE" | "ORGANISATEUR";
   auteurNom: string;
   contenu: string;
@@ -80,14 +83,18 @@ export default function CommentairesDetail({
         )}
         {commentaires.map((c) => (
           <div key={c.id} className="flex items-start gap-2.5 text-sm">
-            <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-              style={{ background: "var(--surface-hover)", color: "var(--muted)" }}
-            >
-              {c.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-            </div>
+            <Link href={hrefProfil(c.auteurType, c.auteurId)}>
+              <div
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                style={{ background: "var(--surface-hover)", color: "var(--muted)" }}
+              >
+                {c.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
+              </div>
+            </Link>
             <div>
-              <span className="font-semibold">{c.auteurNom}</span>{" "}
+              <Link href={hrefProfil(c.auteurType, c.auteurId)} className="font-semibold hover:underline">
+                {c.auteurNom}
+              </Link>{" "}
               <span>{c.contenu}</span>
               <div className="text-xs" style={{ color: "var(--muted)" }}>
                 {new Date(c.createdAt).toLocaleDateString(locale, {

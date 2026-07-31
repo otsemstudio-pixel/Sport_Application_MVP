@@ -171,6 +171,16 @@
     "semaineNumero": "Semana {n}",
     "jourNumero": "Día {n}"
   },
+  "profilPublic": {
+    "retour": "Atrás",
+    "sabonner": "Seguir",
+    "seDesabonner": "Dejar de seguir",
+    "abonnes": "Seguidores",
+    "abonnements": "Siguiendo",
+    "likesRecus": "Me gusta",
+    "commentairesRecus": "Comentarios",
+    "vuesRecues": "Visualizaciones"
+  },
   "evenement": {
     "titreTournois": "Torneos",
     "filtrerVille": "Filtrar por ciudad",
@@ -226,7 +236,11 @@
     "commentairesTitre": "Comentarios ({n})",
     "aucunCommentaire": "Aún no hay comentarios.",
     "retourFil": "Volver al feed",
-    "seancePartageeTitre": "Sesión de entrenamiento"
+    "seancePartageeTitre": "Sesión de entrenamiento",
+    "filtreTout": "Todo",
+    "filtreAbonnements": "Siguiendo",
+    "aucunPostAbonnements": "Aún no hay publicaciones de las cuentas que sigues.",
+    "nombreVues": "{n} visualizaciones"
   },
   "organisateur": {
     "titreTableauDeBord": "Panel",

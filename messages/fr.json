@@ -171,6 +171,16 @@
     "semaineNumero": "Semaine {n}",
     "jourNumero": "Jour {n}"
   },
+  "profilPublic": {
+    "retour": "Retour",
+    "sabonner": "S'abonner",
+    "seDesabonner": "Se désabonner",
+    "abonnes": "Abonnés",
+    "abonnements": "Abonnements",
+    "likesRecus": "Likes reçus",
+    "commentairesRecus": "Commentaires",
+    "vuesRecues": "Vues"
+  },
   "evenement": {
     "titreTournois": "Tournois",
     "filtrerVille": "Filtrer par ville",
@@ -226,7 +236,11 @@
     "commentairesTitre": "Commentaires ({n})",
     "aucunCommentaire": "Aucun commentaire pour l'instant.",
     "retourFil": "Retour au fil",
-    "seancePartageeTitre": "Séance d'entraînement"
+    "seancePartageeTitre": "Séance d'entraînement",
+    "filtreTout": "Tout",
+    "filtreAbonnements": "Abonnements",
+    "aucunPostAbonnements": "Aucune publication des comptes suivis pour l'instant.",
+    "nombreVues": "{n} vues"
   },
   "organisateur": {
     "titreTableauDeBord": "Tableau de bord",

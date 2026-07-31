@@ -4,19 +4,25 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import CreateEventForm from "@/components/CreateEventForm";
+import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import { Calendar, CalendarDays, ChevronRight, MapPin, ShieldCheck, Users } from "lucide-react";
 
 export default async function OrganisateurPage() {
   const session = await getSession();
   if (!session || session.role !== "ORGANISATEUR") redirect("/connexion");
 
-  const [organisateur, evenements] = await Promise.all([
+  const [organisateur, evenements, abonnes, abonnements, likes, commentaires, vues] = await Promise.all([
     prisma.organisateur.findUnique({ where: { id: session.organisateurId } }),
     prisma.evenement.findMany({
       where: { organisateurId: session.organisateurId },
       include: { _count: { select: { inscriptions: true } } },
       orderBy: { date: "asc" },
     }),
+    prisma.abonnement.count({ where: { suiviId: session.organisateurId, suiviType: "ORGANISATEUR" } }),
+    prisma.abonnement.count({ where: { suiveurId: session.organisateurId, suiveurType: "ORGANISATEUR" } }),
+    prisma.postLike.count({ where: { post: { auteurId: session.organisateurId, auteurType: "ORGANISATEUR" } } }),
+    prisma.postCommentaire.count({ where: { post: { auteurId: session.organisateurId, auteurType: "ORGANISATEUR" } } }),
+    prisma.postVue.count({ where: { post: { auteurId: session.organisateurId, auteurType: "ORGANISATEUR" } } }),
   ]);
 
   const locale = await getLocale();
@@ -39,6 +45,15 @@ export default async function OrganisateurPage() {
           </span>
         )}
       </div>
+
+      <BandeauStatistiquesProfil
+        abonnes={abonnes}
+        abonnements={abonnements}
+        likes={likes}
+        commentaires={commentaires}
+        vues={vues}
+        locale={locale}
+      />
 
       <section className="grid grid-cols-2 gap-3">
         <div className="card flex flex-col items-center gap-1 py-4">

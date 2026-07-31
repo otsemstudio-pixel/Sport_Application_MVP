@@ -171,6 +171,16 @@
     "semaineNumero": "Settimana {n}",
     "jourNumero": "Giorno {n}"
   },
+  "profilPublic": {
+    "retour": "Indietro",
+    "sabonner": "Segui",
+    "seDesabonner": "Non seguire più",
+    "abonnes": "Follower",
+    "abonnements": "Seguiti",
+    "likesRecus": "Mi piace",
+    "commentairesRecus": "Commenti",
+    "vuesRecues": "Visualizzazioni"
+  },
   "evenement": {
     "titreTournois": "Tornei",
     "filtrerVille": "Filtra per città",
@@ -226,7 +236,11 @@
     "commentairesTitre": "Commenti ({n})",
     "aucunCommentaire": "Ancora nessun commento.",
     "retourFil": "Torna alla bacheca",
-    "seancePartageeTitre": "Seduta di allenamento"
+    "seancePartageeTitre": "Seduta di allenamento",
+    "filtreTout": "Tutti",
+    "filtreAbonnements": "Seguiti",
+    "aucunPostAbonnements": "Ancora nessuna pubblicazione dagli account che segui.",
+    "nombreVues": "{n} visualizzazioni"
   },
   "organisateur": {
     "titreTableauDeBord": "Pannello di controllo",

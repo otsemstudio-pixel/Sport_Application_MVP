@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import ConsentementFlow from "@/components/ConsentementFlow";
 import BasculeMensurations from "@/components/BasculeMensurations";
+import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
@@ -24,6 +25,14 @@ export default async function ProfilPage() {
   const mineur = isMineur(athlete.dateNaissance);
   const consentementValide = athlete.consentement?.codeValide === true;
   const initiale = athlete.nom.trim()[0]?.toUpperCase() ?? "?";
+
+  const [abonnes, abonnements, likes, commentaires, vues] = await Promise.all([
+    prisma.abonnement.count({ where: { suiviId: athlete.id, suiviType: "ATHLETE" } }),
+    prisma.abonnement.count({ where: { suiveurId: athlete.id, suiveurType: "ATHLETE" } }),
+    prisma.postLike.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
+    prisma.postCommentaire.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
+    prisma.postVue.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,6 +56,15 @@ export default async function ProfilPage() {
           )}
         </div>
       </div>
+
+      <BandeauStatistiquesProfil
+        abonnes={abonnes}
+        abonnements={abonnements}
+        likes={likes}
+        commentaires={commentaires}
+        vues={vues}
+        locale={locale}
+      />
 
       <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
         <InfoLigne icon={Mail} label={t("email")} valeur={athlete.email} />

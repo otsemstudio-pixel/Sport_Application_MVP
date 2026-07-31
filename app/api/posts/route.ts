@@ -16,10 +16,24 @@ export async function GET(req: NextRequest) {
   }
 
   const cursor = req.nextUrl.searchParams.get("cursor") ?? undefined;
+  const filtre = req.nextUrl.searchParams.get("filtre");
+
+  let where: { OR: { auteurId: string; auteurType: "ATHLETE" | "ORGANISATEUR" }[] } | undefined;
+  if (filtre === "abonnements") {
+    const abonnements = await prisma.abonnement.findMany({
+      where: { suiveurId: auteurIdSession(session), suiveurType: session.role },
+      select: { suiviId: true, suiviType: true },
+    });
+    if (abonnements.length === 0) {
+      return NextResponse.json({ posts: [], nextCursor: null });
+    }
+    where = { OR: abonnements.map((a) => ({ auteurId: a.suiviId, auteurType: a.suiviType })) };
+  }
 
   const posts = await prisma.post.findMany({
     take: PAGE_SIZE,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+    where,
     orderBy: { createdAt: "desc" },
     include: INCLUDE_POST_RELATIONS,
   });

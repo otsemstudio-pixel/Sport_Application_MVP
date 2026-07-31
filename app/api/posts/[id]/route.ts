@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs, auteurIdSession } from "@/lib/posts";
 
 export async function GET(
   _req: Request,
@@ -23,6 +23,18 @@ export async function GET(
   if (!post) {
     return NextResponse.json({ error: t("postIntrouvable") }, { status: 404 });
   }
+
+  await prisma.postVue.upsert({
+    where: {
+      postId_spectateurId_spectateurType: {
+        postId: post.id,
+        spectateurId: auteurIdSession(session),
+        spectateurType: session.role,
+      },
+    },
+    update: {},
+    create: { postId: post.id, spectateurId: auteurIdSession(session), spectateurType: session.role },
+  });
 
   const commentaires = await prisma.postCommentaire.findMany({
     where: { postId: id },
