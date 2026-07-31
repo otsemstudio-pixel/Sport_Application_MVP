@@ -1,32 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, isMineur } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
+  const t = await getTranslations("erreurs");
   const session = await getSession();
   if (!session || session.role !== "ATHLETE") {
-    return NextResponse.json({ error: "Non autorisé." }, { status: 403 });
+    return NextResponse.json({ error: t("nonAutorise") }, { status: 403 });
   }
 
   const { telephoneParent } = await req.json();
   if (!telephoneParent) {
-    return NextResponse.json(
-      { error: "Numéro de téléphone du parent requis." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: t("aucunTelephone") }, { status: 400 });
   }
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: session.athleteId },
   });
   if (!athlete) {
-    return NextResponse.json({ error: "Introuvable." }, { status: 404 });
+    return NextResponse.json({ error: t("introuvable") }, { status: 404 });
   }
   if (!isMineur(athlete.dateNaissance)) {
-    return NextResponse.json(
-      { error: "Ce profil n'est pas mineur, aucun consentement requis." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: t("profilPasMineur") }, { status: 400 });
   }
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();

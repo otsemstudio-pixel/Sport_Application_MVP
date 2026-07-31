@@ -1,5 +1,6 @@
 import Logo from "@/components/nav/Logo";
 import LogoutButton from "@/components/LogoutButton";
+import SelecteurLangue from "@/components/SelecteurLangue";
 
 export default function MobileTopBar({
   role,
@@ -15,7 +16,10 @@ export default function MobileTopBar({
       }}
     >
       <Logo href={role === "ATHLETE" ? "/entrainement" : "/organisateur"} />
-      <LogoutButton compact />
+      <div className="flex items-center gap-1.5">
+        <SelecteurLangue compact />
+        <LogoutButton compact />
+      </div>
     </header>
   );
 }

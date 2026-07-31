@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, PartyPopper, PlusCircle } from "lucide-react";
 
 type Defi = {
@@ -13,6 +14,8 @@ type Defi = {
 
 export default function SeanceForm({ defis }: { defis: Defi[] }) {
   const router = useRouter();
+  const t = useTranslations("entrainement");
+  const tCommun = useTranslations("commun");
   const [erreur, setErreur] = useState<string | null>(null);
   const [succes, setSucces] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
@@ -36,19 +39,19 @@ export default function SeanceForm({ defis }: { defis: Defi[] }) {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
 
     const data = await res.json();
     if (data.nouveauxBadges?.length > 0) {
       setSucces(
-        `Séance enregistrée ! Nouveau(x) badge(s) débloqué(s) : ${data.nouveauxBadges
-          .map((b: { nom: string }) => b.nom)
-          .join(", ")}`
+        t("seanceEnregistreeAvecBadges", {
+          badges: data.nouveauxBadges.map((b: { nom: string }) => b.nom).join(", "),
+        })
       );
     } else {
-      setSucces("Séance enregistrée !");
+      setSucces(t("seanceEnregistree"));
     }
     (e.target as HTMLFormElement).reset();
     router.refresh();
@@ -57,7 +60,7 @@ export default function SeanceForm({ defis }: { defis: Defi[] }) {
   if (defis.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--muted)" }}>
-        Aucun défi disponible pour ce sport.
+        {t("aucunDefi")}
       </p>
     );
   }
@@ -65,7 +68,7 @@ export default function SeanceForm({ defis }: { defis: Defi[] }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <label className="field-label">
-        Défi
+        {t("defi")}
         <select name="defiId" required className="input">
           {defis.map((defi) => (
             <option key={defi.id} value={defi.id}>
@@ -75,7 +78,7 @@ export default function SeanceForm({ defis }: { defis: Defi[] }) {
         </select>
       </label>
       <label className="field-label">
-        Valeur mesurée
+        {t("valeurMesuree")}
         <input name="valeurMesuree" type="number" step="any" required className="input" />
       </label>
       {erreur && (
@@ -92,7 +95,7 @@ export default function SeanceForm({ defis }: { defis: Defi[] }) {
       )}
       <button type="submit" disabled={chargement} className="btn btn-primary">
         <PlusCircle size={16} />
-        {chargement ? "Enregistrement…" : "Enregistrer la séance"}
+        {chargement ? t("enregistrementEnCours") : t("enregistrerLaSeance")}
       </button>
     </form>
   );

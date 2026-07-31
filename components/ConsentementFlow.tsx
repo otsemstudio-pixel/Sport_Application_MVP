@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, MessageCircle, ShieldAlert } from "lucide-react";
 
 export default function ConsentementFlow({
@@ -12,6 +13,8 @@ export default function ConsentementFlow({
   codeDejaEnvoye: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("consentement");
+  const tCommun = useTranslations("commun");
   const [etape, setEtape] = useState<"telephone" | "code">(
     codeDejaEnvoye ? "code" : "telephone"
   );
@@ -34,10 +37,10 @@ export default function ConsentementFlow({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
-    setMessage("Un code a été envoyé par SMS au parent (voir la console du serveur pour le MVP).");
+    setMessage(t("codeEnvoyeMessage"));
     setEtape("code");
   }
 
@@ -56,7 +59,7 @@ export default function ConsentementFlow({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
     router.refresh();
@@ -69,17 +72,16 @@ export default function ConsentementFlow({
     >
       <div className="flex items-center gap-2">
         <ShieldAlert size={18} style={{ color: "var(--gold)" }} />
-        <h2 className="font-semibold">Consentement parental requis</h2>
+        <h2 className="font-semibold">{t("titre")}</h2>
       </div>
       <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-        Ce profil est mineur : il reste inactif (impossible de s&apos;inscrire à un
-        tournoi) tant qu&apos;un parent n&apos;a pas validé un code envoyé par SMS.
+        {t("description")}
       </p>
 
       {etape === "telephone" && (
         <form onSubmit={envoyerCode} className="flex flex-col gap-3">
           <label className="field-label">
-            Téléphone du parent
+            {t("telephoneParent")}
             <input
               name="telephoneParent"
               type="tel"
@@ -96,7 +98,7 @@ export default function ConsentementFlow({
           )}
           <button type="submit" disabled={chargement} className="btn btn-primary">
             <MessageCircle size={16} />
-            {chargement ? "Envoi…" : "Envoyer le code par SMS"}
+            {chargement ? t("envoiEnCours") : t("envoyerCode")}
           </button>
         </form>
       )}
@@ -105,7 +107,7 @@ export default function ConsentementFlow({
         <form onSubmit={validerCode} className="flex flex-col gap-3">
           {message && <p className="chip chip-success self-start">{message}</p>}
           <label className="field-label">
-            Code reçu par le parent
+            {t("codeRecu")}
             <input name="code" type="text" inputMode="numeric" required className="input" />
           </label>
           {erreur && (
@@ -116,10 +118,10 @@ export default function ConsentementFlow({
           )}
           <div className="flex gap-2">
             <button type="submit" disabled={chargement} className="btn btn-primary flex-1">
-              {chargement ? "Validation…" : "Valider le code"}
+              {chargement ? t("validationEnCours") : t("validerCode")}
             </button>
             <button type="button" onClick={() => setEtape("telephone")} className="btn btn-secondary">
-              Renvoyer
+              {t("renvoyer")}
             </button>
           </div>
         </form>

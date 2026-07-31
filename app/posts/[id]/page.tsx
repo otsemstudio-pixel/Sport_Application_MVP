@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, getTranslations } from "next-intl/server";
 import { formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
@@ -26,6 +27,10 @@ export default async function PostDetailPage({
   });
   if (!post) notFound();
 
+  const locale = await getLocale();
+  const t = await getTranslations("fil");
+  const tCommun = await getTranslations("commun");
+
   const commentaires = await prisma.postCommentaire.findMany({
     where: { postId: id },
     orderBy: { createdAt: "asc" },
@@ -33,12 +38,13 @@ export default async function PostDetailPage({
 
   const noms = await resoudreNomsAuteurs([post, ...commentaires]);
   const idsLikesParMoi = await idsPostsLikesParSession([post.id], session);
-  const postFormate = formaterPost(post, noms, idsLikesParMoi, session);
+  const fallbackNom = tCommun("utilisateur");
+  const postFormate = formaterPost(post, noms, idsLikesParMoi, session, fallbackNom);
 
   const commentairesFormates = commentaires.map((c) => ({
     id: c.id,
     auteurType: c.auteurType,
-    auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? "Utilisateur",
+    auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
     contenu: c.contenu,
     createdAt: c.createdAt.toISOString(),
   }));
@@ -47,7 +53,7 @@ export default async function PostDetailPage({
     <div className="flex flex-col gap-6">
       <Link href="/fil" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
         <ArrowLeft size={14} />
-        Retour au fil
+        {t("retourFil")}
       </Link>
 
       <div className="card flex flex-col gap-4 p-5">
@@ -67,11 +73,11 @@ export default async function PostDetailPage({
                 ) : (
                   <UserRound size={11} />
                 )}
-                {postFormate.auteurType === "ORGANISATEUR" ? "Organisateur" : "Athlète"}
+                {postFormate.auteurType === "ORGANISATEUR" ? t("organisateur") : t("athlete")}
               </span>
             </div>
             <span className="text-xs" style={{ color: "var(--muted)" }}>
-              {postFormate.createdAt.toLocaleDateString("fr-FR", {
+              {postFormate.createdAt.toLocaleDateString(locale, {
                 day: "numeric",
                 month: "long",
                 year: "numeric",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, getTranslations } from "next-intl/server";
 import ImageCarousel from "@/components/ImageCarousel";
 import InscriptionButton from "@/components/InscriptionButton";
 import {
@@ -14,13 +15,6 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-
-const LABELS_NIVEAU: Record<string, string> = {
-  DEBUTANT: "Débutant",
-  INTERMEDIAIRE: "Intermédiaire",
-  AVANCE: "Avancé",
-  TOUS_NIVEAUX: "Tous niveaux",
-};
 
 export default async function EvenementDetailPage({
   params,
@@ -41,6 +35,9 @@ export default async function EvenementDetailPage({
     },
   });
   if (!evenement) notFound();
+
+  const locale = await getLocale();
+  const t = await getTranslations("evenement");
 
   let bloque = false;
   let statutInscription: string | undefined;
@@ -65,7 +62,7 @@ export default async function EvenementDetailPage({
     <div className="flex flex-col gap-6">
       <Link href="/tournois" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
         <ArrowLeft size={14} />
-        Retour aux tournois
+        {t("retourTournois")}
       </Link>
 
       <div className="card overflow-hidden">
@@ -87,11 +84,11 @@ export default async function EvenementDetailPage({
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-xl font-bold">{evenement.nom}</h1>
               <span className={`chip shrink-0 ${complet ? "chip-danger" : "chip-primary"}`}>
-                {complet ? "Complet" : `${placesRestantes} places`}
+                {complet ? t("complet") : t("places", { n: placesRestantes })}
               </span>
             </div>
             <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-              {evenement.sport.nom} · Organisé par {evenement.organisateur.nom}
+              {evenement.sport.nom} · {t("organisePar", { nom: evenement.organisateur.nom })}
               {evenement.organisateur.verifie && (
                 <ShieldCheck size={13} className="ml-1 inline" style={{ color: "var(--success)" }} />
               )}
@@ -102,42 +99,46 @@ export default async function EvenementDetailPage({
             {ouvertDebutants && (
               <span className="chip chip-success">
                 <GraduationCap size={12} />
-                Ouvert aux débutants
+                {t("ouvertDebutants")}
               </span>
             )}
-            {!evenement.clubRequis && <span className="chip chip-success">Sans club requis</span>}
+            {!evenement.clubRequis && <span className="chip chip-success">{t("sansClubRequis")}</span>}
           </div>
 
           <p className="whitespace-pre-wrap text-sm leading-relaxed">{evenement.description}</p>
 
           <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
-            <Ligne icon={MapPin} label="Lieu" valeur={evenement.lieu} />
-            <Ligne icon={Calendar} label="Date" valeur={new Date(evenement.date).toLocaleDateString("fr-FR")} />
-            <Ligne icon={Users} label="Places" valeur={`${evenement._count.inscriptions}/${evenement.placesMax}`} />
-            <Ligne icon={GraduationCap} label="Niveau requis" valeur={LABELS_NIVEAU[evenement.niveauRequis]} />
-            <Ligne icon={ShieldCheck} label="Club requis" valeur={evenement.clubRequis ? "Oui" : "Non"} />
+            <Ligne icon={MapPin} label={t("lieu")} valeur={evenement.lieu} />
+            <Ligne icon={Calendar} label={t("date")} valeur={new Date(evenement.date).toLocaleDateString(locale)} />
+            <Ligne
+              icon={Users}
+              label={t("placesLabel")}
+              valeur={`${evenement._count.inscriptions}/${evenement.placesMax}`}
+            />
+            <Ligne icon={GraduationCap} label={t("niveauRequisLabel")} valeur={t(`niveaux.${evenement.niveauRequis}`)} />
+            <Ligne icon={ShieldCheck} label={t("clubRequisLabel")} valeur={evenement.clubRequis ? t("oui") : t("non")} />
             {(evenement.ageMin || evenement.ageMax) && (
               <Ligne
                 icon={Users}
-                label="Âge"
+                label={t("age")}
                 valeur={[
-                  evenement.ageMin ? `min ${evenement.ageMin} ans` : null,
-                  evenement.ageMax ? `max ${evenement.ageMax} ans` : null,
+                  evenement.ageMin ? t("ageMinValeur", { n: evenement.ageMin }) : null,
+                  evenement.ageMax ? t("ageMaxValeur", { n: evenement.ageMax }) : null,
                 ]
                   .filter(Boolean)
                   .join(" · ")}
               />
             )}
             {evenement.nombreEquipesMax && (
-              <Ligne icon={Users} label="Équipes max" valeur={String(evenement.nombreEquipesMax)} />
+              <Ligne icon={Users} label={t("equipesMax")} valeur={String(evenement.nombreEquipesMax)} />
             )}
             {evenement.equipementFourni && (
-              <Ligne icon={Trophy} label="Équipement" valeur={evenement.equipementFourni} />
+              <Ligne icon={Trophy} label={t("equipement")} valeur={evenement.equipementFourni} />
             )}
             <Ligne
               icon={Banknote}
-              label="Frais d'inscription"
-              valeur={evenement.fraisInscription > 0 ? `${evenement.fraisInscription} FCFA` : "Gratuit"}
+              label={t("fraisInscriptionLabel")}
+              valeur={evenement.fraisInscription > 0 ? `${evenement.fraisInscription} FCFA` : t("gratuit")}
             />
           </div>
 

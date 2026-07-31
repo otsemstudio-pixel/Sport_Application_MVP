@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Send } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
 
 export default function PostComposer() {
   const router = useRouter();
+  const t = useTranslations("fil");
+  const tCommun = useTranslations("commun");
   const [contenu, setContenu] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -27,7 +30,7 @@ export default function PostComposer() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
 
@@ -41,7 +44,7 @@ export default function PostComposer() {
       <textarea
         value={contenu}
         onChange={(e) => setContenu(e.target.value)}
-        placeholder="Partage un moment d'entraînement…"
+        placeholder={t("placeholderComposer")}
         maxLength={500}
         rows={3}
         className="input resize-none"
@@ -64,7 +67,7 @@ export default function PostComposer() {
             className="btn btn-primary"
           >
             <Send size={15} />
-            {chargement ? "Publication…" : "Publier"}
+            {chargement ? t("publicationEnCours") : t("publier")}
           </button>
         </div>
       </div>

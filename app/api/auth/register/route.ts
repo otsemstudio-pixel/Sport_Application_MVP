@@ -1,41 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { createSession, hashPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
+  const t = await getTranslations("erreurs");
   const body = await req.json();
   const { role, email, password, nom } = body;
 
   if (!role || !email || !password || !nom) {
-    return NextResponse.json({ error: "Champs manquants." }, { status: 400 });
+    return NextResponse.json({ error: t("champsManquants") }, { status: 400 });
   }
   if (typeof password !== "string" || password.length < 6) {
-    return NextResponse.json(
-      { error: "Le mot de passe doit contenir au moins 6 caractères." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: t("motDePasseCourt") }, { status: 400 });
   }
 
   if (role === "ATHLETE") {
     const { dateNaissance, ville, sportId } = body;
     if (!dateNaissance || !ville || !sportId) {
-      return NextResponse.json(
-        { error: "Champs manquants pour un profil athlète." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: t("champsManquantsAthlete") }, { status: 400 });
     }
 
     const sport = await prisma.sport.findUnique({ where: { id: sportId } });
     if (!sport) {
-      return NextResponse.json({ error: "Sport invalide." }, { status: 400 });
+      return NextResponse.json({ error: t("sportInvalide") }, { status: 400 });
     }
 
     const existant = await prisma.athlete.findUnique({ where: { email } });
     if (existant) {
-      return NextResponse.json(
-        { error: "Un compte existe déjà avec cet email." },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: t("emailDejaUtilise") }, { status: 409 });
     }
 
     const athlete = await prisma.athlete.create({
@@ -56,10 +49,7 @@ export async function POST(req: NextRequest) {
   if (role === "ORGANISATEUR") {
     const existant = await prisma.organisateur.findUnique({ where: { email } });
     if (existant) {
-      return NextResponse.json(
-        { error: "Un compte existe déjà avec cet email." },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: t("emailDejaUtilise") }, { status: 409 });
     }
 
     const organisateur = await prisma.organisateur.create({
@@ -77,5 +67,5 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ error: "Rôle invalide." }, { status: 400 });
+  return NextResponse.json({ error: t("roleInvalide") }, { status: 400 });
 }

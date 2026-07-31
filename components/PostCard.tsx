@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
 
@@ -46,6 +47,9 @@ function GrillePhotos({ images }: { images: string[] }) {
 
 export default function PostCard({ post }: { post: Post }) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("fil");
+  const tCommun = useTranslations("commun");
   const [nbCommentaires, setNbCommentaires] = useState(post.nombreCommentaires);
   const [afficherCommentaires, setAfficherCommentaires] = useState(false);
   const [commentaires, setCommentaires] = useState<Commentaire[] | null>(null);
@@ -73,7 +77,7 @@ export default function PostCard({ post }: { post: Post }) {
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
     const commentaire = await res.json();
@@ -116,11 +120,11 @@ export default function PostCard({ post }: { post: Post }) {
                   ) : (
                     <UserRound size={11} />
                   )}
-                  {post.auteurType === "ORGANISATEUR" ? "Organisateur" : "Athlète"}
+                  {post.auteurType === "ORGANISATEUR" ? t("organisateur") : t("athlete")}
                 </span>
               </div>
               <span className="text-xs" style={{ color: "var(--muted)" }}>
-                {new Date(post.createdAt).toLocaleDateString("fr-FR", {
+                {new Date(post.createdAt).toLocaleDateString(locale, {
                   day: "numeric",
                   month: "short",
                   hour: "2-digit",
@@ -130,7 +134,7 @@ export default function PostCard({ post }: { post: Post }) {
             </div>
           </div>
           {post.auteurCestMoi && (
-            <button onClick={supprimerPost} aria-label="Supprimer" className="btn btn-ghost !p-1.5">
+            <button onClick={supprimerPost} aria-label={t("supprimer")} className="btn btn-ghost !p-1.5">
               <Trash2 size={15} />
             </button>
           )}
@@ -155,7 +159,7 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex flex-col gap-2 border-t pt-3" style={{ borderColor: "var(--border)" }}>
           {commentaires === null && (
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              Chargement…
+              {t("chargementEnCours")}
             </p>
           )}
           {commentaires?.map((c) => (
@@ -168,7 +172,7 @@ export default function PostCard({ post }: { post: Post }) {
             <input
               value={nouveauCommentaire}
               onChange={(e) => setNouveauCommentaire(e.target.value)}
-              placeholder="Ajouter un commentaire…"
+              placeholder={t("ajouterCommentaire")}
               className="input flex-1 !py-1.5 text-sm"
             />
             <button type="submit" className="btn btn-primary !px-3">

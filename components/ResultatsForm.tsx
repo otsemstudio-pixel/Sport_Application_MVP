@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle2, Save } from "lucide-react";
 
 type Ligne = {
@@ -19,6 +20,8 @@ export default function ResultatsForm({
   inscrits: { athleteId: string; nom: string; classement: number | null; score: number | null }[];
 }) {
   const router = useRouter();
+  const t = useTranslations("organisateur");
+  const tCommun = useTranslations("commun");
   const [lignes, setLignes] = useState<Ligne[]>(
     inscrits.map((i) => ({
       athleteId: i.athleteId,
@@ -49,7 +52,7 @@ export default function ResultatsForm({
       .map((l) => ({ athleteId: l.athleteId, classement: l.classement, score: l.score }));
 
     if (resultats.length === 0) {
-      setErreur("Renseigne au moins un classement et un score.");
+      setErreur(t("renseigneAuMoinsUn"));
       return;
     }
 
@@ -63,7 +66,7 @@ export default function ResultatsForm({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
     setSucces(true);
@@ -73,7 +76,7 @@ export default function ResultatsForm({
   if (inscrits.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--muted)" }}>
-        Aucun inscrit pour l&apos;instant.
+        {t("aucunInscrit")}
       </p>
     );
   }
@@ -86,7 +89,7 @@ export default function ResultatsForm({
             <span className="flex-1 truncate font-medium">{l.nom}</span>
             <input
               type="number"
-              placeholder="Classement"
+              placeholder={t("classementPlaceholder")}
               value={l.classement}
               onChange={(e) => majLigne(l.athleteId, "classement", e.target.value)}
               className="input w-24 !py-1.5"
@@ -94,7 +97,7 @@ export default function ResultatsForm({
             <input
               type="number"
               step="any"
-              placeholder="Score"
+              placeholder={t("scorePlaceholder")}
               value={l.score}
               onChange={(e) => majLigne(l.athleteId, "score", e.target.value)}
               className="input w-24 !py-1.5"
@@ -111,12 +114,12 @@ export default function ResultatsForm({
       {succes && (
         <p className="chip chip-success self-start">
           <CheckCircle2 size={14} />
-          Résultats enregistrés.
+          {t("resultatsEnregistres")}
         </p>
       )}
       <button type="submit" disabled={chargement} className="btn btn-primary self-start">
         <Save size={16} />
-        {chargement ? "Enregistrement…" : "Enregistrer les résultats"}
+        {chargement ? t("enregistrementEnCours") : t("enregistrerLesResultats")}
       </button>
     </form>
   );

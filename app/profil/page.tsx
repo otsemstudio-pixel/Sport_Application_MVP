@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession, isMineur } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, getTranslations } from "next-intl/server";
 import ConsentementFlow from "@/components/ConsentementFlow";
 import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity } from "lucide-react";
 
@@ -14,6 +15,9 @@ export default async function ProfilPage() {
   });
   if (!athlete) redirect("/connexion");
 
+  const locale = await getLocale();
+  const t = await getTranslations("auth");
+  const tConsentement = await getTranslations("consentement");
   const mineur = isMineur(athlete.dateNaissance);
   const consentementValide = athlete.consentement?.codeValide === true;
   const initiale = athlete.nom.trim()[0]?.toUpperCase() ?? "?";
@@ -35,21 +39,21 @@ export default async function ProfilPage() {
           {mineur && (
             <span className={`chip mt-2 ${consentementValide ? "chip-success" : "chip-danger"}`}>
               {consentementValide ? <ShieldCheck size={13} /> : <ShieldAlert size={13} />}
-              {consentementValide ? "Consentement validé" : "Consentement en attente"}
+              {consentementValide ? tConsentement("statutValide") : tConsentement("statutEnAttente")}
             </span>
           )}
         </div>
       </div>
 
       <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
-        <InfoLigne icon={Mail} label="Email" valeur={athlete.email} />
+        <InfoLigne icon={Mail} label={t("email")} valeur={athlete.email} />
         <InfoLigne
           icon={Calendar}
-          label="Date de naissance"
-          valeur={new Date(athlete.dateNaissance).toLocaleDateString("fr-FR")}
+          label={t("dateNaissance")}
+          valeur={new Date(athlete.dateNaissance).toLocaleDateString(locale)}
         />
-        <InfoLigne icon={MapPin} label="Ville" valeur={athlete.ville} />
-        <InfoLigne icon={Activity} label="Sport" valeur={athlete.sportPrincipal.nom} />
+        <InfoLigne icon={MapPin} label={t("ville")} valeur={athlete.ville} />
+        <InfoLigne icon={Activity} label={t("sport")} valeur={athlete.sportPrincipal.nom} />
       </div>
 
       {mineur && !consentementValide && (

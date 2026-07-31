@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { comprimerEtUploaderImage, NOMBRE_MAX_IMAGES, TAILLE_MAX_FICHIER } from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
+  const t = await getTranslations("erreurs");
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    return NextResponse.json({ error: t("nonAuthentifie") }, { status: 401 });
   }
 
   if (session.role === "ATHLETE") {
@@ -15,16 +17,10 @@ export async function POST(req: NextRequest) {
       include: { consentement: true },
     });
     if (!athlete) {
-      return NextResponse.json({ error: "Introuvable." }, { status: 404 });
+      return NextResponse.json({ error: t("introuvable") }, { status: 404 });
     }
     if (estBloquePourConsentement(athlete)) {
-      return NextResponse.json(
-        {
-          error:
-            "Ce profil mineur doit obtenir le consentement parental avant d'ajouter des images.",
-        },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: t("mineurNonConsentiImage") }, { status: 403 });
     }
   }
 
@@ -35,24 +31,24 @@ export async function POST(req: NextRequest) {
   const fichiers = formData.getAll("files").filter((f): f is File => f instanceof File);
 
   if (fichiers.length === 0) {
-    return NextResponse.json({ error: "Aucun fichier reçu." }, { status: 400 });
+    return NextResponse.json({ error: t("aucunFichier") }, { status: 400 });
   }
   if (fichiers.length > NOMBRE_MAX_IMAGES) {
     return NextResponse.json(
-      { error: `Maximum ${NOMBRE_MAX_IMAGES} images.` },
+      { error: t("maxImages", { n: NOMBRE_MAX_IMAGES }) },
       { status: 400 }
     );
   }
   for (const fichier of fichiers) {
     if (fichier.size > TAILLE_MAX_FICHIER) {
       return NextResponse.json(
-        { error: `${fichier.name} dépasse la taille maximale de 5 Mo.` },
+        { error: t("fichierTropLourd", { nom: fichier.name }) },
         { status: 400 }
       );
     }
     if (!fichier.type.startsWith("image/")) {
       return NextResponse.json(
-        { error: `${fichier.name} n'est pas une image.` },
+        { error: t("fichierPasImage", { nom: fichier.name }) },
         { status: 400 }
       );
     }

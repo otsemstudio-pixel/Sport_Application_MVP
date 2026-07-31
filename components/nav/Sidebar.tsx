@@ -1,8 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import Logo from "@/components/nav/Logo";
 import NavLinks, { type NavLien } from "@/components/nav/NavLinks";
 import LogoutButton from "@/components/LogoutButton";
+import SelecteurLangue from "@/components/SelecteurLangue";
 
-export default function Sidebar({
+export default async function Sidebar({
   liens,
   nom,
   role,
@@ -11,6 +13,7 @@ export default function Sidebar({
   nom: string | null;
   role: "ATHLETE" | "ORGANISATEUR";
 }) {
+  const t = await getTranslations("nav");
   const initiale = nom?.trim()?.[0]?.toUpperCase() ?? "?";
 
   return (
@@ -26,6 +29,8 @@ export default function Sidebar({
         <NavLinks liens={liens} variant="sidebar" />
       </nav>
 
+      <SelecteurLangue />
+
       <div
         className="flex items-center gap-3 rounded-xl border px-3 py-2.5"
         style={{ borderColor: "var(--border)" }}
@@ -37,9 +42,9 @@ export default function Sidebar({
           {initiale}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{nom ?? "Mon compte"}</p>
+          <p className="truncate text-sm font-semibold">{nom ?? t("monCompte")}</p>
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            {role === "ATHLETE" ? "Athlète" : "Organisateur"}
+            {role === "ATHLETE" ? t("athlete") : t("organisateur")}
           </p>
         </div>
         <LogoutButton compact />

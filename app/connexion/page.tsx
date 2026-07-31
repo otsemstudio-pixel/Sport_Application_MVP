@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
 
 export default function ConnexionPage() {
   const router = useRouter();
+  const t = useTranslations("auth");
+  const tCommun = useTranslations("commun");
   const [role, setRole] = useState<"ATHLETE" | "ORGANISATEUR">("ATHLETE");
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
@@ -30,7 +33,7 @@ export default function ConnexionPage() {
     setChargement(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
 
@@ -41,9 +44,9 @@ export default function ConnexionPage() {
   return (
     <div className="mx-auto flex max-w-sm flex-col gap-6 pt-6 sm:pt-10">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Connexion</h1>
+        <h1 className="text-2xl font-bold">{t("titreConnexion")}</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-          Content de te revoir.
+          {t("sousTitreConnexion")}
         </p>
       </div>
 
@@ -54,24 +57,24 @@ export default function ConnexionPage() {
             onClick={() => setRole("ATHLETE")}
             className={`pill-toggle-btn ${role === "ATHLETE" ? "active" : ""}`}
           >
-            Athlète
+            {t("athlete")}
           </button>
           <button
             type="button"
             onClick={() => setRole("ORGANISATEUR")}
             className={`pill-toggle-btn ${role === "ORGANISATEUR" ? "active" : ""}`}
           >
-            Organisateur
+            {t("organisateur")}
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="field-label">
-            Email
+            {t("email")}
             <input name="email" type="email" required className="input" />
           </label>
           <label className="field-label">
-            Mot de passe
+            {t("motDePasse")}
             <input name="password" type="password" required className="input" />
           </label>
 
@@ -83,15 +86,15 @@ export default function ConnexionPage() {
           )}
 
           <button type="submit" disabled={chargement} className="btn btn-primary mt-1 py-3">
-            {chargement ? "Connexion…" : "Se connecter"}
+            {chargement ? t("connexionEnCours") : t("seConnecterBouton")}
           </button>
         </form>
       </div>
 
       <p className="text-center text-sm" style={{ color: "var(--muted)" }}>
-        Pas encore de compte ?{" "}
+        {t("pasDeCompte")}{" "}
         <Link href="/inscription" className="font-medium" style={{ color: "var(--primary)" }}>
-          S&apos;inscrire
+          {t("inscrisToiLien")}
         </Link>
       </p>
     </div>

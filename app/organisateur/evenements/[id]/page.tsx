@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, getTranslations } from "next-intl/server";
 import InscriptionStatusControl from "@/components/InscriptionStatusControl";
 import ResultatsForm from "@/components/ResultatsForm";
 import { ArrowLeft, Calendar, MapPin, Trophy, Users } from "lucide-react";
@@ -30,6 +31,8 @@ export default async function GestionEvenementPage({
     notFound();
   }
 
+  const locale = await getLocale();
+  const t = await getTranslations("organisateur");
   const resultatParAthlete = new Map(
     evenement.resultats.map((r) => [r.athleteId, r])
   );
@@ -43,7 +46,7 @@ export default async function GestionEvenementPage({
           style={{ color: "var(--muted)" }}
         >
           <ArrowLeft size={14} />
-          Tableau de bord
+          {t("titreTableauDeBord")}
         </Link>
         <h1 className="text-2xl font-bold">{evenement.nom}</h1>
         <div
@@ -56,20 +59,20 @@ export default async function GestionEvenementPage({
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
-            {new Date(evenement.date).toLocaleDateString("fr-FR")}
+            {new Date(evenement.date).toLocaleDateString(locale)}
           </span>
           <span className="flex items-center gap-1.5">
             <Users size={14} />
-            {evenement.inscriptions.length}/{evenement.placesMax} inscrits
+            {evenement.inscriptions.length}/{evenement.placesMax}
           </span>
         </div>
       </div>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Inscriptions</h2>
+        <h2 className="font-semibold">{t("inscriptionsTitre")}</h2>
         {evenement.inscriptions.length === 0 && (
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Aucune inscription reçue pour l&apos;instant.
+            {t("aucuneInscriptionRecue")}
           </p>
         )}
         <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
@@ -94,7 +97,7 @@ export default async function GestionEvenementPage({
       <section className="card flex flex-col gap-3 p-5">
         <h2 className="flex items-center gap-2 font-semibold">
           <Trophy size={17} style={{ color: "var(--gold)" }} />
-          Résultats du tournoi
+          {t("resultatsTournoi")}
         </h2>
         <ResultatsForm
           evenementId={evenement.id}

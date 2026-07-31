@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { auteurIdSession, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
@@ -7,9 +8,11 @@ import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
 const PAGE_SIZE = 15;
 
 export async function GET(req: NextRequest) {
+  const t = await getTranslations("erreurs");
+  const tCommun = await getTranslations("commun");
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    return NextResponse.json({ error: t("nonAuthentifie") }, { status: 401 });
   }
 
   const cursor = req.nextUrl.searchParams.get("cursor") ?? undefined;
@@ -26,17 +29,19 @@ export async function GET(req: NextRequest) {
 
   const noms = await resoudreNomsAuteurs(posts);
   const idsLikesParMoi = await idsPostsLikesParSession(posts.map((p) => p.id), session);
+  const fallbackNom = tCommun("utilisateur");
 
   return NextResponse.json({
-    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session)),
+    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session, fallbackNom)),
     nextCursor: posts.length === PAGE_SIZE ? posts[posts.length - 1].id : null,
   });
 }
 
 export async function POST(req: NextRequest) {
+  const t = await getTranslations("erreurs");
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    return NextResponse.json({ error: t("nonAuthentifie") }, { status: 401 });
   }
 
   if (session.role === "ATHLETE") {
@@ -45,28 +50,19 @@ export async function POST(req: NextRequest) {
       include: { consentement: true },
     });
     if (!athlete) {
-      return NextResponse.json({ error: "Introuvable." }, { status: 404 });
+      return NextResponse.json({ error: t("introuvable") }, { status: 404 });
     }
     if (estBloquePourConsentement(athlete)) {
-      return NextResponse.json(
-        {
-          error:
-            "Ce profil mineur doit obtenir le consentement parental avant de publier.",
-        },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: t("mineurNonConsentiPublier") }, { status: 403 });
     }
   }
 
   const { contenu, images } = await req.json();
   if (!contenu || typeof contenu !== "string" || contenu.trim().length === 0) {
-    return NextResponse.json({ error: "Contenu requis." }, { status: 400 });
+    return NextResponse.json({ error: t("contenuRequis") }, { status: 400 });
   }
   if (contenu.length > 500) {
-    return NextResponse.json(
-      { error: "Le contenu est limité à 500 caractères." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: t("contenuTropLong") }, { status: 400 });
   }
   const urlsImages: string[] = Array.isArray(images) ? images.slice(0, NOMBRE_MAX_IMAGES) : [];
 

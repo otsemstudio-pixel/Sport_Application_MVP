@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, Send } from "lucide-react";
 
 type Commentaire = {
@@ -18,6 +19,9 @@ export default function CommentairesDetail({
   postId: string;
   commentairesInitiaux: Commentaire[];
 }) {
+  const locale = useLocale();
+  const t = useTranslations("fil");
+  const tCommun = useTranslations("commun");
   const [commentaires, setCommentaires] = useState(commentairesInitiaux);
   const [nouveauCommentaire, setNouveauCommentaire] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
@@ -38,7 +42,7 @@ export default function CommentairesDetail({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
     const commentaire = await res.json();
@@ -48,13 +52,13 @@ export default function CommentairesDetail({
 
   return (
     <div className="card flex flex-col gap-3 p-5">
-      <h2 className="font-semibold">Commentaires ({commentaires.length})</h2>
+      <h2 className="font-semibold">{t("commentairesTitre", { n: commentaires.length })}</h2>
 
       <form onSubmit={envoyerCommentaire} className="flex gap-2">
         <input
           value={nouveauCommentaire}
           onChange={(e) => setNouveauCommentaire(e.target.value)}
-          placeholder="Ajouter un commentaire…"
+          placeholder={t("ajouterCommentaire")}
           className="input flex-1"
         />
         <button type="submit" disabled={chargement} className="btn btn-primary !px-3">
@@ -71,7 +75,7 @@ export default function CommentairesDetail({
       <div className="flex flex-col gap-3">
         {commentaires.length === 0 && (
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Aucun commentaire pour l&apos;instant.
+            {t("aucunCommentaire")}
           </p>
         )}
         {commentaires.map((c) => (
@@ -86,7 +90,7 @@ export default function CommentairesDetail({
               <span className="font-semibold">{c.auteurNom}</span>{" "}
               <span>{c.contenu}</span>
               <div className="text-xs" style={{ color: "var(--muted)" }}>
-                {new Date(c.createdAt).toLocaleDateString("fr-FR", {
+                {new Date(c.createdAt).toLocaleDateString(locale, {
                   day: "numeric",
                   month: "short",
                   hour: "2-digit",

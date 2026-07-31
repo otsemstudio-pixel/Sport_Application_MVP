@@ -62,13 +62,14 @@ export function formaterPost(
   },
   noms: Map<string, string>,
   idsLikesParMoi: Set<string>,
-  session: SessionInfo
+  session: SessionInfo,
+  fallbackNom = "Utilisateur"
 ) {
   return {
     id: post.id,
     auteurId: post.auteurId,
     auteurType: post.auteurType,
-    auteurNom: noms.get(`${post.auteurType}:${post.auteurId}`) ?? "Utilisateur",
+    auteurNom: noms.get(`${post.auteurType}:${post.auteurId}`) ?? fallbackNom,
     contenu: post.contenu,
     images: [...post.images].sort((a, b) => a.ordre - b.ordre).map((i) => i.url),
     createdAt: post.createdAt,

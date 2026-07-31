@@ -2,23 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Plus } from "lucide-react";
 import SportSelect from "@/components/SportSelect";
 import ImageUploader from "@/components/ImageUploader";
 
-const NIVEAUX = [
-  { value: "TOUS_NIVEAUX", label: "Tous niveaux" },
-  { value: "DEBUTANT", label: "Débutant" },
-  { value: "INTERMEDIAIRE", label: "Intermédiaire" },
-  { value: "AVANCE", label: "Avancé" },
-];
-
 export default function CreateEventForm() {
   const router = useRouter();
+  const t = useTranslations("organisateur");
+  const tEvenement = useTranslations("evenement");
+  const tAuth = useTranslations("auth");
+  const tCommun = useTranslations("commun");
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
   const [ouvert, setOuvert] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+
+  const NIVEAUX = ["TOUS_NIVEAUX", "DEBUTANT", "INTERMEDIAIRE", "AVANCE"] as const;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,7 +55,7 @@ export default function CreateEventForm() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
 
@@ -69,7 +69,7 @@ export default function CreateEventForm() {
     return (
       <button onClick={() => setOuvert(true)} className="btn btn-primary self-start">
         <Plus size={16} />
-        Créer un événement
+        {t("creerEvenement")}
       </button>
     );
   }
@@ -77,69 +77,69 @@ export default function CreateEventForm() {
   return (
     <form onSubmit={handleSubmit} className="card flex flex-col gap-3 p-5">
       <label className="field-label">
-        Nom de l&apos;événement
+        {t("nomEvenement")}
         <input name="nom" required className="input" />
       </label>
       <label className="field-label">
-        Sport
+        {tAuth("sport")}
         <SportSelect name="sportId" required />
       </label>
       <label className="field-label">
-        Description
+        {t("description")}
         <textarea name="description" required rows={3} className="input resize-none" />
       </label>
       <label className="field-label">
-        Lieu / ville
+        {t("lieuVille")}
         <input name="lieu" required className="input" />
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="field-label">
-          Date
+          {t("date")}
           <input name="date" type="date" required className="input" />
         </label>
         <label className="field-label">
-          Places maximum
+          {t("placesMaximum")}
           <input name="placesMax" type="number" min={1} required className="input" />
         </label>
       </div>
       <label className="field-label">
-        Niveau requis
+        {t("niveauRequis")}
         <select name="niveauRequis" required defaultValue="TOUS_NIVEAUX" className="input">
           {NIVEAUX.map((n) => (
-            <option key={n.value} value={n.value}>
-              {n.label}
+            <option key={n} value={n}>
+              {tEvenement(`niveaux.${n}`)}
             </option>
           ))}
         </select>
       </label>
       <label className="flex items-center gap-2 text-sm">
         <input name="clubRequis" type="checkbox" className="h-4 w-4" />
-        Club requis (décoche pour ouvrir aux athlètes sans club)
+        {t("clubRequisCheckbox")}
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="field-label">
-          Âge minimum (optionnel)
+          {t("ageMinOptionnel")}
           <input name="ageMin" type="number" min={0} className="input" />
         </label>
         <label className="field-label">
-          Âge maximum (optionnel)
+          {t("ageMaxOptionnel")}
           <input name="ageMax" type="number" min={0} className="input" />
         </label>
       </div>
       <label className="field-label">
-        Nombre d&apos;équipes maximum (optionnel, sports collectifs)
+        {t("equipesMaxOptionnel")}
         <input name="nombreEquipesMax" type="number" min={1} className="input" />
       </label>
       <label className="field-label">
-        Équipement fourni (optionnel)
-        <input name="equipementFourni" placeholder="Ex : ballons fournis, prévoir tenue de sport" className="input" />
+        {t("equipementOptionnel")}
+        <input name="equipementFourni" placeholder={t("equipementPlaceholder")} className="input" />
       </label>
       <label className="field-label">
-        Frais d&apos;inscription (FCFA)
+        {t("fraisInscriptionFcfa")}
         <input name="fraisInscription" type="number" min={0} defaultValue={0} className="input" />
       </label>
       <div className="field-label">
-        Images (jusqu&apos;à 4)
+        {t("imagesJusqua4")}
         <ImageUploader dossier="evenements" value={images} onChange={setImages} />
       </div>
       {erreur && (
@@ -150,10 +150,10 @@ export default function CreateEventForm() {
       )}
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={chargement} className="btn btn-primary flex-1">
-          {chargement ? "Création…" : "Créer"}
+          {chargement ? t("creationEnCours") : t("creer")}
         </button>
         <button type="button" onClick={() => setOuvert(false)} className="btn btn-secondary">
-          Annuler
+          {t("annuler")}
         </button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import PostCard, { type Post } from "@/components/PostCard";
 
 export default function FilFeed({
@@ -10,6 +11,7 @@ export default function FilFeed({
   postsInitiaux: Post[];
   curseurInitial: string | null;
 }) {
+  const t = useTranslations("fil");
   const [posts, setPosts] = useState(postsInitiaux);
   const [curseur, setCurseur] = useState(curseurInitial);
   const [chargement, setChargement] = useState(false);
@@ -28,7 +30,7 @@ export default function FilFeed({
   if (posts.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--muted)" }}>
-        Aucune publication pour l&apos;instant. Sois le premier à partager un moment !
+        {t("aucunPost")}
       </p>
     );
   }
@@ -44,7 +46,7 @@ export default function FilFeed({
           disabled={chargement}
           className="btn btn-secondary self-center"
         >
-          {chargement ? "Chargement…" : "Charger plus"}
+          {chargement ? t("chargementEnCours") : t("chargerPlus")}
         </button>
       )}
     </div>

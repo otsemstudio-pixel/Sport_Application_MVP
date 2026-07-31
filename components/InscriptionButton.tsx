@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle2, Clock, UserPlus, XCircle } from "lucide-react";
 
-const STATUTS: Record<
-  string,
-  { label: string; icon: typeof CheckCircle2; chip: string }
-> = {
-  EN_ATTENTE: { label: "Inscription en attente", icon: Clock, chip: "chip-neutral" },
-  CONFIRME: { label: "Inscription confirmée", icon: CheckCircle2, chip: "chip-success" },
-  REFUSE: { label: "Inscription refusée", icon: XCircle, chip: "chip-danger" },
+const ICONES: Record<string, typeof CheckCircle2> = {
+  EN_ATTENTE: Clock,
+  CONFIRME: CheckCircle2,
+  REFUSE: XCircle,
+};
+const CHIPS: Record<string, string> = {
+  EN_ATTENTE: "chip-neutral",
+  CONFIRME: "chip-success",
+  REFUSE: "chip-danger",
 };
 
 export default function InscriptionButton({
@@ -25,16 +28,18 @@ export default function InscriptionButton({
   statutInscription?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("evenement");
+  const tCommun = useTranslations("commun");
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
 
   if (statutInscription) {
-    const statut = STATUTS[statutInscription] ?? STATUTS.EN_ATTENTE;
-    const Icon = statut.icon;
+    const cle = STATUT_LABEL_KEY[statutInscription] ?? "inscriptionEnAttente";
+    const Icon = ICONES[statutInscription] ?? Clock;
     return (
-      <span className={`chip self-start ${statut.chip}`}>
+      <span className={`chip self-start ${CHIPS[statutInscription] ?? "chip-neutral"}`}>
         <Icon size={14} />
-        {statut.label}
+        {t(cle)}
       </span>
     );
   }
@@ -49,7 +54,7 @@ export default function InscriptionButton({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? "Une erreur est survenue.");
+      setErreur(data.error ?? tCommun("erreurGenerique"));
       return;
     }
     router.refresh();
@@ -63,7 +68,7 @@ export default function InscriptionButton({
         className="btn btn-primary self-start"
       >
         <UserPlus size={16} />
-        {chargement ? "Inscription…" : "S'inscrire"}
+        {chargement ? t("inscriptionEnCours") : t("sinscrire")}
       </button>
       {erreur && (
         <p className="chip chip-danger self-start">
@@ -74,3 +79,9 @@ export default function InscriptionButton({
     </div>
   );
 }
+
+const STATUT_LABEL_KEY: Record<string, "inscriptionEnAttente" | "inscriptionConfirmee" | "inscriptionRefusee"> = {
+  EN_ATTENTE: "inscriptionEnAttente",
+  CONFIRME: "inscriptionConfirmee",
+  REFUSE: "inscriptionRefusee",
+};

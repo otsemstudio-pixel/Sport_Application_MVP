@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 import SeanceForm from "@/components/SeanceForm";
 import { Flame, Lock, Medal, Trophy } from "lucide-react";
 
@@ -13,6 +14,8 @@ export default async function EntrainementPage() {
     include: { sportPrincipal: true },
   });
   if (!athlete) redirect("/connexion");
+
+  const t = await getTranslations("entrainement");
 
   const [defis, badges, groupes, totalSeances] = await Promise.all([
     prisma.defi.findMany({
@@ -48,7 +51,7 @@ export default async function EntrainementPage() {
   const nomParId = new Map(athletesClassement.map((a) => [a.id, a.nom]));
   const classement = groupes.map((g, index) => ({
     rang: index + 1,
-    nom: nomParId.get(g.athleteId) ?? "Athlète",
+    nom: nomParId.get(g.athleteId) ?? t("athleteFallback"),
     nombreSeances: g._count._all,
     moi: g.athleteId === athlete.id,
   }));
@@ -57,25 +60,25 @@ export default async function EntrainementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">Entraînement</h1>
+        <h1 className="text-2xl font-bold">{t("titre")}</h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>
           {athlete.sportPrincipal.nom} · {athlete.ville}
         </p>
       </div>
 
       <section className="grid grid-cols-3 gap-3">
-        <StatCard icon={Flame} valeur={totalSeances} label="Séances" />
-        <StatCard icon={Medal} valeur={idsObtenus.size} label="Badges" />
-        <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label="Rang local" />
+        <StatCard icon={Flame} valeur={totalSeances} label={t("statSeances")} />
+        <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
+        <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
       </section>
 
       <section className="card flex flex-col gap-4 p-5">
-        <h2 className="font-semibold">Enregistrer une séance</h2>
+        <h2 className="font-semibold">{t("enregistrerSeance")}</h2>
         <SeanceForm defis={defis} />
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Badges</h2>
+        <h2 className="font-semibold">{t("badges")}</h2>
         <div className="grid grid-cols-3 gap-3">
           {badges.map((badge) => {
             const obtenu = idsObtenus.has(badge.id);
@@ -109,10 +112,10 @@ export default async function EntrainementPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Classement local ({athlete.ville})</h2>
+        <h2 className="font-semibold">{t("classementLocal", { ville: athlete.ville })}</h2>
         {classement.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Aucune séance enregistrée pour l&apos;instant dans ta ville.
+            {t("aucuneSeance")}
           </p>
         ) : (
           <ol className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
@@ -125,10 +128,12 @@ export default async function EntrainementPage() {
                 <div className="flex items-center gap-3">
                   <RangBadge rang={c.rang} />
                   <span className={c.moi ? "font-semibold" : ""}>
-                    {c.nom} {c.moi && <span style={{ color: "var(--primary)" }}>(toi)</span>}
+                    {c.nom} {c.moi && <span style={{ color: "var(--primary)" }}>{t("toi")}</span>}
                   </span>
                 </div>
-                <span style={{ color: "var(--muted)" }}>{c.nombreSeances} séances</span>
+                <span style={{ color: "var(--muted)" }}>
+                  {t("nombreSeances", { n: c.nombreSeances })}
+                </span>
               </li>
             ))}
           </ol>
