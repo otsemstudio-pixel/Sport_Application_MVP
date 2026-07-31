@@ -78,7 +78,9 @@ export default async function ObjectifsPage() {
               <div key={o.id} className="card flex flex-col gap-2 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold">{o.exercice.nom}</p>
+                    <Link href={`/entrainement/exercices/${o.exerciceId}`} className="font-semibold underline-offset-2 hover:underline">
+                      {o.exercice.nom}
+                    </Link>
                     <p className="text-xs" style={{ color: "var(--muted)" }}>
                       {t("cibleLabel", { valeur: o.valeurCible, unite })}
                       {valeurActuelle != null && ` · ${t("actuelLabel", { valeur: valeurActuelle, unite })}`}

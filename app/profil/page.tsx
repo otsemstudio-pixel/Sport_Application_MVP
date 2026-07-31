@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession, isMineur } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import ConsentementFlow from "@/components/ConsentementFlow";
-import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity } from "lucide-react";
+import BasculeMensurations from "@/components/BasculeMensurations";
+import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
   const session = await getSession();
@@ -18,6 +20,7 @@ export default async function ProfilPage() {
   const locale = await getLocale();
   const t = await getTranslations("auth");
   const tConsentement = await getTranslations("consentement");
+  const tMensurations = await getTranslations("mensurations");
   const mineur = isMineur(athlete.dateNaissance);
   const consentementValide = athlete.consentement?.codeValide === true;
   const initiale = athlete.nom.trim()[0]?.toUpperCase() ?? "?";
@@ -61,6 +64,19 @@ export default async function ProfilPage() {
           telephoneExistant={athlete.consentement?.telephoneParent ?? null}
           codeDejaEnvoye={!!athlete.consentement}
         />
+      )}
+
+      <BasculeMensurations activeInitial={athlete.suiviMensurationsActive} />
+      {athlete.suiviMensurationsActive && (
+        <Link href="/entrainement/mensurations" className="card surface-hover flex items-center gap-3 p-4">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+            style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+          >
+            <Scale size={16} />
+          </div>
+          <span className="text-sm font-semibold">{tMensurations("voirMonSuivi")}</span>
+        </Link>
       )}
     </div>
   );

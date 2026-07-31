@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, Minus, TrendingDown, TrendingUp } from "lucide-react";
 
@@ -138,7 +139,9 @@ export default function StatistiquesEntrainement() {
               <ol className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
                 {data.totauxParExercice.map((te) => (
                   <li key={te.exerciceId} className="flex items-center justify-between py-2 text-sm">
-                    <span className="font-medium">{te.nom}</span>
+                    <Link href={`/entrainement/exercices/${te.exerciceId}`} className="font-medium underline-offset-2 hover:underline">
+                      {te.nom}
+                    </Link>
                     <span style={{ color: "var(--muted)" }}>
                       {te.total} {libelleUnite(te.uniteMesure)}
                     </span>

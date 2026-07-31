@@ -447,6 +447,28 @@ async function reinitialiserSeancesDemo(
     { nom: "Squats", series: [{ repetitions: 12 }, { repetitions: 12 }, { repetitions: 10 }] },
   ]);
 
+  // Historique plus long (jusqu'à 5 mois en arrière) pour que le calendrier
+  // de régularité et les graphiques de progression par exercice soient
+  // visuellement parlants sur plusieurs mois, pas seulement les derniers jours.
+  // Les valeurs progressent légèrement avec le temps pour illustrer une vraie
+  // courbe de progression sur les graphiques.
+  for (let jours = 150; jours >= 45; jours -= 4) {
+    const progres = (150 - jours) / 150; // 0 (le plus ancien) -> 1 (le plus récent de cette plage)
+    if (jours % 8 < 4) {
+      const squatsReps = Math.round(10 + progres * 8);
+      await creerSeance(mamadou.id, joursAvant(jours), [
+        { nom: "Squats", series: [{ repetitions: squatsReps }, { repetitions: squatsReps - 2 }] },
+        { nom: "Sprint 30m chronométré", series: [{ dureeSecondes: Math.round((5.6 - progres * 0.6) * 10) / 10 }] },
+      ]);
+    } else {
+      const pompesReps = Math.round(12 + progres * 10);
+      await creerSeance(mamadou.id, joursAvant(jours), [
+        { nom: "Pompes", series: [{ repetitions: pompesReps }, { repetitions: pompesReps - 3 }] },
+        { nom: "Abdominaux", series: [{ repetitions: Math.round(30 + progres * 15) }] },
+      ]);
+    }
+  }
+
   await creerSeance(
     aicha.id,
     joursAvant(0),
@@ -769,6 +791,30 @@ async function reinitialiserEvenementsDemo(
   return { tournoiQuartier };
 }
 
+// Athlète de démonstration avec le suivi de mensurations activé, plusieurs
+// entrées de poids réparties dans le temps.
+async function reinitialiserMensurationsDemo(athletes: { id: string }[]) {
+  const ibrahim = athletes[4];
+
+  await prisma.athlete.update({ where: { id: ibrahim.id }, data: { suiviMensurationsActive: true } });
+  await prisma.mensuration.deleteMany({ where: { athleteId: ibrahim.id } });
+
+  const entrees = [
+    { jours: 120, poidsKg: 78.5, tailleCm: 178 },
+    { jours: 100, poidsKg: 78.0 },
+    { jours: 80, poidsKg: 77.2 },
+    { jours: 60, poidsKg: 76.8 },
+    { jours: 40, poidsKg: 76.0 },
+    { jours: 20, poidsKg: 75.4 },
+    { jours: 3, poidsKg: 75.0 },
+  ];
+  for (const e of entrees) {
+    await prisma.mensuration.create({
+      data: { athleteId: ibrahim.id, date: joursAvant(e.jours), poidsKg: e.poidsKg, tailleCm: e.tailleCm ?? null },
+    });
+  }
+}
+
 async function main() {
   const sportParNom = await seedReferentiels();
   const { programmesParNom, seancesParCle } = await seedProgrammes();
@@ -778,6 +824,7 @@ async function main() {
   const { seancePartageable } = await reinitialiserSeancesDemo(athletes, programmesParNom, seancesParCle);
   await reinitialiserPostsDemo(athletes, organisateurs, seancePartageable);
   await reinitialiserEvenementsDemo(organisateurs, athletes, sportParNom);
+  await reinitialiserMensurationsDemo(athletes);
 
   console.log("Seed de démonstration terminé.");
   console.log(`Comptes démo (mot de passe partagé : ${MOT_DE_PASSE_DEMO}) :`);

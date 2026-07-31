@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 import SeanceEntrainementForm from "@/components/SeanceEntrainementForm";
 import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
+import CalendrierRegularite from "@/components/CalendrierRegularite";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
 
 function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
@@ -105,6 +106,8 @@ export default async function EntrainementPage() {
         <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
         <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
       </section>
+
+      <CalendrierRegularite />
 
       <section className="grid grid-cols-2 gap-3">
         <Link href="/entrainement/programmes" className="card surface-hover flex flex-col items-center gap-1.5 p-4 text-center">

@@ -109,7 +109,33 @@
     "decouvrirProgrammes": "Découvrir les programmes",
     "mesObjectifs": "Mes objectifs",
     "programmeEnCours": "Programme en cours",
-    "voirMonProgramme": "Voir mon programme"
+    "voirMonProgramme": "Voir mon programme",
+    "calendrierRegularite": "Calendrier de régularité"
+  },
+  "exercices": {
+    "retourEntrainement": "Retour à l'entraînement",
+    "evolutionRecord": "Évolution du record",
+    "volumeParSemaine": "Volume par semaine",
+    "pasAssezDeDonnees": "Pas assez de données sur cette période.",
+    "periode": {
+      "1m": "1 mois",
+      "3m": "3 mois",
+      "6m": "6 mois",
+      "tout": "Tout"
+    }
+  },
+  "mensurations": {
+    "titre": "Mensurations",
+    "retourProfil": "Retour au profil",
+    "nouvelleEntree": "Nouvelle entrée",
+    "poidsKgLabel": "Poids (kg)",
+    "tailleCmLabel": "Taille (cm)",
+    "ajouter": "Ajouter",
+    "evolutionPoids": "Évolution du poids",
+    "aucuneEntree": "Aucune entrée pour l'instant.",
+    "activerSuivi": "Suivi de mensurations",
+    "activerSuiviDescription": "Strictement privé : jamais visible par un autre athlète, un organisateur, ou dans le fil.",
+    "voirMonSuivi": "Voir mon suivi de mensurations"
   },
   "statistiques": {
     "titre": "Statistiques",

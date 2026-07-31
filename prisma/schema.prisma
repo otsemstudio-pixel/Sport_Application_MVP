@@ -56,6 +56,8 @@ model Athlete {
   sportPrincipal   Sport    @relation(fields: [sportPrincipalId], references: [id])
   createdAt        DateTime @default(now())
 
+  suiviMensurationsActive Boolean @default(false)
+
   consentement        ConsentementParental?
   seancesEntrainement SeanceEntrainement[]
   athleteBadges       AthleteBadge[]
@@ -65,6 +67,7 @@ model Athlete {
   recordsPersonnels   RecordPersonnel[]
   objectifs           Objectif[]
   programmesSuivis    AthleteProgramme[]
+  mensurations        Mensuration[]
 }
 
 model ConsentementParental {
@@ -76,6 +79,18 @@ model ConsentementParental {
   codeValide      Boolean   @default(false)
   dateValidation  DateTime?
   createdAt       DateTime  @default(now())
+}
+
+// Strictement privé : jamais exposé via une route acceptant un id
+// d'athlète autre que celui de la session (voir /api/mensurations).
+model Mensuration {
+  id        String   @id @default(cuid())
+  athleteId String
+  athlete   Athlete  @relation(fields: [athleteId], references: [id])
+  date      DateTime @default(now())
+  poidsKg   Float?
+  tailleCm  Float?
+  createdAt DateTime @default(now())
 }
 
 model Exercice {

@@ -109,7 +109,33 @@
     "decouvrirProgrammes": "Scopri i programmi",
     "mesObjectifs": "I miei obiettivi",
     "programmeEnCours": "Programma in corso",
-    "voirMonProgramme": "Vedi il mio programma"
+    "voirMonProgramme": "Vedi il mio programma",
+    "calendrierRegularite": "Calendario di regolarità"
+  },
+  "exercices": {
+    "retourEntrainement": "Torna all'allenamento",
+    "evolutionRecord": "Evoluzione del record",
+    "volumeParSemaine": "Volume settimanale",
+    "pasAssezDeDonnees": "Dati insufficienti per questo periodo.",
+    "periode": {
+      "1m": "1 mese",
+      "3m": "3 mesi",
+      "6m": "6 mesi",
+      "tout": "Tutto"
+    }
+  },
+  "mensurations": {
+    "titre": "Misurazioni",
+    "retourProfil": "Torna al profilo",
+    "nouvelleEntree": "Nuova voce",
+    "poidsKgLabel": "Peso (kg)",
+    "tailleCmLabel": "Altezza (cm)",
+    "ajouter": "Aggiungi",
+    "evolutionPoids": "Evoluzione del peso",
+    "aucuneEntree": "Ancora nessuna voce.",
+    "activerSuivi": "Monitoraggio delle misurazioni",
+    "activerSuiviDescription": "Strettamente privato: mai visibile ad altri atleti, organizzatori, o nella bacheca.",
+    "voirMonSuivi": "Vedi il mio monitoraggio"
   },
   "statistiques": {
     "titre": "Statistiche",

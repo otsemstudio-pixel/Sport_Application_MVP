@@ -109,7 +109,33 @@
     "decouvrirProgrammes": "Programme entdecken",
     "mesObjectifs": "Meine Ziele",
     "programmeEnCours": "Aktuelles Programm",
-    "voirMonProgramme": "Mein Programm ansehen"
+    "voirMonProgramme": "Mein Programm ansehen",
+    "calendrierRegularite": "Regelmäßigkeitskalender"
+  },
+  "exercices": {
+    "retourEntrainement": "Zurück zum Training",
+    "evolutionRecord": "Rekordentwicklung",
+    "volumeParSemaine": "Wöchentliches Volumen",
+    "pasAssezDeDonnees": "Nicht genügend Daten für diesen Zeitraum.",
+    "periode": {
+      "1m": "1 Monat",
+      "3m": "3 Monate",
+      "6m": "6 Monate",
+      "tout": "Alle"
+    }
+  },
+  "mensurations": {
+    "titre": "Körpermaße",
+    "retourProfil": "Zurück zum Profil",
+    "nouvelleEntree": "Neuer Eintrag",
+    "poidsKgLabel": "Gewicht (kg)",
+    "tailleCmLabel": "Größe (cm)",
+    "ajouter": "Hinzufügen",
+    "evolutionPoids": "Gewichtsverlauf",
+    "aucuneEntree": "Noch keine Einträge.",
+    "activerSuivi": "Körpermaß-Tracking",
+    "activerSuiviDescription": "Streng privat: nie sichtbar für andere Athleten, Veranstalter oder im Feed.",
+    "voirMonSuivi": "Mein Tracking ansehen"
   },
   "statistiques": {
     "titre": "Statistiken",

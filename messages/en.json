@@ -109,7 +109,33 @@
     "decouvrirProgrammes": "Discover programs",
     "mesObjectifs": "My goals",
     "programmeEnCours": "Current program",
-    "voirMonProgramme": "View my program"
+    "voirMonProgramme": "View my program",
+    "calendrierRegularite": "Regularity calendar"
+  },
+  "exercices": {
+    "retourEntrainement": "Back to training",
+    "evolutionRecord": "Record progression",
+    "volumeParSemaine": "Volume per week",
+    "pasAssezDeDonnees": "Not enough data for this period.",
+    "periode": {
+      "1m": "1 month",
+      "3m": "3 months",
+      "6m": "6 months",
+      "tout": "All"
+    }
+  },
+  "mensurations": {
+    "titre": "Body measurements",
+    "retourProfil": "Back to profile",
+    "nouvelleEntree": "New entry",
+    "poidsKgLabel": "Weight (kg)",
+    "tailleCmLabel": "Height (cm)",
+    "ajouter": "Add",
+    "evolutionPoids": "Weight over time",
+    "aucuneEntree": "No entries yet.",
+    "activerSuivi": "Body measurement tracking",
+    "activerSuiviDescription": "Strictly private: never visible to another athlete, an organizer, or in the feed.",
+    "voirMonSuivi": "View my measurement tracking"
   },
   "statistiques": {
     "titre": "Statistics",
