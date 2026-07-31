@@ -7,7 +7,11 @@ export const INCLUDE_POST_RELATIONS = {
   images: { select: { url: true, ordre: true } },
   _count: { select: { likes: true, commentaires: true } },
   seanceEntrainement: {
-    include: { exercicesRealises: { include: { exercice: true } } },
+    include: {
+      exercicesRealises: {
+        include: { exercice: true, series: { orderBy: { numeroSerie: "asc" } } },
+      },
+    },
   },
 } as const;
 
@@ -65,9 +69,15 @@ type SeanceRecapSource = {
   date: Date;
   exercicesRealises: {
     id: string;
-    valeur: number;
-    series: number | null;
     exercice: { nom: string; uniteMesure: string };
+    series: {
+      id: string;
+      numeroSerie: number;
+      repetitions: number | null;
+      poidsKg: number | null;
+      dureeSecondes: number | null;
+      distanceMetres: number | null;
+    }[];
   }[];
 } | null;
 
@@ -107,8 +117,14 @@ export function formaterPost(
             id: er.id,
             nom: er.exercice.nom,
             uniteMesure: er.exercice.uniteMesure,
-            valeur: er.valeur,
-            series: er.series,
+            series: er.series.map((s) => ({
+              id: s.id,
+              numeroSerie: s.numeroSerie,
+              repetitions: s.repetitions,
+              poidsKg: s.poidsKg,
+              dureeSecondes: s.dureeSecondes,
+              distanceMetres: s.distanceMetres,
+            })),
           })),
         }
       : null,

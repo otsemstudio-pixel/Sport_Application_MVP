@@ -3,13 +3,27 @@
 import { useTranslations } from "next-intl";
 import { Dumbbell } from "lucide-react";
 
+type SerieRecap = {
+  id: string;
+  numeroSerie: number;
+  repetitions: number | null;
+  poidsKg: number | null;
+  dureeSecondes: number | null;
+  distanceMetres: number | null;
+};
+
 type ExerciceRecap = {
   id: string;
   nom: string;
   uniteMesure: string;
-  valeur: number;
-  series: number | null;
+  series: SerieRecap[];
 };
+
+function valeurPrincipale(s: SerieRecap, uniteMesure: string) {
+  if (uniteMesure === "DUREE_SECONDES") return s.dureeSecondes;
+  if (uniteMesure === "DISTANCE_METRES") return s.distanceMetres;
+  return s.repetitions;
+}
 
 export default function RecapSeance({ exercices }: { exercices: ExerciceRecap[] }) {
   const t = useTranslations("entrainement");
@@ -30,7 +44,10 @@ export default function RecapSeance({ exercices }: { exercices: ExerciceRecap[] 
           <li key={e.id} className="flex items-center justify-between gap-2">
             <span className="font-medium">{e.nom}</span>
             <span style={{ color: "var(--muted)" }}>
-              {e.series ? `${e.series}x${e.valeur}` : `${e.valeur} ${t(`unites.${e.uniteMesure}`)}`}
+              {e.series
+                .map((s) => `${valeurPrincipale(s, e.uniteMesure) ?? "-"}${s.poidsKg ? ` @${s.poidsKg}kg` : ""}`)
+                .join("/")}{" "}
+              {t(`unites.${e.uniteMesure}`)}
             </span>
           </li>
         ))}

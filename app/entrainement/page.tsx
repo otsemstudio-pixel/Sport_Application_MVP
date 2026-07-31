@@ -1,10 +1,19 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 import SeanceEntrainementForm from "@/components/SeanceEntrainementForm";
 import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
-import { Flame, Lock, Medal, Trophy } from "lucide-react";
+import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
+
+function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
+  const joursEcoules = Math.floor((Date.now() - dateDebut.getTime()) / 86_400_000);
+  const numeroSemaine = Math.floor(joursEcoules / 7) + 1;
+  const numeroJour = (joursEcoules % 7) + 1;
+  if (numeroSemaine < 1 || numeroSemaine > dureeSemaines) return null;
+  return { numeroSemaine, numeroJour };
+}
 
 export default async function EntrainementPage() {
   const session = await getSession();
@@ -18,7 +27,7 @@ export default async function EntrainementPage() {
 
   const t = await getTranslations("entrainement");
 
-  const [exercices, badges, groupes, totalSeances] = await Promise.all([
+  const [exercices, badges, groupes, totalSeances, records, programmeSuivi] = await Promise.all([
     prisma.exercice.findMany({
       where: {
         OR: [
@@ -37,7 +46,31 @@ export default async function EntrainementPage() {
       take: 20,
     }),
     prisma.seanceEntrainement.count({ where: { athleteId: athlete.id } }),
+    prisma.recordPersonnel.findMany({ where: { athleteId: athlete.id } }),
+    prisma.athleteProgramme.findFirst({
+      where: { athleteId: athlete.id, statut: "EN_COURS" },
+      include: { programme: true },
+      orderBy: { dateDebut: "desc" },
+    }),
   ]);
+
+  let seanceDuJourProgramme = null;
+  if (programmeSuivi) {
+    const jour = calculerSeanceDuJour(programmeSuivi.dateDebut, programmeSuivi.programme.dureeSemaines);
+    if (jour) {
+      const programmeSeance = await prisma.programmeSeance.findFirst({
+        where: { programmeId: programmeSuivi.programmeId, numeroSemaine: jour.numeroSemaine, numeroJour: jour.numeroJour },
+        include: { exercicesPrevus: true },
+      });
+      if (programmeSeance) {
+        seanceDuJourProgramme = {
+          id: programmeSeance.id,
+          nomSeance: programmeSeance.nomSeance,
+          exercicesPrevus: programmeSeance.exercicesPrevus,
+        };
+      }
+    }
+  }
 
   const badgesObtenus = await prisma.athleteBadge.findMany({
     where: { athleteId: athlete.id },
@@ -73,9 +106,34 @@ export default async function EntrainementPage() {
         <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
       </section>
 
+      <section className="grid grid-cols-2 gap-3">
+        <Link href="/entrainement/programmes" className="card surface-hover flex flex-col items-center gap-1.5 p-4 text-center">
+          <CalendarRange size={18} style={{ color: "var(--primary)" }} />
+          <span className="text-sm font-semibold">{t("decouvrirProgrammes")}</span>
+        </Link>
+        <Link href="/entrainement/objectifs" className="card surface-hover flex flex-col items-center gap-1.5 p-4 text-center">
+          <Target size={18} style={{ color: "var(--primary)" }} />
+          <span className="text-sm font-semibold">{t("mesObjectifs")}</span>
+        </Link>
+      </section>
+
+      {programmeSuivi && (
+        <section className="card flex items-center justify-between gap-3 p-4" style={{ borderColor: "var(--primary)" }}>
+          <div>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              {t("programmeEnCours")}
+            </p>
+            <p className="font-semibold">{programmeSuivi.programme.nom}</p>
+          </div>
+          <Link href={`/entrainement/programmes/${programmeSuivi.programmeId}`} className="btn btn-secondary">
+            {t("voirMonProgramme")}
+          </Link>
+        </section>
+      )}
+
       <section className="card flex flex-col gap-4 p-5">
         <h2 className="font-semibold">{t("enregistrerSeance")}</h2>
-        <SeanceEntrainementForm exercices={exercices} />
+        <SeanceEntrainementForm exercices={exercices} records={records} seanceDuJourProgramme={seanceDuJourProgramme} />
       </section>
 
       <StatistiquesEntrainement />

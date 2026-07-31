@@ -21,7 +21,19 @@ export type Post = {
   seance: {
     id: string;
     date: string;
-    exercices: { id: string; nom: string; uniteMesure: string; valeur: number; series: number | null }[];
+    exercices: {
+      id: string;
+      nom: string;
+      uniteMesure: string;
+      series: {
+        id: string;
+        numeroSerie: number;
+        repetitions: number | null;
+        poidsKg: number | null;
+        dureeSecondes: number | null;
+        distanceMetres: number | null;
+      }[];
+    }[];
   } | null;
 };
 

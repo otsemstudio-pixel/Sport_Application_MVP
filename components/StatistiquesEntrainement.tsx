@@ -6,11 +6,18 @@ import { CalendarDays, Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 type Periode = "jour" | "semaine" | "mois";
 
+type Serie = {
+  id: string;
+  numeroSerie: number;
+  repetitions: number | null;
+  poidsKg: number | null;
+  dureeSecondes: number | null;
+  distanceMetres: number | null;
+};
 type ExerciceRealise = {
   id: string;
-  valeur: number;
-  series: number | null;
   exercice: { nom: string; uniteMesure: string };
+  series: Serie[];
 };
 type Seance = {
   id: string;
@@ -18,6 +25,12 @@ type Seance = {
   noteOptionnelle: string | null;
   exercicesRealises: ExerciceRealise[];
 };
+
+function valeurPrincipale(s: Serie, uniteMesure: string) {
+  if (uniteMesure === "DUREE_SECONDES") return s.dureeSecondes;
+  if (uniteMesure === "DISTANCE_METRES") return s.distanceMetres;
+  return s.repetitions;
+}
 type TotalExercice = { exerciceId: string; nom: string; uniteMesure: string; total: number };
 
 type ReponseJour = { periode: "jour"; date: string; seances: Seance[] };
@@ -88,8 +101,10 @@ export default function StatistiquesEntrainement() {
                 <ul className="flex flex-col gap-1 text-sm">
                   {s.exercicesRealises.map((er) => (
                     <li key={er.id}>
-                      {er.series ? `${er.series}x${er.valeur}` : `${er.valeur} ${libelleUnite(er.exercice.uniteMesure)}`}{" "}
-                      <span className="font-medium">{er.exercice.nom}</span>
+                      {er.series
+                        .map((serie) => `${valeurPrincipale(serie, er.exercice.uniteMesure) ?? "-"}${serie.poidsKg ? ` @${serie.poidsKg}kg` : ""}`)
+                        .join("/")}{" "}
+                      {libelleUnite(er.exercice.uniteMesure)} <span className="font-medium">{er.exercice.nom}</span>
                     </li>
                   ))}
                 </ul>

@@ -24,6 +24,17 @@ enum UniteMesure {
   SERIES_X_REPETITIONS
 }
 
+enum SensAmelioration {
+  PLUS_HAUT_MIEUX
+  PLUS_BAS_MIEUX
+}
+
+enum StatutProgramme {
+  EN_COURS
+  TERMINE
+  ABANDONNE
+}
+
 model Sport {
   id                   String               @id @default(cuid())
   nom                  String               @unique
@@ -51,6 +62,9 @@ model Athlete {
   inscriptions        Inscription[]
   resultats           Resultat[]
   sessions            Session[]
+  recordsPersonnels   RecordPersonnel[]
+  objectifs           Objectif[]
+  programmesSuivis    AthleteProgramme[]
 }
 
 model ConsentementParental {
@@ -69,19 +83,25 @@ model Exercice {
   nom                  String               @unique
   categoriePerformance CategoriePerformance
   uniteMesure          UniteMesure
+  sensAmelioration     SensAmelioration     @default(PLUS_HAUT_MIEUX)
   description          String
   createdAt            DateTime             @default(now())
 
-  exercicesRealises ExerciceRealise[]
+  exercicesRealises  ExerciceRealise[]
+  recordsPersonnels  RecordPersonnel[]
+  objectifs          Objectif[]
+  programmeExercices ProgrammeExercice[]
 }
 
 model SeanceEntrainement {
-  id              String   @id @default(cuid())
-  athleteId       String
-  athlete         Athlete  @relation(fields: [athleteId], references: [id])
-  date            DateTime @default(now())
-  noteOptionnelle String?
-  createdAt       DateTime @default(now())
+  id                String           @id @default(cuid())
+  athleteId         String
+  athlete           Athlete          @relation(fields: [athleteId], references: [id])
+  date              DateTime         @default(now())
+  noteOptionnelle   String?
+  programmeSeanceId String?
+  programmeSeance   ProgrammeSeance? @relation(fields: [programmeSeanceId], references: [id])
+  createdAt         DateTime         @default(now())
 
   exercicesRealises ExerciceRealise[]
   postsPartages     Post[]
@@ -93,18 +113,107 @@ model ExerciceRealise {
   seance     SeanceEntrainement @relation(fields: [seanceId], references: [id])
   exerciceId String
   exercice   Exercice           @relation(fields: [exerciceId], references: [id])
-  valeur     Float
-  series     Int?
   createdAt  DateTime           @default(now())
+
+  series Serie[]
+}
+
+model Serie {
+  id                 String          @id @default(cuid())
+  exerciceRealiseId  String
+  exerciceRealise    ExerciceRealise @relation(fields: [exerciceRealiseId], references: [id])
+  numeroSerie        Int
+  repetitions        Int?
+  poidsKg            Float?
+  dureeSecondes      Float?
+  distanceMetres     Float?
+  tempsReposSecondes Int?
+  createdAt          DateTime        @default(now())
+}
+
+model RecordPersonnel {
+  id              String   @id @default(cuid())
+  athleteId       String
+  athlete         Athlete  @relation(fields: [athleteId], references: [id])
+  exerciceId      String
+  exercice        Exercice @relation(fields: [exerciceId], references: [id])
+  valeur          Float
+  dateRealisation DateTime
+  createdAt       DateTime @default(now())
+
+  @@unique([athleteId, exerciceId])
+}
+
+model Objectif {
+  id          String    @id @default(cuid())
+  athleteId   String
+  athlete     Athlete   @relation(fields: [athleteId], references: [id])
+  exerciceId  String
+  exercice    Exercice  @relation(fields: [exerciceId], references: [id])
+  valeurCible Float
+  dateLimite  DateTime?
+  atteint     Boolean   @default(false)
+  dateAtteint DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Programme {
+  id                   String                @id @default(cuid())
+  nom                  String
+  description          String
+  dureeSemaines        Int
+  categoriePerformance CategoriePerformance?
+  createdAt            DateTime              @default(now())
+
+  seances          ProgrammeSeance[]
+  athletesSuiveurs AthleteProgramme[]
+}
+
+model ProgrammeSeance {
+  id            String    @id @default(cuid())
+  programmeId   String
+  programme     Programme @relation(fields: [programmeId], references: [id])
+  numeroSemaine Int
+  numeroJour    Int
+  nomSeance     String
+  createdAt     DateTime  @default(now())
+
+  exercicesPrevus  ProgrammeExercice[]
+  seancesRealisees SeanceEntrainement[]
+}
+
+model ProgrammeExercice {
+  id                   String          @id @default(cuid())
+  programmeSeanceId    String
+  programmeSeance      ProgrammeSeance @relation(fields: [programmeSeanceId], references: [id])
+  exerciceId           String
+  exercice             Exercice        @relation(fields: [exerciceId], references: [id])
+  seriesPrevues        Int?
+  repetitionsPrevues   Int?
+  dureePrevueSecondes  Float?
+  distancePrevueMetres Float?
+  poidsPrevuKg         Float?
+  createdAt            DateTime        @default(now())
+}
+
+model AthleteProgramme {
+  id          String          @id @default(cuid())
+  athleteId   String
+  athlete     Athlete         @relation(fields: [athleteId], references: [id])
+  programmeId String
+  programme   Programme       @relation(fields: [programmeId], references: [id])
+  dateDebut   DateTime        @default(now())
+  statut      StatutProgramme @default(EN_COURS)
+  createdAt   DateTime        @default(now())
 }
 
 model Badge {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  nom           String
-  description   String
-  seuilSeances  Int
-  createdAt     DateTime @default(now())
+  id           String   @id @default(cuid())
+  code         String   @unique
+  nom          String
+  description  String
+  seuilSeances Int
+  createdAt    DateTime @default(now())
 
   athleteBadges AthleteBadge[]
 }
@@ -140,24 +249,24 @@ enum NiveauRequis {
 }
 
 model Evenement {
-  id                String       @id @default(cuid())
-  organisateurId    String
-  organisateur      Organisateur @relation(fields: [organisateurId], references: [id])
-  nom               String
-  sportId           String
-  sport             Sport        @relation(fields: [sportId], references: [id])
-  lieu              String
-  date              DateTime
-  placesMax         Int
-  description       String
-  niveauRequis      NiveauRequis
-  clubRequis        Boolean      @default(false)
-  ageMin            Int?
-  ageMax            Int?
-  nombreEquipesMax  Int?
-  equipementFourni  String?
-  fraisInscription  Int          @default(0)
-  createdAt         DateTime     @default(now())
+  id               String       @id @default(cuid())
+  organisateurId   String
+  organisateur     Organisateur @relation(fields: [organisateurId], references: [id])
+  nom              String
+  sportId          String
+  sport            Sport        @relation(fields: [sportId], references: [id])
+  lieu             String
+  date             DateTime
+  placesMax        Int
+  description      String
+  niveauRequis     NiveauRequis
+  clubRequis       Boolean      @default(false)
+  ageMin           Int?
+  ageMax           Int?
+  nombreEquipesMax Int?
+  equipementFourni String?
+  fraisInscription Int          @default(0)
+  createdAt        DateTime     @default(now())
 
   inscriptions Inscription[]
   resultats    Resultat[]

@@ -8,27 +8,33 @@ function debutDeJournee(date: Date) {
   return d;
 }
 
-async function totauxParExercice(athleteId: string, debut: Date, fin: Date) {
-  const groupes = await prisma.exerciceRealise.groupBy({
-    by: ["exerciceId"],
-    where: { seance: { athleteId, date: { gte: debut, lt: fin } } },
-    _sum: { valeur: true },
-  });
-  const exercices = await prisma.exercice.findMany({
-    where: { id: { in: groupes.map((g) => g.exerciceId) } },
-  });
-  const parId = new Map(exercices.map((e) => [e.id, e]));
+function champPrincipal(uniteMesure: string): "repetitions" | "dureeSecondes" | "distanceMetres" {
+  if (uniteMesure === "DUREE_SECONDES") return "dureeSecondes";
+  if (uniteMesure === "DISTANCE_METRES") return "distanceMetres";
+  return "repetitions";
+}
 
-  return groupes
-    .map((g) => {
-      const exercice = parId.get(g.exerciceId);
-      return {
-        exerciceId: g.exerciceId,
-        nom: exercice?.nom ?? "",
-        uniteMesure: exercice?.uniteMesure ?? "REPETITIONS",
-        total: g._sum.valeur ?? 0,
-      };
-    })
+async function totauxParExercice(athleteId: string, debut: Date, fin: Date) {
+  const lignes = await prisma.exerciceRealise.findMany({
+    where: { seance: { athleteId, date: { gte: debut, lt: fin } } },
+    select: {
+      exerciceId: true,
+      exercice: { select: { nom: true, uniteMesure: true } },
+      series: { select: { repetitions: true, dureeSecondes: true, distanceMetres: true } },
+    },
+  });
+
+  const totaux = new Map<string, { nom: string; uniteMesure: string; total: number }>();
+  for (const l of lignes) {
+    const champ = champPrincipal(l.exercice.uniteMesure);
+    const sousTotal = l.series.reduce((acc, s) => acc + (s[champ] ?? 0), 0);
+    const existant = totaux.get(l.exerciceId);
+    if (existant) existant.total += sousTotal;
+    else totaux.set(l.exerciceId, { nom: l.exercice.nom, uniteMesure: l.exercice.uniteMesure, total: sousTotal });
+  }
+
+  return [...totaux.entries()]
+    .map(([exerciceId, v]) => ({ exerciceId, ...v, total: Math.round(v.total * 100) / 100 }))
     .sort((a, b) => a.nom.localeCompare(b.nom));
 }
 
@@ -49,7 +55,11 @@ export async function GET(req: NextRequest) {
 
     const seances = await prisma.seanceEntrainement.findMany({
       where: { athleteId, date: { gte: dateReference, lt: fin } },
-      include: { exercicesRealises: { include: { exercice: true } } },
+      include: {
+        exercicesRealises: {
+          include: { exercice: true, series: { orderBy: { numeroSerie: "asc" } } },
+        },
+      },
       orderBy: { date: "desc" },
     });
 

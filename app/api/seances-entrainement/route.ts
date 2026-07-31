@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { evaluerBadges } from "@/lib/badges";
+import { recalculerRecordPersonnel } from "@/lib/records";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -21,12 +22,25 @@ export async function GET(req: NextRequest) {
 
   const seances = await prisma.seanceEntrainement.findMany({
     where: { athleteId: session.athleteId, date: plage },
-    include: { exercicesRealises: { include: { exercice: true } } },
+    include: {
+      exercicesRealises: {
+        include: { exercice: true, series: { orderBy: { numeroSerie: "asc" } } },
+      },
+    },
     orderBy: { date: "desc" },
   });
 
   return NextResponse.json(seances);
 }
+
+type SerieEntree = {
+  repetitions?: number;
+  poidsKg?: number;
+  dureeSecondes?: number;
+  distanceMetres?: number;
+  tempsReposSecondes?: number;
+};
+type ExerciceEntree = { exerciceId: string; series: SerieEntree[] };
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -34,17 +48,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 403 });
   }
 
-  const { noteOptionnelle, exercices } = await req.json();
+  const { noteOptionnelle, programmeSeanceId, exercices } = (await req.json()) as {
+    noteOptionnelle?: string;
+    programmeSeanceId?: string;
+    exercices: ExerciceEntree[];
+  };
+
   if (!Array.isArray(exercices) || exercices.length === 0) {
     return NextResponse.json({ error: "Ajoute au moins un exercice." }, { status: 400 });
   }
   for (const e of exercices) {
-    if (!e.exerciceId || typeof e.valeur !== "number") {
-      return NextResponse.json({ error: "Champs manquants." }, { status: 400 });
+    if (!e.exerciceId || !Array.isArray(e.series) || e.series.length === 0) {
+      return NextResponse.json({ error: "Chaque exercice doit avoir au moins une série." }, { status: 400 });
+    }
+    for (const s of e.series) {
+      if (
+        typeof s.repetitions !== "number" &&
+        typeof s.poidsKg !== "number" &&
+        typeof s.dureeSecondes !== "number" &&
+        typeof s.distanceMetres !== "number"
+      ) {
+        return NextResponse.json({ error: "Chaque série doit avoir au moins une valeur mesurée." }, { status: 400 });
+      }
     }
   }
 
-  const idsExercices = exercices.map((e: { exerciceId: string }) => e.exerciceId);
+  const idsExercices = exercices.map((e) => e.exerciceId);
   const exercicesValides = await prisma.exercice.findMany({
     where: { id: { in: idsExercices } },
     select: { id: true },
@@ -53,22 +82,50 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Exercice introuvable." }, { status: 404 });
   }
 
+  if (programmeSeanceId) {
+    const programmeSeance = await prisma.programmeSeance.findUnique({ where: { id: programmeSeanceId } });
+    if (!programmeSeance) {
+      return NextResponse.json({ error: "Séance de programme introuvable." }, { status: 404 });
+    }
+  }
+
   const seance = await prisma.seanceEntrainement.create({
     data: {
       athleteId: session.athleteId,
       noteOptionnelle: noteOptionnelle || null,
+      programmeSeanceId: programmeSeanceId || null,
       exercicesRealises: {
-        create: exercices.map((e: { exerciceId: string; valeur: number; series?: number }) => ({
+        create: exercices.map((e) => ({
           exerciceId: e.exerciceId,
-          valeur: e.valeur,
-          series: typeof e.series === "number" ? e.series : null,
+          series: {
+            create: e.series.map((s, index) => ({
+              numeroSerie: index + 1,
+              repetitions: typeof s.repetitions === "number" ? s.repetitions : null,
+              poidsKg: typeof s.poidsKg === "number" ? s.poidsKg : null,
+              dureeSecondes: typeof s.dureeSecondes === "number" ? s.dureeSecondes : null,
+              distanceMetres: typeof s.distanceMetres === "number" ? s.distanceMetres : null,
+              tempsReposSecondes: typeof s.tempsReposSecondes === "number" ? s.tempsReposSecondes : null,
+            })),
+          },
         })),
       },
     },
-    include: { exercicesRealises: { include: { exercice: true } } },
+    include: {
+      exercicesRealises: {
+        include: { exercice: true, series: { orderBy: { numeroSerie: "asc" } } },
+      },
+    },
   });
 
   const nouveauxBadges = await evaluerBadges(session.athleteId);
 
-  return NextResponse.json({ seance, nouveauxBadges }, { status: 201 });
+  const nouveauxRecords: { exerciceId: string; valeur: number }[] = [];
+  for (const exerciceId of new Set(idsExercices)) {
+    const resultat = await recalculerRecordPersonnel(session.athleteId, exerciceId);
+    if (resultat?.estNouveauRecord) {
+      nouveauxRecords.push({ exerciceId, valeur: resultat.record.valeur });
+    }
+  }
+
+  return NextResponse.json({ seance, nouveauxBadges, nouveauxRecords }, { status: 201 });
 }
