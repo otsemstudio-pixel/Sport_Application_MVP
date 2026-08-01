@@ -119,6 +119,9 @@
     "programmeEnCours": "Aktuelles Programm",
     "voirMonProgramme": "Mein Programm ansehen",
     "calendrierRegularite": "Regelmäßigkeitskalender",
+    "regulariteTitre": "Regelmäßigkeit",
+    "regulariteJours": "{n}/7 aktive Tage diese Woche",
+    "regulariteDescription": "Bleib dran für nachhaltige Fortschritte.",
     "ressenti": {
       "DIFFICILE": "Schwer",
       "CORRECT": "Okay",
@@ -358,6 +361,10 @@
     "suggestionReductionCharge": "Die letzten Einheiten waren wohl anstrengend: Reduziere die Belastung beim nächsten Mal etwas."
   },
   "tacheDuJour": {
-    "titre": "Aufgabe des Tages"
+    "titre": "Aufgabe des Tages",
+    "badgeTermine": "Erledigt",
+    "badgeReprise": "Sanfter Wiedereinstieg",
+    "badgeAujourdhui": "Heute",
+    "commencer": "Loslegen"
   }
 }

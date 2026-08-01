@@ -7,10 +7,12 @@ import SeanceEntrainementForm from "@/components/SeanceEntrainementForm";
 import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
 import CalendrierRegularite from "@/components/CalendrierRegularite";
 import TacheDuJour from "@/components/TacheDuJour";
+import ProgressRing from "@/components/ProgressRing";
 import type { EvenementMascotte } from "@/lib/mascotte";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
 
 const TROIS_JOURS_MS = 3 * 86_400_000;
+const SEPT_JOURS_MS = 7 * 86_400_000;
 
 function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
   const joursEcoules = Math.floor((Date.now() - dateDebut.getTime()) / 86_400_000);
@@ -32,7 +34,7 @@ export default async function EntrainementPage() {
 
   const t = await getTranslations("entrainement");
 
-  const [exercices, badges, groupes, totalSeances, records, programmeSuivi] = await Promise.all([
+  const [exercices, badges, groupes, totalSeances, records, programmeSuivi, seancesSemaine] = await Promise.all([
     prisma.exercice.findMany({
       where: {
         OR: [
@@ -57,7 +59,16 @@ export default async function EntrainementPage() {
       include: { programme: true },
       orderBy: { dateDebut: "desc" },
     }),
+    prisma.seanceEntrainement.findMany({
+      where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - SEPT_JOURS_MS) } },
+      select: { date: true },
+    }),
   ]);
+
+  // Régularité de la semaine : nombre de jours distincts (sur les 7 derniers)
+  // ayant au moins une séance, affiché comme anneau de progression.
+  const joursActifsSemaine = new Set(seancesSemaine.map((s) => s.date.toISOString().slice(0, 10))).size;
+  const pourcentageRegularite = Math.round((joursActifsSemaine / 7) * 100);
 
   let seanceDuJourProgramme = null;
   if (programmeSuivi) {
@@ -195,6 +206,21 @@ export default async function EntrainementPage() {
         />
       )}
 
+      <section className="hero-card flex items-center gap-4 p-5">
+        <ProgressRing pourcentage={pourcentageRegularite} taille={84} epaisseur={8}>
+          <span className="text-lg font-bold">{pourcentageRegularite}%</span>
+        </ProgressRing>
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+            {t("regulariteTitre")}
+          </p>
+          <p className="text-sm font-semibold">{t("regulariteJours", { n: joursActifsSemaine })}</p>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>
+            {t("regulariteDescription")}
+          </p>
+        </div>
+      </section>
+
       <section className="grid grid-cols-3 gap-3">
         <StatCard icon={Flame} valeur={totalSeances} label={t("statSeances")} />
         <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
@@ -228,7 +254,7 @@ export default async function EntrainementPage() {
         </section>
       )}
 
-      <section className="card flex flex-col gap-4 p-5">
+      <section id="enregistrer-seance" className="card flex flex-col gap-4 p-5 scroll-mt-20">
         <h2 className="font-semibold">{t("enregistrerSeance")}</h2>
         <SeanceEntrainementForm exercices={exercicesPourFormulaire} records={records} seanceDuJourProgramme={seanceDuJourProgramme} />
       </section>
@@ -243,21 +269,21 @@ export default async function EntrainementPage() {
             return (
               <div
                 key={badge.id}
-                className="card flex flex-col items-center gap-1.5 p-3 text-center"
+                className="stat-card-rich flex flex-col items-center gap-2 p-3.5 text-center"
                 style={
                   obtenu
-                    ? { borderColor: "var(--gold)", background: "var(--gold-soft)" }
+                    ? { borderColor: "var(--gold)", background: "var(--gold-soft)", boxShadow: "0 6px 18px -10px var(--gold-soft)" }
                     : { opacity: 0.55 }
                 }
               >
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
+                  className="flex h-12 w-12 items-center justify-center rounded-full"
                   style={{
                     background: obtenu ? "var(--gold-soft)" : "var(--surface-hover)",
                     color: obtenu ? "var(--gold)" : "var(--muted)",
                   }}
                 >
-                  {obtenu ? <Medal size={18} /> : <Lock size={16} />}
+                  {obtenu ? <Medal size={20} /> : <Lock size={17} />}
                 </div>
                 <div className="text-xs font-semibold">{badge.nom}</div>
                 <div className="text-[11px] leading-tight" style={{ color: "var(--muted)" }}>
@@ -306,14 +332,16 @@ function StatCard({
   valeur,
   label,
 }: {
-  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+  icon: React.ComponentType<{ size?: number }>;
   valeur: string | number;
   label: string;
 }) {
   return (
-    <div className="card flex flex-col items-center gap-1 py-4">
-      <Icon size={18} style={{ color: "var(--primary)" }} />
-      <span className="text-lg font-bold">{valeur}</span>
+    <div className="stat-card-rich flex flex-col items-center gap-2 py-5">
+      <div className="badge-icon-circle h-10 w-10">
+        <Icon size={18} />
+      </div>
+      <span className="text-xl font-bold">{valeur}</span>
       <span className="text-[11px]" style={{ color: "var(--muted)" }}>
         {label}
       </span>

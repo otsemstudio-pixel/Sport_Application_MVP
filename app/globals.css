@@ -356,6 +356,55 @@ body {
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
 
+  /* Carte "héros" avec halo de couleur (dégradé statique, pas de
+     backdrop-filter — jamais soumise à la détection de capacité) utilisée
+     pour les indicateurs clés (régularité, tâche du jour). */
+  .hero-card {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-soft), var(--surface) 65%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .badge-icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .stat-card-rich {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .stat-card-rich:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px var(--primary-soft);
+  }
+
+  .day-pill {
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+  .day-pill.today {
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+
+  .nav-active-pill {
+    background: var(--primary-soft);
+    border-radius: 999px;
+  }
+
   /* Dégradé (opaque) par défaut — l'effet verre n'apparaît que lorsque
      data-effets="complet" a été posé côté client après confirmation de la
      capacité de l'appareil (voir components/DetectionEffetsVisuels.tsx).

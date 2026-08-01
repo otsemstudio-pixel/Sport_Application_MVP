@@ -35,13 +35,15 @@ export default function NavLinks({
             <Link
               key={lien.href}
               href={lien.href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5"
+              className="flex flex-1 flex-col items-center justify-center gap-1 py-2"
             >
-              <Icon
-                size={22}
-                strokeWidth={actif ? 2.4 : 1.8}
-                style={{ color: actif ? "var(--primary)" : "var(--muted)" }}
-              />
+              <span className={`flex h-9 w-9 items-center justify-center rounded-full ${actif ? "nav-active-pill" : ""}`}>
+                <Icon
+                  size={20}
+                  strokeWidth={actif ? 2.4 : 1.8}
+                  style={{ color: actif ? "var(--primary)" : "var(--muted)" }}
+                />
+              </span>
               <span
                 className="text-[11px] font-medium"
                 style={{ color: actif ? "var(--primary)" : "var(--muted)" }}

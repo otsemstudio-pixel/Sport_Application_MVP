@@ -58,6 +58,10 @@ export default function CalendrierRegularite() {
   const nombreJoursDansMois = new Date(moisAffiche.getFullYear(), moisAffiche.getMonth() + 1, 0).getDate();
   const premierJourSemaine = (new Date(moisAffiche.getFullYear(), moisAffiche.getMonth(), 1).getDay() + 6) % 7; // lundi = 0
 
+  const aujourdhui = new Date();
+  const estMoisAffiche =
+    aujourdhui.getFullYear() === moisAffiche.getFullYear() && aujourdhui.getMonth() === moisAffiche.getMonth();
+
   async function ouvrirJour(jour: number) {
     setJourSelectionne(jour);
     setSeancesJour(null);
@@ -98,12 +102,13 @@ export default function CalendrierRegularite() {
           const jour = i + 1;
           const n = nombreParJour.get(jour) ?? 0;
           const niveau = niveauIntensite(n);
+          const estAujourdhui = estMoisAffiche && jour === aujourdhui.getDate();
           return (
             <button
               key={jour}
               onClick={() => n > 0 && ouvrirJour(jour)}
               disabled={n === 0}
-              className="flex aspect-square items-center justify-center rounded-md text-[11px] font-medium transition-transform"
+              className={`day-pill aspect-square text-[11px] font-medium transition-transform ${estAujourdhui ? "today" : ""}`}
               style={{
                 background: niveau === 0 ? "var(--surface-hover)" : "var(--primary)",
                 opacity: niveau === 0 ? 1 : OPACITES[niveau],

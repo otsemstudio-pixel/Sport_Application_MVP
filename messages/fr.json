@@ -119,6 +119,9 @@
     "programmeEnCours": "Programme en cours",
     "voirMonProgramme": "Voir mon programme",
     "calendrierRegularite": "Calendrier de régularité",
+    "regulariteTitre": "Régularité",
+    "regulariteJours": "{n}/7 jours actifs cette semaine",
+    "regulariteDescription": "Continue sur ta lancée pour progresser durablement.",
     "ressenti": {
       "DIFFICILE": "Difficile",
       "CORRECT": "Correcte",
@@ -358,6 +361,10 @@
     "suggestionReductionCharge": "Tu sembles avoir trouvé les dernières séances difficiles : pense à réduire un peu la charge la prochaine fois."
   },
   "tacheDuJour": {
-    "titre": "Tâche du jour"
+    "titre": "Tâche du jour",
+    "badgeTermine": "Terminé",
+    "badgeReprise": "Reprise en douceur",
+    "badgeAujourdhui": "Aujourd'hui",
+    "commencer": "Commencer"
   }
 }
