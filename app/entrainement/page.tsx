@@ -77,6 +77,20 @@ export default async function EntrainementPage() {
     }
   }
 
+  // Un programme peut être suivi sans restriction de catégorie : ses
+  // exercices ne sont donc pas garantis d'être dans la liste filtrée par la
+  // catégorie de l'athlète. Sans ça, le <select> du formulaire pointerait
+  // vers un exercice absent de ses options et "Ajouter la série" resterait
+  // silencieusement sans effet.
+  const exercicesPourFormulaire = seanceDuJourProgramme
+    ? [
+        ...exercices,
+        ...seanceDuJourProgramme.exercicesPrevus
+          .map((p) => p.exercice)
+          .filter((e) => !exercices.some((ex) => ex.id === e.id)),
+      ]
+    : exercices;
+
   // Tâche du jour : la séance de programme prévue si elle existe, sinon un
   // exercice suggéré (catégorie de l'athlète, le moins réalisé récemment).
   let tacheDuJour: { titre: string; beneficePerformance: string | null; exerciceId: string } | null = null;
@@ -216,7 +230,7 @@ export default async function EntrainementPage() {
 
       <section className="card flex flex-col gap-4 p-5">
         <h2 className="font-semibold">{t("enregistrerSeance")}</h2>
-        <SeanceEntrainementForm exercices={exercices} records={records} seanceDuJourProgramme={seanceDuJourProgramme} />
+        <SeanceEntrainementForm exercices={exercicesPourFormulaire} records={records} seanceDuJourProgramme={seanceDuJourProgramme} />
       </section>
 
       <StatistiquesEntrainement />
