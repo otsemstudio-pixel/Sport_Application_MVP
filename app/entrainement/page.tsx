@@ -6,7 +6,11 @@ import { getTranslations } from "next-intl/server";
 import SeanceEntrainementForm from "@/components/SeanceEntrainementForm";
 import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
 import CalendrierRegularite from "@/components/CalendrierRegularite";
+import TacheDuJour from "@/components/TacheDuJour";
+import type { EvenementMascotte } from "@/lib/mascotte";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
+
+const TROIS_JOURS_MS = 3 * 86_400_000;
 
 function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
   const joursEcoules = Math.floor((Date.now() - dateDebut.getTime()) / 86_400_000);
@@ -61,7 +65,7 @@ export default async function EntrainementPage() {
     if (jour) {
       const programmeSeance = await prisma.programmeSeance.findFirst({
         where: { programmeId: programmeSuivi.programmeId, numeroSemaine: jour.numeroSemaine, numeroJour: jour.numeroJour },
-        include: { exercicesPrevus: true },
+        include: { exercicesPrevus: { include: { exercice: true } } },
       });
       if (programmeSeance) {
         seanceDuJourProgramme = {
@@ -70,6 +74,72 @@ export default async function EntrainementPage() {
           exercicesPrevus: programmeSeance.exercicesPrevus,
         };
       }
+    }
+  }
+
+  // Tâche du jour : la séance de programme prévue si elle existe, sinon un
+  // exercice suggéré (catégorie de l'athlète, le moins réalisé récemment).
+  let tacheDuJour: { titre: string; beneficePerformance: string | null; exerciceId: string } | null = null;
+  if (seanceDuJourProgramme) {
+    const premierExercicePrevu = seanceDuJourProgramme.exercicesPrevus[0];
+    tacheDuJour = {
+      titre: seanceDuJourProgramme.nomSeance,
+      beneficePerformance: premierExercicePrevu?.exercice.beneficePerformance ?? null,
+      exerciceId: premierExercicePrevu?.exerciceId ?? "",
+    };
+  } else if (exercices.length > 0) {
+    const septJoursAvant = new Date(Date.now() - 7 * 86_400_000);
+    const realisationsRecentes = await prisma.exerciceRealise.groupBy({
+      by: ["exerciceId"],
+      where: { seance: { athleteId: athlete.id, date: { gte: septJoursAvant } } },
+      _count: { _all: true },
+    });
+    const compteParExercice = new Map(realisationsRecentes.map((r) => [r.exerciceId, r._count._all]));
+    const exerciceSuggere = exercices.reduce((moins, e) =>
+      (compteParExercice.get(e.id) ?? 0) < (compteParExercice.get(moins.id) ?? 0) ? e : moins
+    );
+    tacheDuJour = {
+      titre: exerciceSuggere.nom,
+      beneficePerformance: exerciceSuggere.beneficePerformance,
+      exerciceId: exerciceSuggere.id,
+    };
+  }
+
+  let evenementMascotte: EvenementMascotte = "TACHE_DUJOUR";
+  let suggererReductionCharge = false;
+  if (tacheDuJour) {
+    const debutJour = new Date();
+    debutJour.setHours(0, 0, 0, 0);
+    const [seanceAujourdhui, derniereSeance] = await Promise.all([
+      prisma.seanceEntrainement.findFirst({
+        where: { athleteId: athlete.id, date: { gte: debutJour } },
+        include: { exercicesRealises: true },
+      }),
+      prisma.seanceEntrainement.findFirst({
+        where: { athleteId: athlete.id },
+        orderBy: { date: "desc" },
+        select: { date: true },
+      }),
+    ]);
+
+    const tacheCompleteeAujourdhui = seanceAujourdhui?.exercicesRealises.some(
+      (er) => er.exerciceId === tacheDuJour!.exerciceId
+    );
+    const inactif3Jours = !derniereSeance || Date.now() - derniereSeance.date.getTime() >= TROIS_JOURS_MS;
+
+    if (tacheCompleteeAujourdhui) evenementMascotte = "TACHE_COMPLETEE";
+    else if (inactif3Jours) evenementMascotte = "INACTIVITE_3J";
+
+    if (tacheDuJour.exerciceId) {
+      const dernieresSeancesAvecExercice = await prisma.seanceEntrainement.findMany({
+        where: { athleteId: athlete.id, exercicesRealises: { some: { exerciceId: tacheDuJour.exerciceId } } },
+        orderBy: { date: "desc" },
+        take: 3,
+        include: { retourSeance: true },
+      });
+      suggererReductionCharge =
+        dernieresSeancesAvecExercice.length === 3 &&
+        dernieresSeancesAvecExercice.every((s) => s.retourSeance?.ressenti === "DIFFICILE");
     }
   }
 
@@ -100,6 +170,16 @@ export default async function EntrainementPage() {
           {athlete.sportPrincipal.nom} · {athlete.ville}
         </p>
       </div>
+
+      {tacheDuJour && (
+        <TacheDuJour
+          categorie={athlete.sportPrincipal.categoriePerformance}
+          titre={tacheDuJour.titre}
+          beneficePerformance={tacheDuJour.beneficePerformance}
+          evenement={evenementMascotte}
+          suggererReductionCharge={suggererReductionCharge}
+        />
+      )}
 
       <section className="grid grid-cols-3 gap-3">
         <StatCard icon={Flame} valeur={totalSeances} label={t("statSeances")} />

@@ -65,7 +65,7 @@ export default async function EvenementDetailPage({
         {t("retourTournois")}
       </Link>
 
-      <div className="card overflow-hidden">
+      <div className="card glass overflow-hidden">
         {evenement.images.length > 0 ? (
           <div className="p-2">
             <ImageCarousel images={evenement.images.map((i) => i.url)} />

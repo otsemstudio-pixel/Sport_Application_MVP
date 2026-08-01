@@ -7,11 +7,8 @@ export default async function PublicHeader() {
   const t = await getTranslations("nav");
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between border-b px-4 py-3.5 backdrop-blur-lg sm:px-8"
-      style={{
-        borderColor: "var(--border)",
-        background: "color-mix(in srgb, var(--background) 85%, transparent)",
-      }}
+      className="glass sticky top-0 z-20 flex items-center justify-between border-b px-4 py-3.5 sm:px-8"
+      style={{ borderColor: "var(--border)" }}
     >
       <Logo />
       <div className="flex items-center gap-2 text-sm">

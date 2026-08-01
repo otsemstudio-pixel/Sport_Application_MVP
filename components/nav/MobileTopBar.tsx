@@ -9,11 +9,8 @@ export default function MobileTopBar({
 }) {
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between border-b px-4 py-3 backdrop-blur-lg sm:hidden"
-      style={{
-        borderColor: "var(--border)",
-        background: "color-mix(in srgb, var(--background) 85%, transparent)",
-      }}
+      className="glass sticky top-0 z-20 flex items-center justify-between border-b px-4 py-3 sm:hidden"
+      style={{ borderColor: "var(--border)" }}
     >
       <Logo href={role === "ATHLETE" ? "/entrainement" : "/organisateur"} />
       <div className="flex items-center gap-1.5">

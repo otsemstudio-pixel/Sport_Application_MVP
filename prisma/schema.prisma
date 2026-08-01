@@ -29,6 +29,24 @@ enum SensAmelioration {
   PLUS_BAS_MIEUX
 }
 
+enum PreferenceEffets {
+  AUTO
+  DEGRADE
+  COMPLET
+}
+
+enum ThemeFond {
+  CLAIR
+  SOMBRE
+  SPORT
+}
+
+enum RessentiSeance {
+  DIFFICILE
+  CORRECT
+  FACILE
+}
+
 enum StatutProgramme {
   EN_COURS
   TERMINE
@@ -56,7 +74,10 @@ model Athlete {
   sportPrincipal   Sport    @relation(fields: [sportPrincipalId], references: [id])
   createdAt        DateTime @default(now())
 
-  suiviMensurationsActive Boolean @default(false)
+  suiviMensurationsActive Boolean          @default(false)
+  preferenceEffetsVisuels PreferenceEffets @default(AUTO)
+  themeFond               ThemeFond        @default(CLAIR)
+  onboardingComplete      Boolean          @default(true)
 
   consentement        ConsentementParental?
   seancesEntrainement SeanceEntrainement[]
@@ -100,6 +121,7 @@ model Exercice {
   uniteMesure          UniteMesure
   sensAmelioration     SensAmelioration     @default(PLUS_HAUT_MIEUX)
   description          String
+  beneficePerformance  String?
   createdAt            DateTime             @default(now())
 
   exercicesRealises  ExerciceRealise[]
@@ -120,8 +142,19 @@ model SeanceEntrainement {
 
   exercicesRealises ExerciceRealise[]
   postsPartages     Post[]
+  retourSeance      RetourSeance?
 
   @@index([athleteId, date])
+}
+
+// Ressenti fermé (pas de conversation libre) associé à une séance, saisi via
+// la mascotte scriptée à la fin de la séance.
+model RetourSeance {
+  id        String             @id @default(cuid())
+  seanceId  String             @unique
+  seance    SeanceEntrainement @relation(fields: [seanceId], references: [id])
+  ressenti  RessentiSeance
+  createdAt DateTime           @default(now())
 }
 
 model ExerciceRealise {

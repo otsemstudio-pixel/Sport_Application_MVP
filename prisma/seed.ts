@@ -52,35 +52,41 @@ async function seedReferentiels() {
   const EXERCICES: {
     nom: string;
     description: string;
+    beneficePerformance: string;
     categoriePerformance: string;
     uniteMesure: string;
     sensAmelioration: string;
   }[] = [
     // Renforcement général (utilisable par tous les sports)
-    { nom: "Squats", description: "Squats au poids du corps", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Pompes", description: "Pompes au poids du corps", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Tractions", description: "Tractions à la barre", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Abdominaux", description: "Crunchs ou relevés de buste", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Fentes", description: "Fentes avant alternées", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Gainage", description: "Gainage ventral (planche)", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Burpees", description: "Burpees complets", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Planche latérale", description: "Gainage latéral, de chaque côté", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Squats", description: "Squats au poids du corps", beneficePerformance: "Renforce les jambes et les fessiers, la base de tout démarrage explosif.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Pompes", description: "Pompes au poids du corps", beneficePerformance: "Développe la force du haut du corps utile dans la plupart des sports de contact et de lancer.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Tractions", description: "Tractions à la barre", beneficePerformance: "Construit la force du dos et des bras, essentielle pour la lutte et les duels physiques.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Abdominaux", description: "Crunchs ou relevés de buste", beneficePerformance: "Stabilise le tronc, la base de tout transfert de force entre le bas et le haut du corps.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Fentes", description: "Fentes avant alternées", beneficePerformance: "Améliore l'équilibre et la puissance unilatérale des jambes.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Gainage", description: "Gainage ventral (planche)", beneficePerformance: "Renforce la sangle abdominale profonde pour protéger le dos à l'effort.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Burpees", description: "Burpees complets", beneficePerformance: "Travaille le cardio et la puissance en même temps, pour tenir sur la durée d'un match.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Planche latérale", description: "Gainage latéral, de chaque côté", beneficePerformance: "Renforce les obliques, utiles pour la stabilité lors des changements de direction.", categoriePerformance: "RENFORCEMENT_GENERAL", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_HAUT_MIEUX" },
     // Explosivité / puissance
-    { nom: "Sprint 30m chronométré", description: "Temps sur un sprint de 30m", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
-    { nom: "Sauts en longueur", description: "Distance du meilleur saut en longueur sans élan", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DISTANCE_METRES", sensAmelioration: "PLUS_HAUT_MIEUX" },
-    { nom: "Corde à sauter", description: "Nombre de sauts à la corde sans interruption", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Sprint 30m chronométré", description: "Temps sur un sprint de 30m", beneficePerformance: "Développe la vitesse pure, décisive dans les phases de démarrage.", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
+    { nom: "Sauts en longueur", description: "Distance du meilleur saut en longueur sans élan", beneficePerformance: "Mesure et développe la puissance explosive des jambes.", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "DISTANCE_METRES", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Corde à sauter", description: "Nombre de sauts à la corde sans interruption", beneficePerformance: "Améliore la coordination et le rythme, utiles pour l'explosivité répétée.", categoriePerformance: "EXPLOSIVITE_PUISSANCE", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
     // Endurance
-    { nom: "10 km chronométré", description: "Temps sur une distance de 10 km", categoriePerformance: "ENDURANCE", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
-    { nom: "Course en durée (distance parcourue)", description: "Distance parcourue sur un temps fixe (ex. 12 minutes)", categoriePerformance: "ENDURANCE", uniteMesure: "DISTANCE_METRES", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "10 km chronométré", description: "Temps sur une distance de 10 km", beneficePerformance: "Développe l'endurance fondamentale, la capacité à tenir l'effort sur la durée.", categoriePerformance: "ENDURANCE", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
+    { nom: "5 km chronométré", description: "Temps sur une distance de 5 km", beneficePerformance: "Développe la vitesse de fond, un bon complément aux sorties longues.", categoriePerformance: "ENDURANCE", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
+    { nom: "Course en durée (distance parcourue)", description: "Distance parcourue sur un temps fixe (ex. 12 minutes)", beneficePerformance: "Évalue la capacité aérobie et sa progression dans le temps.", categoriePerformance: "ENDURANCE", uniteMesure: "DISTANCE_METRES", sensAmelioration: "PLUS_HAUT_MIEUX" },
     // Combat
-    { nom: "Mouvements de lutte au sol chronométrés", description: "Enchaînement de mouvements au sol contre la montre", categoriePerformance: "COMBAT", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
-    { nom: "Enchaînement technique combat noté", description: "Enchaînement technique jugé par un coach", categoriePerformance: "COMBAT", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Mouvements de lutte au sol chronométrés", description: "Enchaînement de mouvements au sol contre la montre", beneficePerformance: "Développe l'endurance spécifique au combat au sol.", categoriePerformance: "COMBAT", uniteMesure: "DUREE_SECONDES", sensAmelioration: "PLUS_BAS_MIEUX" },
+    { nom: "Enchaînement technique combat noté", description: "Enchaînement technique jugé par un coach", beneficePerformance: "Affine la précision technique évaluée en conditions proches de la compétition.", categoriePerformance: "COMBAT", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Déséquilibres réussis", description: "Nombre de déséquilibres réussis à l'entraînement", beneficePerformance: "Travaille le placement et le timing, la clé des projections en lutte.", categoriePerformance: "COMBAT", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    // Collectif / tactique
+    { nom: "Dribbles en continu", description: "Nombre de dribbles réalisés sans perdre le contrôle du ballon", beneficePerformance: "Améliore le contrôle de balle sous pression, utile en match.", categoriePerformance: "COLLECTIF_TACTIQUE", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
+    { nom: "Tirs réussis", description: "Nombre de tirs réussis sur une série", beneficePerformance: "Mesure et développe la précision de finition, décisive en match.", categoriePerformance: "COLLECTIF_TACTIQUE", uniteMesure: "REPETITIONS", sensAmelioration: "PLUS_HAUT_MIEUX" },
   ];
 
   for (const exercice of EXERCICES) {
     await prisma.exercice.upsert({
       where: { nom: exercice.nom },
-      update: { sensAmelioration: exercice.sensAmelioration as never },
+      update: { sensAmelioration: exercice.sensAmelioration as never, beneficePerformance: exercice.beneficePerformance },
       create: exercice as never,
     });
   }
@@ -279,6 +285,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
       sport: "Basketball",
       dateNaissance: new Date("2005-03-12"),
       mineur: false,
+      themeFond: "SPORT" as const,
     },
     {
       email: "modou.fall@demo.scoutapp",
@@ -317,12 +324,14 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
   const passwordHash = await bcrypt.hash(MOT_DE_PASSE_DEMO, 10);
   const athletes = [];
   for (const a of donnees) {
+    const themeFond = "themeFond" in a ? a.themeFond : undefined;
     const athlete = await prisma.athlete.upsert({
       where: { email: a.email },
       update: {
         nom: a.nom,
         ville: a.ville,
         sportPrincipalId: sportParNom.get(a.sport)!.id,
+        ...(themeFond ? { themeFond, onboardingComplete: true } : {}),
       },
       create: {
         email: a.email,
@@ -331,6 +340,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
         ville: a.ville,
         dateNaissance: a.dateNaissance,
         sportPrincipalId: sportParNom.get(a.sport)!.id,
+        ...(themeFond ? { themeFond, onboardingComplete: true } : {}),
       },
     });
     athletes.push(athlete);
@@ -377,6 +387,7 @@ async function reinitialiserSeancesDemo(
     where: { seanceEntrainementId: { in: idsAnciennes } },
     data: { seanceEntrainementId: null },
   });
+  await prisma.retourSeance.deleteMany({ where: { seanceId: { in: idsAnciennes } } });
   await prisma.serie.deleteMany({ where: { exerciceRealise: { seanceId: { in: idsAnciennes } } } });
   await prisma.exerciceRealise.deleteMany({ where: { seanceId: { in: idsAnciennes } } });
   await prisma.seanceEntrainement.deleteMany({ where: { id: { in: idsAnciennes } } });
@@ -469,7 +480,7 @@ async function reinitialiserSeancesDemo(
     }
   }
 
-  await creerSeance(
+  const seanceAujourdhuiAicha = await creerSeance(
     aicha.id,
     joursAvant(0),
     [
@@ -482,6 +493,12 @@ async function reinitialiserSeancesDemo(
   await creerSeance(aicha.id, joursAvant(9), [
     { nom: "Planche latérale", series: [{ dureeSecondes: 90 }] },
     { nom: "Abdominaux", series: [{ repetitions: 40 }] },
+  ]);
+  const seance15Aicha = await creerSeance(aicha.id, joursAvant(15), [
+    { nom: "10 km chronométré", series: [{ dureeSecondes: 2820 }] },
+  ]);
+  const seance25Aicha = await creerSeance(aicha.id, joursAvant(25), [
+    { nom: "10 km chronométré", series: [{ dureeSecondes: 2850 }] },
   ]);
   await creerSeance(aicha.id, joursAvant(40), [{ nom: "10 km chronométré", series: [{ dureeSecondes: 2800 }] }]);
 
@@ -549,6 +566,15 @@ async function reinitialiserSeancesDemo(
     data: { athleteId: aicha.id, exerciceId: dixKm.id, valeurCible: 2600, atteint: false },
   });
 
+  // Ressentis de démonstration : trois séances consécutives "difficile" sur le
+  // 10 km chronométré d'Aïcha pour illustrer la suggestion de réduction de
+  // charge de la mascotte (tâche du jour), plus quelques ressentis variés
+  // ailleurs pour montrer le fonctionnement général.
+  await prisma.retourSeance.create({ data: { seanceId: seanceAujourdhuiAicha.id, ressenti: "DIFFICILE" } });
+  await prisma.retourSeance.create({ data: { seanceId: seance15Aicha.id, ressenti: "DIFFICILE" } });
+  await prisma.retourSeance.create({ data: { seanceId: seance25Aicha.id, ressenti: "DIFFICILE" } });
+  await prisma.retourSeance.create({ data: { seanceId: seanceAujourdhuiMamadou.id, ressenti: "CORRECT" } });
+
   return {
     seancePartageable: {
       id: seanceAujourdhuiMamadou.id,
@@ -575,6 +601,7 @@ async function reinitialiserPostsDemo(
   const idsAnciens = anciensPosts.map((p) => p.id);
   await prisma.postCommentaire.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postLike.deleteMany({ where: { postId: { in: idsAnciens } } });
+  await prisma.postVue.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postImage.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.post.deleteMany({ where: { id: { in: idsAnciens } } });
 

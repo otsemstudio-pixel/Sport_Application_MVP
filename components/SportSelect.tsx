@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Sport = {
+export type Sport = {
   id: string;
   nom: string;
   categoriePerformance: "EXPLOSIVITE_PUISSANCE" | "ENDURANCE" | "COLLECTIF_TACTIQUE" | "COMBAT";
@@ -21,12 +21,14 @@ export default function SportSelect({
   defaultValue,
   className = "input",
   avecTousLesSports = false,
+  onChange,
 }: {
   name: string;
   required?: boolean;
   defaultValue?: string;
   className?: string;
   avecTousLesSports?: boolean;
+  onChange?: (sport: Sport | null) => void;
 }) {
   const [sports, setSports] = useState<Sport[] | null>(null);
 
@@ -53,7 +55,13 @@ export default function SportSelect({
   }
 
   return (
-    <select name={name} required={required} defaultValue={defaultValue} className={className}>
+    <select
+      name={name}
+      required={required}
+      defaultValue={defaultValue}
+      className={className}
+      onChange={onChange ? (e) => onChange(sports.find((s) => s.id === e.target.value) ?? null) : undefined}
+    >
       {avecTousLesSports ? (
         <option value="">Tous les sports</option>
       ) : (

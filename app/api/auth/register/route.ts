@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
         dateNaissance: new Date(dateNaissance),
         ville,
         sportPrincipalId: sportId,
+        onboardingComplete: false,
       },
     });
 

@@ -42,7 +42,15 @@
     "seConnecterBouton": "Accedi",
     "connexionEnCours": "Accesso…",
     "pasDeCompte": "Non hai ancora un account?",
-    "inscrisToiLien": "Registrati"
+    "inscrisToiLien": "Registrati",
+    "commencer": "Inizia",
+    "passer": "Salta",
+    "premierDefiIntro": "Prova una prima sfida per scoprire come funziona.",
+    "chargementExercices": "Caricamento esercizi…",
+    "valeurDefiPlaceholder": "Il tuo valore",
+    "validerDefi": "Conferma la mia sfida",
+    "continuer": "Continua",
+    "terminerOnboarding": "Fine"
   },
   "consentement": {
     "titre": "Consenso dei genitori richiesto",
@@ -110,7 +118,13 @@
     "mesObjectifs": "I miei obiettivi",
     "programmeEnCours": "Programma in corso",
     "voirMonProgramme": "Vedi il mio programma",
-    "calendrierRegularite": "Calendario di regolarità"
+    "calendrierRegularite": "Calendario di regolarità",
+    "ressenti": {
+      "DIFFICILE": "Difficile",
+      "CORRECT": "Corretto",
+      "FACILE": "Facile"
+    },
+    "ressentiEnregistre": "Grazie, registrato!"
   },
   "exercices": {
     "retourEntrainement": "Torna all'allenamento",
@@ -240,7 +254,9 @@
     "filtreTout": "Tutti",
     "filtreAbonnements": "Seguiti",
     "aucunPostAbonnements": "Ancora nessuna pubblicazione dagli account che segui.",
-    "nombreVues": "{n} visualizzazioni"
+    "nombreVues": "{n} visualizzazioni",
+    "filtreMonSport": "Il mio sport",
+    "filtreTousLesSports": "Tutti gli sport"
   },
   "organisateur": {
     "titreTableauDeBord": "Pannello di controllo",
@@ -312,5 +328,36 @@
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 5 MB.",
     "fichierPasImage": "{nom} non è un'immagine."
+  },
+  "apparence": {
+    "titre": "Aspetto",
+    "themeFondLabel": "Tema di sfondo",
+    "theme": {
+      "CLAIR": "Chiaro",
+      "SOMBRE": "Scuro",
+      "SPORT": "Colore sport"
+    },
+    "effetsLabel": "Effetti visivi",
+    "effets": {
+      "AUTO": "Auto",
+      "DEGRADE": "Ridotto",
+      "COMPLET": "Completo"
+    },
+    "effetsDescription": "In modalità auto, gli effetti ricchi (sfocatura, trasparenza) si attivano solo se il tuo dispositivo può mostrarli senza rallentare l'app."
+  },
+  "mascotte": {
+    "bienvenue": "Benvenuto su ScoutApp! Ti accompagnerò nel tuo allenamento.",
+    "tacheDuJour": "Oggi: {titre}",
+    "tacheCompletee": "Bravo, hai già completato il compito di oggi: {titre}!",
+    "inactivite3j": "È passato un po' di tempo! Ripartiamo con calma con: {titre}",
+    "seanceTerminee": "Bella sessione! Come ti è sembrata?",
+    "objectifAtteint": "Obiettivo raggiunto, complimenti!",
+    "nouveauRecord": "Nuovo record personale, bravo!",
+    "premierDefi": "Complimenti per la tua prima sfida! Sei pronto per iniziare.",
+    "astuce": "Consiglio: registra una sessione dopo ogni allenamento per seguire i tuoi progressi.",
+    "suggestionReductionCharge": "Le ultime sessioni sembrano essere state difficili: pensa a ridurre un po' il carico la prossima volta."
+  },
+  "tacheDuJour": {
+    "titre": "Compito del giorno"
   }
 }

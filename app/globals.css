@@ -42,6 +42,129 @@
   }
 }
 
+/* Thème explicite (compte authentifié avec une préférence enregistrée) :
+   prime sur prefers-color-scheme grâce à la spécificité du sélecteur
+   d'attribut, quel que soit l'ordre des règles. Les visiteurs non
+   authentifiés continuent de suivre prefers-color-scheme ci-dessus. */
+:root[data-theme="light"] {
+  --background: #faf9f7;
+  --surface: #ffffff;
+  --surface-hover: #f4f2ef;
+  --border: rgba(24, 24, 27, 0.09);
+  --foreground: #18181b;
+  --muted: #71717a;
+  --primary: #ea580c;
+  --primary-hover: #c2410c;
+  --primary-foreground: #fff7ed;
+  --primary-soft: rgba(234, 88, 12, 0.1);
+  --gold: #b45309;
+  --gold-soft: rgba(217, 119, 6, 0.12);
+  --success: #15803d;
+  --success-soft: rgba(21, 128, 61, 0.1);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.1);
+}
+:root[data-theme="dark"] {
+  --background: #0a0a0c;
+  --surface: #17171b;
+  --surface-hover: #1f1f24;
+  --border: rgba(255, 255, 255, 0.08);
+  --foreground: #f4f4f5;
+  --muted: #9a9aa2;
+  --primary: #fb7a20;
+  --primary-hover: #ff9142;
+  --primary-foreground: #1a0d02;
+  --primary-soft: rgba(251, 122, 32, 0.14);
+  --gold: #f2b544;
+  --gold-soft: rgba(242, 181, 68, 0.14);
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.12);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.12);
+}
+/* "Couleur sport" : mêmes surfaces que le thème clair, fond légèrement
+   teinté, chaleureux — l'accent (--primary) vient de data-categorie
+   ci-dessous, pas d'ici. */
+:root[data-theme="sport"] {
+  --background: #fdf6f0;
+  --surface: #ffffff;
+  --surface-hover: #f7efe7;
+  --border: rgba(24, 24, 27, 0.09);
+  --foreground: #18181b;
+  --muted: #71717a;
+  --gold: #b45309;
+  --gold-soft: rgba(217, 119, 6, 0.12);
+  --success: #15803d;
+  --success-soft: rgba(21, 128, 61, 0.1);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.1);
+}
+
+/* Identité par catégorie de performance (sport principal de l'athlète) :
+   remplace uniquement l'accent, s'applique par-dessus n'importe quel thème
+   de fond. Variante "dark" plus lumineuse pour rester lisible sur fond
+   sombre, même logique que le orange par défaut. */
+:root[data-categorie="EXPLOSIVITE_PUISSANCE"] {
+  --primary: #ea580c;
+  --primary-hover: #c2410c;
+  --primary-soft: rgba(234, 88, 12, 0.1);
+  --primary-foreground: #fff7ed;
+}
+:root[data-theme="dark"][data-categorie="EXPLOSIVITE_PUISSANCE"] {
+  --primary: #fb7a20;
+  --primary-hover: #ff9142;
+  --primary-soft: rgba(251, 122, 32, 0.14);
+  --primary-foreground: #1a0d02;
+}
+:root[data-categorie="ENDURANCE"] {
+  --primary: #0891b2;
+  --primary-hover: #0e7490;
+  --primary-soft: rgba(8, 145, 178, 0.1);
+  --primary-foreground: #ecfeff;
+}
+:root[data-theme="dark"][data-categorie="ENDURANCE"] {
+  --primary: #22d3ee;
+  --primary-hover: #67e8f9;
+  --primary-soft: rgba(34, 211, 238, 0.14);
+  --primary-foreground: #083344;
+}
+:root[data-categorie="COLLECTIF_TACTIQUE"] {
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --primary-soft: rgba(22, 163, 74, 0.1);
+  --primary-foreground: #f0fdf4;
+}
+:root[data-theme="dark"][data-categorie="COLLECTIF_TACTIQUE"] {
+  --primary: #4ade80;
+  --primary-hover: #86efac;
+  --primary-soft: rgba(74, 222, 128, 0.14);
+  --primary-foreground: #052e16;
+}
+:root[data-categorie="COMBAT"] {
+  --primary: #be123c;
+  --primary-hover: #9f1239;
+  --primary-soft: rgba(190, 18, 60, 0.1);
+  --primary-foreground: #fff1f2;
+}
+:root[data-theme="dark"][data-categorie="COMBAT"] {
+  --primary: #fb7185;
+  --primary-hover: #fda4af;
+  --primary-soft: rgba(251, 113, 133, 0.14);
+  --primary-foreground: #4c0519;
+}
+:root[data-categorie="RENFORCEMENT_GENERAL"] {
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-soft: rgba(124, 58, 237, 0.1);
+  --primary-foreground: #f5f3ff;
+}
+:root[data-theme="dark"][data-categorie="RENFORCEMENT_GENERAL"] {
+  --primary: #a78bfa;
+  --primary-hover: #c4b5fd;
+  --primary-soft: rgba(167, 139, 250, 0.14);
+  --primary-foreground: #2e1065;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -232,6 +355,23 @@ body {
     border-radius: var(--radius-md);
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
+
+  /* Dégradé (opaque) par défaut — l'effet verre n'apparaît que lorsque
+     data-effets="complet" a été posé côté client après confirmation de la
+     capacité de l'appareil (voir components/DetectionEffetsVisuels.tsx).
+     Jamais utilisé sur une liste qui scrolle : le flou recalculé en continu
+     est la cause la plus fréquente de ralentissement perceptible. */
+  .glass {
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  [data-effets="complet"] .glass {
+    background: color-mix(in srgb, var(--surface) 68%, transparent);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
 }
 
 @keyframes skeleton-pulse {
@@ -242,6 +382,47 @@ body {
   50% {
     opacity: 0.5;
   }
+}
+
+/* Transitions d'écran et micro-feedback : uniquement opacity/transform,
+   jamais width/height/box-shadow animés. */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes bounce-feedback {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+.anim-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
+}
+.anim-pop-in {
+  animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.anim-feedback {
+  animation: bounce-feedback 0.4s ease-out;
 }
 
 ::selection {

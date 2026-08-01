@@ -17,8 +17,13 @@ export async function GET(req: NextRequest) {
 
   const cursor = req.nextUrl.searchParams.get("cursor") ?? undefined;
   const filtre = req.nextUrl.searchParams.get("filtre");
+  const sport = req.nextUrl.searchParams.get("sport");
 
-  let where: { OR: { auteurId: string; auteurType: "ATHLETE" | "ORGANISATEUR" }[] } | undefined;
+  type Condition =
+    | { OR: { auteurId: string; auteurType: "ATHLETE" | "ORGANISATEUR" }[] }
+    | { auteurType: "ATHLETE"; auteurId: { in: string[] } };
+  const conditions: Condition[] = [];
+
   if (filtre === "abonnements") {
     const abonnements = await prisma.abonnement.findMany({
       where: { suiveurId: auteurIdSession(session), suiveurType: session.role },
@@ -27,8 +32,30 @@ export async function GET(req: NextRequest) {
     if (abonnements.length === 0) {
       return NextResponse.json({ posts: [], nextCursor: null });
     }
-    where = { OR: abonnements.map((a) => ({ auteurId: a.suiviId, auteurType: a.suiviType })) };
+    conditions.push({ OR: abonnements.map((a) => ({ auteurId: a.suiviId, auteurType: a.suiviType })) });
   }
+
+  // "Mon sport" n'a de sens que pour un athlète (un organisateur peut gérer
+  // plusieurs sports) — le paramètre est ignoré pour toute autre session,
+  // jamais dérivé d'une valeur envoyée par le client.
+  if (sport === "mon-sport" && session.role === "ATHLETE") {
+    const athlete = await prisma.athlete.findUnique({
+      where: { id: session.athleteId },
+      select: { sportPrincipalId: true },
+    });
+    if (athlete) {
+      const athletesDuSport = await prisma.athlete.findMany({
+        where: { sportPrincipalId: athlete.sportPrincipalId },
+        select: { id: true },
+      });
+      if (athletesDuSport.length === 0) {
+        return NextResponse.json({ posts: [], nextCursor: null });
+      }
+      conditions.push({ auteurType: "ATHLETE", auteurId: { in: athletesDuSport.map((a) => a.id) } });
+    }
+  }
+
+  const where = conditions.length > 0 ? { AND: conditions } : undefined;
 
   const posts = await prisma.post.findMany({
     take: PAGE_SIZE,

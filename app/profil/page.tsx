@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import ConsentementFlow from "@/components/ConsentementFlow";
 import BasculeMensurations from "@/components/BasculeMensurations";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
+import ParametresApparence from "@/components/ParametresApparence";
 import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
@@ -83,6 +84,11 @@ export default async function ProfilPage() {
           codeDejaEnvoye={!!athlete.consentement}
         />
       )}
+
+      <ParametresApparence
+        themeFondInitial={athlete.themeFond}
+        preferenceEffetsInitiale={athlete.preferenceEffetsVisuels}
+      />
 
       <BasculeMensurations activeInitial={athlete.suiviMensurationsActive} />
       {athlete.suiviMensurationsActive && (

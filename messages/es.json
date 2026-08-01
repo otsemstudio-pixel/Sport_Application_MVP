@@ -42,7 +42,15 @@
     "seConnecterBouton": "Iniciar sesión",
     "connexionEnCours": "Iniciando sesión…",
     "pasDeCompte": "¿Aún no tienes una cuenta?",
-    "inscrisToiLien": "Regístrate"
+    "inscrisToiLien": "Regístrate",
+    "commencer": "Empezar",
+    "passer": "Saltar",
+    "premierDefiIntro": "Prueba un primer reto para ver cómo funciona.",
+    "chargementExercices": "Cargando ejercicios…",
+    "valeurDefiPlaceholder": "Tu valor",
+    "validerDefi": "Confirmar mi reto",
+    "continuer": "Continuar",
+    "terminerOnboarding": "Terminar"
   },
   "consentement": {
     "titre": "Se requiere consentimiento parental",
@@ -110,7 +118,13 @@
     "mesObjectifs": "Mis objetivos",
     "programmeEnCours": "Programa en curso",
     "voirMonProgramme": "Ver mi programa",
-    "calendrierRegularite": "Calendario de regularidad"
+    "calendrierRegularite": "Calendario de regularidad",
+    "ressenti": {
+      "DIFFICILE": "Difícil",
+      "CORRECT": "Correcta",
+      "FACILE": "Fácil"
+    },
+    "ressentiEnregistre": "¡Gracias, anotado!"
   },
   "exercices": {
     "retourEntrainement": "Volver al entrenamiento",
@@ -240,7 +254,9 @@
     "filtreTout": "Todo",
     "filtreAbonnements": "Siguiendo",
     "aucunPostAbonnements": "Aún no hay publicaciones de las cuentas que sigues.",
-    "nombreVues": "{n} visualizaciones"
+    "nombreVues": "{n} visualizaciones",
+    "filtreMonSport": "Mi deporte",
+    "filtreTousLesSports": "Todos los deportes"
   },
   "organisateur": {
     "titreTableauDeBord": "Panel",
@@ -312,5 +328,36 @@
     "maxImages": "Máximo {n} imágenes.",
     "fichierTropLourd": "{nom} supera el tamaño máximo de 5 MB.",
     "fichierPasImage": "{nom} no es una imagen."
+  },
+  "apparence": {
+    "titre": "Apariencia",
+    "themeFondLabel": "Tema de fondo",
+    "theme": {
+      "CLAIR": "Claro",
+      "SOMBRE": "Oscuro",
+      "SPORT": "Color de deporte"
+    },
+    "effetsLabel": "Efectos visuales",
+    "effets": {
+      "AUTO": "Auto",
+      "DEGRADE": "Reducido",
+      "COMPLET": "Completo"
+    },
+    "effetsDescription": "En modo automático, los efectos avanzados (desenfoque, transparencia) solo se activan si tu dispositivo puede mostrarlos sin ralentizar la aplicación."
+  },
+  "mascotte": {
+    "bienvenue": "¡Bienvenido a ScoutApp! Te acompañaré durante tu entrenamiento.",
+    "tacheDuJour": "Hoy: {titre}",
+    "tacheCompletee": "¡Genial, ya completaste la tarea de hoy: {titre}!",
+    "inactivite3j": "¡Ha pasado un tiempo! Retomemos con calma con: {titre}",
+    "seanceTerminee": "¡Buena sesión! ¿Qué tal te pareció?",
+    "objectifAtteint": "¡Objetivo alcanzado, felicidades!",
+    "nouveauRecord": "¡Nuevo récord personal, bien hecho!",
+    "premierDefi": "¡Felicidades por tu primer reto! Estás listo para empezar.",
+    "astuce": "Consejo: registra una sesión después de cada entrenamiento para seguir tu progreso.",
+    "suggestionReductionCharge": "Las últimas sesiones parecen haber sido difíciles: considera reducir un poco la carga la próxima vez."
+  },
+  "tacheDuJour": {
+    "titre": "Tarea del día"
   }
 }

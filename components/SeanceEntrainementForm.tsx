@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Check, PartyPopper, Plus, Send, Sparkles, Trash2, X } from "lucide-react";
 import MinuteurRepos from "@/components/MinuteurRepos";
+import Mascotte from "@/components/Mascotte";
+
+type RessentiSeance = "DIFFICILE" | "CORRECT" | "FACILE";
 
 type UniteMesure = "REPETITIONS" | "DUREE_SECONDES" | "DISTANCE_METRES" | "SERIES_X_REPETITIONS";
 
@@ -51,6 +54,7 @@ export default function SeanceEntrainementForm({
   const router = useRouter();
   const t = useTranslations("entrainement");
   const tCommun = useTranslations("commun");
+  const tMascotte = useTranslations("mascotte");
 
   const [etape, setEtape] = useState<"repos" | "composition" | "termine">("repos");
   const [programmeSeanceIdActif, setProgrammeSeanceIdActif] = useState<string | null>(null);
@@ -73,6 +77,8 @@ export default function SeanceEntrainementForm({
   const [resume, setResume] = useState("");
   const [partageChargement, setPartageChargement] = useState(false);
   const [partageFait, setPartageFait] = useState(false);
+  const [ressentiEnvoye, setRessentiEnvoye] = useState<RessentiSeance | null>(null);
+  const [ressentiChargement, setRessentiChargement] = useState(false);
 
   const exerciceActuel = exercices.find((e) => e.id === exerciceChoisi);
   const champ = exerciceActuel ? champPrincipal(exerciceActuel.uniteMesure) : "repetitions";
@@ -181,6 +187,18 @@ export default function SeanceEntrainementForm({
     router.refresh();
   }
 
+  async function envoyerRessenti(ressenti: RessentiSeance) {
+    if (!seanceId || ressentiChargement) return;
+    setRessentiChargement(true);
+    await fetch(`/api/seances-entrainement/${seanceId}/ressenti`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ressenti }),
+    }).catch(() => {});
+    setRessentiChargement(false);
+    setRessentiEnvoye(ressenti);
+  }
+
   async function partagerSeance() {
     if (!seanceId || !resume.trim()) return;
     setErreur(null);
@@ -213,6 +231,7 @@ export default function SeanceEntrainementForm({
     setPartageFait(false);
     setNouveauxBadges([]);
     setNouveauxRecords([]);
+    setRessentiEnvoye(null);
   }
 
   if (etape === "repos") {
@@ -244,6 +263,27 @@ export default function SeanceEntrainementForm({
             ? t("seanceEnregistreeAvecBadges", { badges: nouveauxBadges.map((b) => b.nom).join(", ") })
             : t("seanceEnregistree")}
         </p>
+
+        <Mascotte message={tMascotte("seanceTerminee")}>
+          {!ressentiEnvoye ? (
+            <div className="mt-2 flex gap-2">
+              {(["DIFFICILE", "CORRECT", "FACILE"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => envoyerRessenti(r)}
+                  disabled={ressentiChargement}
+                  className="btn btn-secondary flex-1 !py-1.5 text-xs"
+                >
+                  {t(`ressenti.${r}`)}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
+              {t("ressentiEnregistre")}
+            </p>
+          )}
+        </Mascotte>
 
         {nouveauxRecords.length > 0 && (
           <div className="flex flex-wrap gap-2">

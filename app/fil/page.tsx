@@ -15,8 +15,27 @@ export default async function FilPage() {
   const t = await getTranslations("fil");
   const tCommun = await getTranslations("commun");
 
+  // Par défaut, un athlète ne voit que les posts de son sport principal
+  // (les posts d'organisateur n'ont pas de sport unique, donc pas de place
+  // dans cette vue par défaut — visibles via "Tous les sports").
+  let where: { auteurType: "ATHLETE"; auteurId: { in: string[] } } | undefined;
+  if (session.role === "ATHLETE") {
+    const athlete = await prisma.athlete.findUnique({
+      where: { id: session.athleteId },
+      select: { sportPrincipalId: true },
+    });
+    if (athlete) {
+      const athletesDuSport = await prisma.athlete.findMany({
+        where: { sportPrincipalId: athlete.sportPrincipalId },
+        select: { id: true },
+      });
+      where = { auteurType: "ATHLETE", auteurId: { in: athletesDuSport.map((a) => a.id) } };
+    }
+  }
+
   const posts = await prisma.post.findMany({
     take: PAGE_SIZE,
+    where,
     orderBy: { createdAt: "desc" },
     include: INCLUDE_POST_RELATIONS,
   });
@@ -41,6 +60,7 @@ export default async function FilPage() {
       <FilFeed
         postsInitiaux={postsFormates}
         curseurInitial={posts.length === PAGE_SIZE ? posts[posts.length - 1].id : null}
+        estAthlete={session.role === "ATHLETE"}
       />
     </div>
   );

@@ -42,7 +42,15 @@
     "seConnecterBouton": "Anmelden",
     "connexionEnCours": "Anmeldung…",
     "pasDeCompte": "Noch kein Konto?",
-    "inscrisToiLien": "Registrieren"
+    "inscrisToiLien": "Registrieren",
+    "commencer": "Loslegen",
+    "passer": "Überspringen",
+    "premierDefiIntro": "Probiere eine erste Challenge aus, um zu sehen, wie es funktioniert.",
+    "chargementExercices": "Übungen werden geladen…",
+    "valeurDefiPlaceholder": "Dein Wert",
+    "validerDefi": "Challenge bestätigen",
+    "continuer": "Weiter",
+    "terminerOnboarding": "Fertig"
   },
   "consentement": {
     "titre": "Elterliche Zustimmung erforderlich",
@@ -110,7 +118,13 @@
     "mesObjectifs": "Meine Ziele",
     "programmeEnCours": "Aktuelles Programm",
     "voirMonProgramme": "Mein Programm ansehen",
-    "calendrierRegularite": "Regelmäßigkeitskalender"
+    "calendrierRegularite": "Regelmäßigkeitskalender",
+    "ressenti": {
+      "DIFFICILE": "Schwer",
+      "CORRECT": "Okay",
+      "FACILE": "Leicht"
+    },
+    "ressentiEnregistre": "Danke, notiert!"
   },
   "exercices": {
     "retourEntrainement": "Zurück zum Training",
@@ -240,7 +254,9 @@
     "filtreTout": "Alle",
     "filtreAbonnements": "Abonniert",
     "aucunPostAbonnements": "Noch keine Beiträge von Konten, denen du folgst.",
-    "nombreVues": "{n} Aufrufe"
+    "nombreVues": "{n} Aufrufe",
+    "filtreMonSport": "Meine Sportart",
+    "filtreTousLesSports": "Alle Sportarten"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -312,5 +328,36 @@
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 5 MB.",
     "fichierPasImage": "{nom} ist kein Bild."
+  },
+  "apparence": {
+    "titre": "Erscheinungsbild",
+    "themeFondLabel": "Hintergrundthema",
+    "theme": {
+      "CLAIR": "Hell",
+      "SOMBRE": "Dunkel",
+      "SPORT": "Sportfarbe"
+    },
+    "effetsLabel": "Visuelle Effekte",
+    "effets": {
+      "AUTO": "Automatisch",
+      "DEGRADE": "Reduziert",
+      "COMPLET": "Voll"
+    },
+    "effetsDescription": "Im Automatikmodus werden reichhaltige Effekte (Unschärfe, Transparenz) nur aktiviert, wenn dein Gerät sie ohne Verlangsamung darstellen kann."
+  },
+  "mascotte": {
+    "bienvenue": "Willkommen bei ScoutApp! Ich begleite dich durch dein Training.",
+    "tacheDuJour": "Heute: {titre}",
+    "tacheCompletee": "Klasse, du hast die heutige Aufgabe schon erledigt: {titre}!",
+    "inactivite3j": "Es ist eine Weile her! Wir starten sanft wieder mit: {titre}",
+    "seanceTerminee": "Starke Einheit! Wie fandest du sie?",
+    "objectifAtteint": "Ziel erreicht, Glückwunsch!",
+    "nouveauRecord": "Neuer persönlicher Rekord, bravo!",
+    "premierDefi": "Glückwunsch zu deiner ersten Challenge! Du bist bereit loszulegen.",
+    "astuce": "Tipp: Erfasse nach jedem Training eine Einheit, um deinen Fortschritt zu verfolgen.",
+    "suggestionReductionCharge": "Die letzten Einheiten waren wohl anstrengend: Reduziere die Belastung beim nächsten Mal etwas."
+  },
+  "tacheDuJour": {
+    "titre": "Aufgabe des Tages"
   }
 }

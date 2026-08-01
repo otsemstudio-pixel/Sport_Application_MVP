@@ -42,7 +42,15 @@
     "seConnecterBouton": "Log in",
     "connexionEnCours": "Logging in…",
     "pasDeCompte": "Don't have an account yet?",
-    "inscrisToiLien": "Sign up"
+    "inscrisToiLien": "Sign up",
+    "commencer": "Get started",
+    "passer": "Skip",
+    "premierDefiIntro": "Try a first challenge to see how it works.",
+    "chargementExercices": "Loading exercises…",
+    "valeurDefiPlaceholder": "Your value",
+    "validerDefi": "Submit my challenge",
+    "continuer": "Continue",
+    "terminerOnboarding": "Finish"
   },
   "consentement": {
     "titre": "Parental consent required",
@@ -110,7 +118,13 @@
     "mesObjectifs": "My goals",
     "programmeEnCours": "Current program",
     "voirMonProgramme": "View my program",
-    "calendrierRegularite": "Regularity calendar"
+    "calendrierRegularite": "Regularity calendar",
+    "ressenti": {
+      "DIFFICILE": "Hard",
+      "CORRECT": "Okay",
+      "FACILE": "Easy"
+    },
+    "ressentiEnregistre": "Thanks, noted!"
   },
   "exercices": {
     "retourEntrainement": "Back to training",
@@ -240,7 +254,9 @@
     "filtreTout": "All",
     "filtreAbonnements": "Following",
     "aucunPostAbonnements": "No posts yet from accounts you follow.",
-    "nombreVues": "{n} views"
+    "nombreVues": "{n} views",
+    "filtreMonSport": "My sport",
+    "filtreTousLesSports": "All sports"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -312,5 +328,36 @@
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} exceeds the maximum size of 5 MB.",
     "fichierPasImage": "{nom} is not an image."
+  },
+  "apparence": {
+    "titre": "Appearance",
+    "themeFondLabel": "Background theme",
+    "theme": {
+      "CLAIR": "Light",
+      "SOMBRE": "Dark",
+      "SPORT": "Sport color"
+    },
+    "effetsLabel": "Visual effects",
+    "effets": {
+      "AUTO": "Auto",
+      "DEGRADE": "Reduced",
+      "COMPLET": "Full"
+    },
+    "effetsDescription": "In auto mode, rich effects (blur, transparency) only turn on if your device can display them without slowing the app down."
+  },
+  "mascotte": {
+    "bienvenue": "Welcome to ScoutApp! I'll be with you throughout your training.",
+    "tacheDuJour": "Today: {titre}",
+    "tacheCompletee": "Nice, you've already completed today's task: {titre}!",
+    "inactivite3j": "It's been a while! Let's ease back in with: {titre}",
+    "seanceTerminee": "Great session! How did it feel?",
+    "objectifAtteint": "Goal reached, congratulations!",
+    "nouveauRecord": "New personal record, well done!",
+    "premierDefi": "Great job on your first challenge! You're ready to start.",
+    "astuce": "Tip: log a session after every workout to track your progress.",
+    "suggestionReductionCharge": "The last few sessions seem to have been tough: consider easing off the load a bit next time."
+  },
+  "tacheDuJour": {
+    "titre": "Task of the day"
   }
 }

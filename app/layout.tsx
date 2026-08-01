@@ -10,6 +10,7 @@ import BottomTabBar from "@/components/nav/BottomTabBar";
 import MobileTopBar from "@/components/nav/MobileTopBar";
 import PublicHeader from "@/components/nav/PublicHeader";
 import type { NavLien } from "@/components/nav/NavLinks";
+import DetectionEffetsVisuels from "@/components/DetectionEffetsVisuels";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,17 +41,33 @@ export default async function RootLayout({
   const t = await getTranslations("nav");
 
   let nom: string | null = null;
+  let themeFond: "CLAIR" | "SOMBRE" | "SPORT" | null = null;
+  let categoriePerformance: string | null = null;
+  let preferenceEffetsVisuels: "AUTO" | "DEGRADE" | "COMPLET" = "AUTO";
   if (session?.role === "ATHLETE") {
-    nom = (await prisma.athlete.findUnique({
+    const athlete = await prisma.athlete.findUnique({
       where: { id: session.athleteId },
-      select: { nom: true },
-    }))?.nom ?? null;
+      select: {
+        nom: true,
+        themeFond: true,
+        preferenceEffetsVisuels: true,
+        sportPrincipal: { select: { categoriePerformance: true } },
+      },
+    });
+    nom = athlete?.nom ?? null;
+    themeFond = athlete?.themeFond ?? null;
+    categoriePerformance = athlete?.sportPrincipal.categoriePerformance ?? null;
+    preferenceEffetsVisuels = athlete?.preferenceEffetsVisuels ?? "AUTO";
   } else if (session?.role === "ORGANISATEUR") {
     nom = (await prisma.organisateur.findUnique({
       where: { id: session.organisateurId },
       select: { nom: true },
     }))?.nom ?? null;
   }
+
+  const dataTheme = themeFond
+    ? ({ CLAIR: "light", SOMBRE: "dark", SPORT: "sport" } as const)[themeFond]
+    : undefined;
 
   const LIENS_ATHLETE: NavLien[] = [
     { href: "/entrainement", label: t("entrainement"), icon: "dumbbell" },
@@ -68,10 +85,13 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
+      data-theme={dataTheme}
+      data-categorie={categoriePerformance ?? undefined}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <NextIntlClientProvider messages={messages}>
+          <DetectionEffetsVisuels preference={preferenceEffetsVisuels} />
           {session ? (
             <div className="flex min-h-full">
               <Sidebar liens={liens} nom={nom} role={session.role} />
