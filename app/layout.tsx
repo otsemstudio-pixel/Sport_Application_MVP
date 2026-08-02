@@ -97,7 +97,7 @@ export default async function RootLayout({
           {session ? (
             <div className="flex min-h-full">
               <Sidebar liens={liens} nom={nom} role={session.role} />
-              <div className="flex min-h-full flex-1 flex-col sm:pl-64">
+              <div className="flex min-h-full min-w-0 flex-1 flex-col sm:pl-64">
                 <MobileTopBar role={session.role} />
                 <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
                   {children}
