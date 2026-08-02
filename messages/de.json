@@ -13,6 +13,7 @@
   "nav": {
     "entrainement": "Training",
     "fil": "Feed",
+    "actualites": "Neuigkeiten",
     "tournois": "Turniere",
     "profil": "Profil",
     "tableauDeBord": "Dashboard",
@@ -271,6 +272,23 @@
     "filtreMonSport": "Meine Sportart",
     "filtreTousLesSports": "Alle Sportarten"
   },
+  "actualites": {
+    "titre": "Neuigkeiten",
+    "tousLesSports": "Alle Sportarten",
+    "scoresEnDirect": "Live-Ergebnisse",
+    "enDirect": "Live",
+    "aVenir": "Bevorstehend",
+    "termine": "Beendet",
+    "aucunArticle": "Noch keine Artikel.",
+    "chargerPlus": "Mehr laden",
+    "chargementEnCours": "Wird geladen…",
+    "retourActualites": "Zurück zu den Neuigkeiten",
+    "source": "Quelle",
+    "nombreVues": "{n} Aufrufe",
+    "ajouterCommentaire": "Kommentar hinzufügen…",
+    "commentairesTitre": "Kommentare ({n})",
+    "aucunCommentaire": "Noch keine Kommentare."
+  },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
     "verifie": "Verifiziert",
@@ -337,6 +355,7 @@
     "contenuRequis": "Inhalt erforderlich.",
     "contenuTropLong": "Der Inhalt ist auf 500 Zeichen begrenzt.",
     "postIntrouvable": "Beitrag nicht gefunden.",
+    "articleIntrouvable": "Artikel nicht gefunden.",
     "aucunFichier": "Keine Datei empfangen.",
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 3 MB.",

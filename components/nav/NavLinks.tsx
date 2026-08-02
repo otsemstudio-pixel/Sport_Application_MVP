@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dumbbell, LayoutDashboard, Rss, Trophy, UserRound, type LucideIcon } from "lucide-react";
+import { Dumbbell, LayoutDashboard, Newspaper, Rss, Trophy, UserRound, type LucideIcon } from "lucide-react";
 
-export type IconKey = "dumbbell" | "trophy" | "profil" | "dashboard" | "fil";
+export type IconKey = "dumbbell" | "trophy" | "profil" | "dashboard" | "fil" | "actualites";
 
 const ICONS: Record<IconKey, LucideIcon> = {
   dumbbell: Dumbbell,
@@ -12,6 +12,7 @@ const ICONS: Record<IconKey, LucideIcon> = {
   profil: UserRound,
   dashboard: LayoutDashboard,
   fil: Rss,
+  actualites: Newspaper,
 };
 
 export type NavLien = { href: string; label: string; icon: IconKey };

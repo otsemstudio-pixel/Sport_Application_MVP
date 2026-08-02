@@ -13,6 +13,7 @@
   "nav": {
     "entrainement": "Allenamento",
     "fil": "Bacheca",
+    "actualites": "Notizie",
     "tournois": "Tornei",
     "profil": "Profilo",
     "tableauDeBord": "Pannello di controllo",
@@ -271,6 +272,23 @@
     "filtreMonSport": "Il mio sport",
     "filtreTousLesSports": "Tutti gli sport"
   },
+  "actualites": {
+    "titre": "Notizie",
+    "tousLesSports": "Tutti gli sport",
+    "scoresEnDirect": "Risultati in diretta",
+    "enDirect": "Diretta",
+    "aVenir": "In arrivo",
+    "termine": "Terminato",
+    "aucunArticle": "Ancora nessun articolo.",
+    "chargerPlus": "Carica altro",
+    "chargementEnCours": "Caricamento…",
+    "retourActualites": "Torna alle notizie",
+    "source": "Fonte",
+    "nombreVues": "{n} visualizzazioni",
+    "ajouterCommentaire": "Aggiungi un commento…",
+    "commentairesTitre": "Commenti ({n})",
+    "aucunCommentaire": "Ancora nessun commento."
+  },
   "organisateur": {
     "titreTableauDeBord": "Pannello di controllo",
     "verifie": "Verificato",
@@ -337,6 +355,7 @@
     "contenuRequis": "Contenuto richiesto.",
     "contenuTropLong": "Il contenuto è limitato a 500 caratteri.",
     "postIntrouvable": "Post non trovato.",
+    "articleIntrouvable": "Articolo non trovato.",
     "aucunFichier": "Nessun file ricevuto.",
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 3 MB.",

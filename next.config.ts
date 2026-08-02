@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
       // Images de démonstration du script de seed.
       { protocol: "https", hostname: "picsum.photos" },
+      // Photos par sport (Wikimedia Commons, libres de droits) utilisées pour
+      // le menu Actualités — mêmes URLs que la galerie de CREDITS_PHOTOS_SPORT.
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
   },
 };

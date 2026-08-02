@@ -13,6 +13,7 @@
   "nav": {
     "entrainement": "Entraînement",
     "fil": "Fil",
+    "actualites": "Actualités",
     "tournois": "Tournois",
     "profil": "Profil",
     "tableauDeBord": "Tableau de bord",
@@ -271,6 +272,23 @@
     "filtreMonSport": "Mon sport",
     "filtreTousLesSports": "Tous les sports"
   },
+  "actualites": {
+    "titre": "Actualités",
+    "tousLesSports": "Tous les sports",
+    "scoresEnDirect": "Scores en direct",
+    "enDirect": "Direct",
+    "aVenir": "À venir",
+    "termine": "Terminé",
+    "aucunArticle": "Aucun article pour l'instant.",
+    "chargerPlus": "Charger plus",
+    "chargementEnCours": "Chargement…",
+    "retourActualites": "Retour aux actualités",
+    "source": "Source",
+    "nombreVues": "{n} vues",
+    "ajouterCommentaire": "Ajouter un commentaire…",
+    "commentairesTitre": "Commentaires ({n})",
+    "aucunCommentaire": "Aucun commentaire pour l'instant."
+  },
   "organisateur": {
     "titreTableauDeBord": "Tableau de bord",
     "verifie": "Vérifié",
@@ -337,6 +355,7 @@
     "contenuRequis": "Contenu requis.",
     "contenuTropLong": "Le contenu est limité à 500 caractères.",
     "postIntrouvable": "Post introuvable.",
+    "articleIntrouvable": "Article introuvable.",
     "aucunFichier": "Aucun fichier reçu.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} dépasse la taille maximale de 3 Mo.",

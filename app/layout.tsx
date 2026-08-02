@@ -72,12 +72,14 @@ export default async function RootLayout({
   const LIENS_ATHLETE: NavLien[] = [
     { href: "/entrainement", label: t("entrainement"), icon: "dumbbell" },
     { href: "/fil", label: t("fil"), icon: "fil" },
+    { href: "/actualites", label: t("actualites"), icon: "actualites" },
     { href: "/tournois", label: t("tournois"), icon: "trophy" },
     { href: "/profil", label: t("profil"), icon: "profil" },
   ];
   const LIENS_ORGANISATEUR: NavLien[] = [
     { href: "/organisateur", label: t("tableauDeBord"), icon: "dashboard" },
     { href: "/fil", label: t("fil"), icon: "fil" },
+    { href: "/actualites", label: t("actualites"), icon: "actualites" },
   ];
 
   const liens = session?.role === "ATHLETE" ? LIENS_ATHLETE : LIENS_ORGANISATEUR;

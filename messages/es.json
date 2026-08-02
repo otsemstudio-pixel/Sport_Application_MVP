@@ -13,6 +13,7 @@
   "nav": {
     "entrainement": "Entrenamiento",
     "fil": "Feed",
+    "actualites": "Noticias",
     "tournois": "Torneos",
     "profil": "Perfil",
     "tableauDeBord": "Panel",
@@ -271,6 +272,23 @@
     "filtreMonSport": "Mi deporte",
     "filtreTousLesSports": "Todos los deportes"
   },
+  "actualites": {
+    "titre": "Noticias",
+    "tousLesSports": "Todos los deportes",
+    "scoresEnDirect": "Marcadores en directo",
+    "enDirect": "En directo",
+    "aVenir": "Próximo",
+    "termine": "Finalizado",
+    "aucunArticle": "Aún no hay artículos.",
+    "chargerPlus": "Cargar más",
+    "chargementEnCours": "Cargando…",
+    "retourActualites": "Volver a noticias",
+    "source": "Fuente",
+    "nombreVues": "{n} visualizaciones",
+    "ajouterCommentaire": "Añadir un comentario…",
+    "commentairesTitre": "Comentarios ({n})",
+    "aucunCommentaire": "Aún no hay comentarios."
+  },
   "organisateur": {
     "titreTableauDeBord": "Panel",
     "verifie": "Verificado",
@@ -337,6 +355,7 @@
     "contenuRequis": "Contenido requerido.",
     "contenuTropLong": "El contenido está limitado a 500 caracteres.",
     "postIntrouvable": "Publicación no encontrada.",
+    "articleIntrouvable": "Artículo no encontrado.",
     "aucunFichier": "No se recibió ningún archivo.",
     "maxImages": "Máximo {n} imágenes.",
     "fichierTropLourd": "{nom} supera el tamaño máximo de 3 MB.",
