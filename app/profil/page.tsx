@@ -7,6 +7,8 @@ import ConsentementFlow from "@/components/ConsentementFlow";
 import BasculeMensurations from "@/components/BasculeMensurations";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import ParametresApparence from "@/components/ParametresApparence";
+import ResumeActiviteProfil from "@/components/ResumeActiviteProfil";
+import { activiteParJour, activiteParSemaine } from "@/lib/activite";
 import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
@@ -27,13 +29,20 @@ export default async function ProfilPage() {
   const consentementValide = athlete.consentement?.codeValide === true;
   const initiale = athlete.nom.trim()[0]?.toUpperCase() ?? "?";
 
-  const [abonnes, abonnements, likes, commentaires, vues] = await Promise.all([
+  const [abonnes, abonnements, likes, commentaires, vues, seancesRecentes] = await Promise.all([
     prisma.abonnement.count({ where: { suiviId: athlete.id, suiviType: "ATHLETE" } }),
     prisma.abonnement.count({ where: { suiveurId: athlete.id, suiveurType: "ATHLETE" } }),
     prisma.postLike.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
     prisma.postCommentaire.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
     prisma.postVue.count({ where: { post: { auteurId: athlete.id, auteurType: "ATHLETE" } } }),
+    prisma.seanceEntrainement.findMany({
+      where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - 35 * 86_400_000) } },
+      select: { date: true },
+    }),
   ]);
+
+  const donneesSemaine = activiteParJour(seancesRecentes, 7);
+  const donneesMois = activiteParSemaine(seancesRecentes, 4);
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,6 +75,8 @@ export default async function ProfilPage() {
         vues={vues}
         locale={locale}
       />
+
+      <ResumeActiviteProfil donneesSemaine={donneesSemaine} donneesMois={donneesMois} />
 
       <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
         <InfoLigne icon={Mail} label={t("email")} valeur={athlete.email} />

@@ -9,12 +9,14 @@ import CalendrierRegularite from "@/components/CalendrierRegularite";
 import TacheDuJour from "@/components/TacheDuJour";
 import ProgressRing from "@/components/ProgressRing";
 import FondSport from "@/components/FondSport";
+import ProgressionJournaliere from "@/components/ProgressionJournaliere";
 import { fondSportPour } from "@/lib/sportBackgrounds";
+import { activiteParJour } from "@/lib/activite";
 import type { EvenementMascotte } from "@/lib/mascotte";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
 
 const TROIS_JOURS_MS = 3 * 86_400_000;
-const SEPT_JOURS_MS = 7 * 86_400_000;
+const QUATORZE_JOURS_MS = 14 * 86_400_000;
 
 function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
   const joursEcoules = Math.floor((Date.now() - dateDebut.getTime()) / 86_400_000);
@@ -36,7 +38,7 @@ export default async function EntrainementPage() {
 
   const t = await getTranslations("entrainement");
 
-  const [exercices, badges, groupes, totalSeances, records, programmeSuivi, seancesSemaine] = await Promise.all([
+  const [exercices, badges, groupes, totalSeances, records, programmeSuivi, seancesRecentes] = await Promise.all([
     prisma.exercice.findMany({
       where: {
         OR: [
@@ -62,14 +64,17 @@ export default async function EntrainementPage() {
       orderBy: { dateDebut: "desc" },
     }),
     prisma.seanceEntrainement.findMany({
-      where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - SEPT_JOURS_MS) } },
+      where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - QUATORZE_JOURS_MS) } },
       select: { date: true },
     }),
   ]);
 
   // Régularité de la semaine : nombre de jours distincts (sur les 7 derniers)
-  // ayant au moins une séance, affiché comme anneau de progression.
-  const joursActifsSemaine = new Set(seancesSemaine.map((s) => s.date.toISOString().slice(0, 10))).size;
+  // ayant au moins une séance, affiché comme anneau de progression. Réutilise
+  // le même jeu de séances (14 jours) que le graphique de progression
+  // journalière ci-dessous plutôt qu'une requête séparée.
+  const donneesProgressionJournaliere = activiteParJour(seancesRecentes, 14);
+  const joursActifsSemaine = donneesProgressionJournaliere.slice(-7).filter((p) => p.nombreSeances > 0).length;
   const pourcentageRegularite = Math.round((joursActifsSemaine / 7) * 100);
 
   let seanceDuJourProgramme = null;
@@ -231,6 +236,8 @@ export default async function EntrainementPage() {
         <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
         <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
       </section>
+
+      <ProgressionJournaliere donnees={donneesProgressionJournaliere} />
 
       <CalendrierRegularite />
 

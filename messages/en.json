@@ -119,6 +119,7 @@
     "programmeEnCours": "Current program",
     "voirMonProgramme": "View my program",
     "calendrierRegularite": "Regularity calendar",
+    "progressionJournaliere": "Daily progression",
     "regulariteTitre": "Regularity",
     "regulariteJours": "{n}/7 active days this week",
     "regulariteDescription": "Keep it up to make lasting progress.",
@@ -364,6 +365,14 @@
     "premierDefi": "Great job on your first challenge! You're ready to start.",
     "astuce": "Tip: log a session after every workout to track your progress.",
     "suggestionReductionCharge": "The last few sessions seem to have been tough: consider easing off the load a bit next time."
+  },
+  "activiteProfil": {
+    "titre": "Sports activity",
+    "semaine": "Week",
+    "mois": "Month",
+    "totalSeances": "{n} sessions",
+    "seances": "sessions",
+    "aucuneActivite": "No activity in this period."
   },
   "creditsPhotos": {
     "titre": "Photo credits",

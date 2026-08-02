@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import InscriptionButton from "@/components/InscriptionButton";
 import SportSelect from "@/components/SportSelect";
+import FondSport from "@/components/FondSport";
+import { fondSportPour } from "@/lib/sportBackgrounds";
 import { Calendar, GraduationCap, MapPin, Search, ShieldAlert, Trophy, Users } from "lucide-react";
 
 export default async function TournoisPage({
@@ -20,7 +22,7 @@ export default async function TournoisPage({
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: session.athleteId },
-    include: { consentement: true, inscriptions: true },
+    include: { consentement: true, inscriptions: true, sportPrincipal: { select: { nom: true } } },
   });
   if (!athlete) redirect("/connexion");
 
@@ -45,8 +47,21 @@ export default async function TournoisPage({
     orderBy: { date: "asc" },
   });
 
+  // Fond photo : celui du sport filtré s'il y en a un, sinon celui du sport
+  // principal de l'athlète (même logique de repli que sur le fil).
+  let fondSportUrl: string | null = null;
+  if (athlete.afficherFondSport) {
+    if (sportId) {
+      const sportFiltre = await prisma.sport.findUnique({ where: { id: sportId }, select: { nom: true } });
+      fondSportUrl = sportFiltre ? fondSportPour(sportFiltre.nom) : null;
+    } else {
+      fondSportUrl = fondSportPour(athlete.sportPrincipal.nom);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
+      {fondSportUrl && <FondSport imageUrl={fondSportUrl} nettete={athlete.netteteFondSport} />}
       <h1 className="text-2xl font-bold">{t("titreTournois")}</h1>
 
       <form className="card flex flex-col gap-2 p-3 sm:flex-row" method="get">

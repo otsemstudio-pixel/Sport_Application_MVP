@@ -119,6 +119,7 @@
     "programmeEnCours": "Programme en cours",
     "voirMonProgramme": "Voir mon programme",
     "calendrierRegularite": "Calendrier de régularité",
+    "progressionJournaliere": "Progression journalière",
     "regulariteTitre": "Régularité",
     "regulariteJours": "{n}/7 jours actifs cette semaine",
     "regulariteDescription": "Continue sur ta lancée pour progresser durablement.",
@@ -364,6 +365,14 @@
     "premierDefi": "Bravo pour ce premier défi ! Tu es prêt à démarrer.",
     "astuce": "Astuce : enregistre une séance après chaque entraînement pour suivre ta progression.",
     "suggestionReductionCharge": "Tu sembles avoir trouvé les dernières séances difficiles : pense à réduire un peu la charge la prochaine fois."
+  },
+  "activiteProfil": {
+    "titre": "Activité sportive",
+    "semaine": "Semaine",
+    "mois": "Mois",
+    "totalSeances": "{n} séances",
+    "seances": "séances",
+    "aucuneActivite": "Aucune activité sur cette période."
   },
   "creditsPhotos": {
     "titre": "Crédits photos",

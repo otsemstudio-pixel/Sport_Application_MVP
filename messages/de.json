@@ -119,6 +119,7 @@
     "programmeEnCours": "Aktuelles Programm",
     "voirMonProgramme": "Mein Programm ansehen",
     "calendrierRegularite": "Regelmäßigkeitskalender",
+    "progressionJournaliere": "Tägliche Entwicklung",
     "regulariteTitre": "Regelmäßigkeit",
     "regulariteJours": "{n}/7 aktive Tage diese Woche",
     "regulariteDescription": "Bleib dran für nachhaltige Fortschritte.",
@@ -364,6 +365,14 @@
     "premierDefi": "Glückwunsch zu deiner ersten Challenge! Du bist bereit loszulegen.",
     "astuce": "Tipp: Erfasse nach jedem Training eine Einheit, um deinen Fortschritt zu verfolgen.",
     "suggestionReductionCharge": "Die letzten Einheiten waren wohl anstrengend: Reduziere die Belastung beim nächsten Mal etwas."
+  },
+  "activiteProfil": {
+    "titre": "Sportliche Aktivität",
+    "semaine": "Woche",
+    "mois": "Monat",
+    "totalSeances": "{n} Einheiten",
+    "seances": "Einheiten",
+    "aucuneActivite": "Keine Aktivität in diesem Zeitraum."
   },
   "creditsPhotos": {
     "titre": "Bildnachweise",

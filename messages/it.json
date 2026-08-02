@@ -119,6 +119,7 @@
     "programmeEnCours": "Programma in corso",
     "voirMonProgramme": "Vedi il mio programma",
     "calendrierRegularite": "Calendario di regolarità",
+    "progressionJournaliere": "Progressione giornaliera",
     "regulariteTitre": "Regolarità",
     "regulariteJours": "{n}/7 giorni attivi questa settimana",
     "regulariteDescription": "Continua così per progredire nel tempo.",
@@ -364,6 +365,14 @@
     "premierDefi": "Complimenti per la tua prima sfida! Sei pronto per iniziare.",
     "astuce": "Consiglio: registra una sessione dopo ogni allenamento per seguire i tuoi progressi.",
     "suggestionReductionCharge": "Le ultime sessioni sembrano essere state difficili: pensa a ridurre un po' il carico la prossima volta."
+  },
+  "activiteProfil": {
+    "titre": "Attività sportiva",
+    "semaine": "Settimana",
+    "mois": "Mese",
+    "totalSeances": "{n} sessioni",
+    "seances": "sessioni",
+    "aucuneActivite": "Nessuna attività in questo periodo."
   },
   "creditsPhotos": {
     "titre": "Crediti foto",
