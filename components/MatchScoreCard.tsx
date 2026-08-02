@@ -52,9 +52,11 @@ export default function MatchScoreCard({ match }: { match: MatchDemo }) {
         style={{ background: "linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.25) 55%, rgba(0,0,0,.15))" }}
       />
 
-      <div className="absolute left-2.5 top-2.5 flex items-center gap-1.5">
-        <BadgeStatut statut={match.statut} />
-        <span className="chip chip-neutral !bg-white/15 !text-white">{match.sport.nom}</span>
+      <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center gap-1.5">
+        <span className="shrink-0">
+          <BadgeStatut statut={match.statut} />
+        </span>
+        <span className="chip chip-neutral !bg-white/15 !text-white min-w-0 truncate">{match.sport.nom}</span>
       </div>
 
       {match.type === "COURSE" ? (
@@ -62,35 +64,35 @@ export default function MatchScoreCard({ match }: { match: MatchDemo }) {
           <span className="truncate text-sm font-semibold">{match.equipeA}</span>
           <div className="flex flex-col gap-0.5">
             {match.participants.slice(0, 3).map((p) => (
-              <div key={p.id} className="flex items-center justify-between text-xs">
-                <span className="truncate">
+              <div key={p.id} className="flex items-center justify-between gap-2 text-xs">
+                <span className="min-w-0 truncate">
                   {p.position}. {p.nom}
                 </span>
-                <span className="shrink-0 pl-2 opacity-85">{p.resultat}</span>
+                <span className="shrink-0 opacity-85">{p.resultat}</span>
               </div>
             ))}
           </div>
-          {match.statutTexte && <span className="text-[11px] opacity-85">{match.statutTexte}</span>}
+          {match.statutTexte && <span className="truncate text-[11px] opacity-85">{match.statutTexte}</span>}
         </div>
       ) : (
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 px-3 py-2.5 text-white">
-          <div className="flex items-center justify-between text-sm font-semibold">
-            <span className="truncate">{match.equipeA}</span>
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <span className="min-w-0 flex-1 truncate">{match.equipeA}</span>
             {hasScore ? (
-              <span className="shrink-0 px-2 text-base font-bold">
+              <span className="shrink-0 text-base font-bold">
                 {match.scoreA} - {match.scoreB}
               </span>
             ) : (
-              <span className="shrink-0 px-2 text-xs font-bold opacity-70">VS</span>
+              <span className="shrink-0 text-xs font-bold opacity-70">VS</span>
             )}
-            <span className="truncate text-right">{match.equipeB}</span>
+            <span className="min-w-0 flex-1 truncate text-right">{match.equipeB}</span>
           </div>
-          <div className="flex items-center justify-between text-[11px] opacity-85">
-            <span className="flex items-center gap-1">
-              <MapPin size={11} />
-              {match.lieu}
+          <div className="flex items-center gap-2 text-[11px] opacity-85">
+            <span className="flex min-w-0 flex-1 items-center gap-1 truncate">
+              <MapPin size={11} className="shrink-0" />
+              <span className="truncate">{match.lieu}</span>
             </span>
-            <span>{match.statutTexte ?? match.minuteAffichee}</span>
+            <span className="shrink-0">{match.statutTexte ?? match.minuteAffichee}</span>
           </div>
         </div>
       )}

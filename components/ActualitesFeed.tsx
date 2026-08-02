@@ -57,8 +57,8 @@ export default function ActualitesFeed({
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+    <div className="flex min-w-0 flex-col gap-5">
+      <div className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
         <button
           onClick={() => changerSport(null)}
           disabled={chargement}
@@ -87,11 +87,11 @@ export default function ActualitesFeed({
       </div>
 
       {matchsFiltres.length > 0 && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex min-w-0 flex-col gap-2.5">
           <h2 className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
             {t("scoresEnDirect")}
           </h2>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          <div className="-mx-4 flex min-w-0 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
             {matchsFiltres.map((m) => (
               <MatchScoreCard key={m.id} match={m} />
             ))}

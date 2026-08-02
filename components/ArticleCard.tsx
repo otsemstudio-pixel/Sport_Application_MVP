@@ -37,19 +37,19 @@ export default function ArticleCard({ article }: { article: Article }) {
             navigateur de chaque visiteur charger l'image directement, la charge
             est répartie comme pour une page classique. */}
         <Image src={article.imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 160px" className="object-cover" unoptimized />
-        <span className="chip chip-primary absolute left-2 top-2">{article.sport.nom}</span>
+        <span className="chip chip-primary absolute left-2 top-2 max-w-[calc(100%-1rem)] truncate">{article.sport.nom}</span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <h3 className="font-semibold leading-snug">{article.titre}</h3>
         <p className="line-clamp-2 text-sm" style={{ color: "var(--muted)" }}>
           {article.chapo}
         </p>
-        <div className="mt-auto flex items-center gap-3 pt-1.5">
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1.5">
+          <span className="min-w-0 flex-1 truncate text-xs" style={{ color: "var(--muted)" }}>
             {new Date(article.publieLe).toLocaleDateString(locale, { day: "numeric", month: "short" })} · {article.source}
           </span>
-          <div className="ml-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div className="ml-auto flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <ArticleLikeButton articleId={article.id} likeInitial={article.likeParMoi} nombreInitial={article.nombreLikes} size={15} />
             <span className="chip chip-neutral">
               <MessageCircle size={12} />
