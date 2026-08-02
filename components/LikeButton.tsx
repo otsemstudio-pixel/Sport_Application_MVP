@@ -30,13 +30,16 @@ export default function LikeButton({
   }
 
   return (
-    <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm">
-      <Heart
-        size={size}
-        fill={liked ? "var(--primary)" : "none"}
-        style={{ color: liked ? "var(--primary)" : "var(--muted)" }}
-      />
-      <span style={{ color: liked ? "var(--primary)" : "var(--muted)" }}>{nombre}</span>
+    <button
+      onClick={toggleLike}
+      className="chip"
+      style={{
+        background: liked ? "var(--primary-soft)" : "var(--surface-hover)",
+        color: liked ? "var(--primary)" : "var(--muted)",
+      }}
+    >
+      <Heart size={size - 3} fill={liked ? "var(--primary)" : "none"} />
+      {nombre}
     </button>
   );
 }

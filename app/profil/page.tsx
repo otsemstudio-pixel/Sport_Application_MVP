@@ -88,6 +88,8 @@ export default async function ProfilPage() {
       <ParametresApparence
         themeFondInitial={athlete.themeFond}
         preferenceEffetsInitiale={athlete.preferenceEffetsVisuels}
+        afficherFondSportInitial={athlete.afficherFondSport}
+        netteteFondSportInitiale={athlete.netteteFondSport}
       />
 
       <BasculeMensurations activeInitial={athlete.suiviMensurationsActive} />

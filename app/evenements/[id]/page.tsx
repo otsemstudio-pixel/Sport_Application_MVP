@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import ImageCarousel from "@/components/ImageCarousel";
 import InscriptionButton from "@/components/InscriptionButton";
+import FondSport from "@/components/FondSport";
+import { fondSportPour } from "@/lib/sportBackgrounds";
 import {
   ArrowLeft,
   Banknote,
@@ -41,18 +43,25 @@ export default async function EvenementDetailPage({
 
   let bloque = false;
   let statutInscription: string | undefined;
+  let afficherFondSport = true;
+  let netteteFondSport = 40;
   if (session.role === "ATHLETE") {
     const athlete = await prisma.athlete.findUnique({
       where: { id: session.athleteId },
       include: { consentement: true },
     });
-    if (athlete) bloque = estBloquePourConsentement(athlete);
+    if (athlete) {
+      bloque = estBloquePourConsentement(athlete);
+      afficherFondSport = athlete.afficherFondSport;
+      netteteFondSport = athlete.netteteFondSport;
+    }
 
     const inscription = await prisma.inscription.findUnique({
       where: { evenementId_athleteId: { evenementId: id, athleteId: session.athleteId } },
     });
     statutInscription = inscription?.statut;
   }
+  const fondSportUrl = afficherFondSport ? fondSportPour(evenement.sport.nom) : null;
 
   const placesRestantes = evenement.placesMax - evenement._count.inscriptions;
   const complet = placesRestantes <= 0;
@@ -60,6 +69,7 @@ export default async function EvenementDetailPage({
 
   return (
     <div className="flex flex-col gap-6">
+      {fondSportUrl && <FondSport imageUrl={fondSportUrl} nettete={netteteFondSport} />}
       <Link href="/tournois" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
         <ArrowLeft size={14} />
         {t("retourTournois")}

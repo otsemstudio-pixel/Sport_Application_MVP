@@ -8,6 +8,8 @@ import StatistiquesEntrainement from "@/components/StatistiquesEntrainement";
 import CalendrierRegularite from "@/components/CalendrierRegularite";
 import TacheDuJour from "@/components/TacheDuJour";
 import ProgressRing from "@/components/ProgressRing";
+import FondSport from "@/components/FondSport";
+import { fondSportPour } from "@/lib/sportBackgrounds";
 import type { EvenementMascotte } from "@/lib/mascotte";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
 
@@ -187,8 +189,11 @@ export default async function EntrainementPage() {
   }));
   const monRang = classement.find((c) => c.moi)?.rang ?? null;
 
+  const fondSportUrl = athlete.afficherFondSport ? fondSportPour(athlete.sportPrincipal.nom) : null;
+
   return (
     <div className="flex flex-col gap-8">
+      {fondSportUrl && <FondSport imageUrl={fondSportUrl} nettete={athlete.netteteFondSport} />}
       <div>
         <h1 className="text-2xl font-bold">{t("titre")}</h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>

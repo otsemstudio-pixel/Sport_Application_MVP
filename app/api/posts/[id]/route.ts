@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs, auteurIdSession } from "@/lib/posts";
+import {
+  INCLUDE_POST_RELATIONS,
+  auteurIdSession,
+  clesAuteursAbonnesParSession,
+  formaterPost,
+  idsPostsLikesParSession,
+  resoudreNomsAuteurs,
+} from "@/lib/posts";
 
 export async function GET(
   _req: Request,
@@ -43,10 +50,11 @@ export async function GET(
 
   const noms = await resoudreNomsAuteurs([post, ...commentaires]);
   const idsLikesParMoi = await idsPostsLikesParSession([post.id], session);
+  const clesAbonnes = await clesAuteursAbonnesParSession([post], session);
   const fallbackNom = tCommun("utilisateur");
 
   return NextResponse.json({
-    ...formaterPost(post, noms, idsLikesParMoi, session, fallbackNom),
+    ...formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes),
     commentaires: commentaires.map((c) => ({
       id: c.id,
       auteurType: c.auteurType,

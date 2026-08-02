@@ -11,15 +11,26 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 403 });
   }
 
-  const { themeFond, preferenceEffetsVisuels } = (await req.json()) as {
+  const { themeFond, preferenceEffetsVisuels, afficherFondSport, netteteFondSport } = (await req.json()) as {
     themeFond?: string;
     preferenceEffetsVisuels?: string;
+    afficherFondSport?: boolean;
+    netteteFondSport?: number;
   };
 
-  const valeurs: { themeFond?: "CLAIR" | "SOMBRE" | "SPORT"; preferenceEffetsVisuels?: "AUTO" | "DEGRADE" | "COMPLET" } = {};
+  const valeurs: {
+    themeFond?: "CLAIR" | "SOMBRE" | "SPORT";
+    preferenceEffetsVisuels?: "AUTO" | "DEGRADE" | "COMPLET";
+    afficherFondSport?: boolean;
+    netteteFondSport?: number;
+  } = {};
   if (themeFond && THEMES.includes(themeFond)) valeurs.themeFond = themeFond as "CLAIR" | "SOMBRE" | "SPORT";
   if (preferenceEffetsVisuels && EFFETS.includes(preferenceEffetsVisuels)) {
     valeurs.preferenceEffetsVisuels = preferenceEffetsVisuels as "AUTO" | "DEGRADE" | "COMPLET";
+  }
+  if (typeof afficherFondSport === "boolean") valeurs.afficherFondSport = afficherFondSport;
+  if (typeof netteteFondSport === "number" && Number.isFinite(netteteFondSport)) {
+    valeurs.netteteFondSport = Math.min(100, Math.max(0, Math.round(netteteFondSport)));
   }
   if (Object.keys(valeurs).length === 0) {
     return NextResponse.json({ error: "Aucune valeur valide." }, { status: 400 });
@@ -33,5 +44,7 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({
     themeFond: athlete.themeFond,
     preferenceEffetsVisuels: athlete.preferenceEffetsVisuels,
+    afficherFondSport: athlete.afficherFondSport,
+    netteteFondSport: athlete.netteteFondSport,
   });
 }

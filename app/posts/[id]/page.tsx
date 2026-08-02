@@ -3,7 +3,14 @@ import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
-import { INCLUDE_POST_RELATIONS, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs, auteurIdSession } from "@/lib/posts";
+import {
+  INCLUDE_POST_RELATIONS,
+  auteurIdSession,
+  clesAuteursAbonnesParSession,
+  formaterPost,
+  idsPostsLikesParSession,
+  resoudreNomsAuteurs,
+} from "@/lib/posts";
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
 import CommentairesDetail from "@/components/CommentairesDetail";
@@ -52,8 +59,9 @@ export default async function PostDetailPage({
 
   const noms = await resoudreNomsAuteurs([post, ...commentaires]);
   const idsLikesParMoi = await idsPostsLikesParSession([post.id], session);
+  const clesAbonnes = await clesAuteursAbonnesParSession([post], session);
   const fallbackNom = tCommun("utilisateur");
-  const postFormate = formaterPost(post, noms, idsLikesParMoi, session, fallbackNom);
+  const postFormate = formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes);
 
   const commentairesFormates = commentaires.map((c) => ({
     id: c.id,

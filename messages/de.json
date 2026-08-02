@@ -346,7 +346,12 @@
       "DEGRADE": "Reduziert",
       "COMPLET": "Voll"
     },
-    "effetsDescription": "Im Automatikmodus werden reichhaltige Effekte (Unschärfe, Transparenz) nur aktiviert, wenn dein Gerät sie ohne Verlangsamung darstellen kann."
+    "effetsDescription": "Im Automatikmodus werden reichhaltige Effekte (Unschärfe, Transparenz) nur aktiviert, wenn dein Gerät sie ohne Verlangsamung darstellen kann.",
+    "fondSportLabel": "Sport-Fotohintergrund",
+    "active": "Ein",
+    "inactive": "Aus",
+    "netteteLabel": "Schärfe ({valeur}%)",
+    "creditsPhotos": "Bildnachweise"
   },
   "mascotte": {
     "bienvenue": "Willkommen bei ScoutApp! Ich begleite dich durch dein Training.",
@@ -359,6 +364,12 @@
     "premierDefi": "Glückwunsch zu deiner ersten Challenge! Du bist bereit loszulegen.",
     "astuce": "Tipp: Erfasse nach jedem Training eine Einheit, um deinen Fortschritt zu verfolgen.",
     "suggestionReductionCharge": "Die letzten Einheiten waren wohl anstrengend: Reduziere die Belastung beim nächsten Mal etwas."
+  },
+  "creditsPhotos": {
+    "titre": "Bildnachweise",
+    "description": "Die Sport-Hintergrundfotos stammen von Wikimedia Commons unter freier Lizenz. Danke an die Fotografen.",
+    "retourProfil": "Zurück zum Profil",
+    "voirSource": "Quelle ansehen"
   },
   "tacheDuJour": {
     "titre": "Aufgabe des Tages",

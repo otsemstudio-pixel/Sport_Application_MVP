@@ -8,10 +8,12 @@ export default function AbonnementBouton({
   type,
   id,
   abonneInitial,
+  compact = false,
 }: {
   type: "athlete" | "organisateur";
   id: string;
   abonneInitial: boolean;
+  compact?: boolean;
 }) {
   const t = useTranslations("profilPublic");
   const [abonne, setAbonne] = useState(abonneInitial);
@@ -29,8 +31,12 @@ export default function AbonnementBouton({
   }
 
   return (
-    <button onClick={basculer} disabled={chargement} className={abonne ? "btn btn-secondary" : "btn btn-primary"}>
-      {abonne ? <UserCheck size={15} /> : <UserPlus size={15} />}
+    <button
+      onClick={basculer}
+      disabled={chargement}
+      className={`btn ${abonne ? "btn-secondary" : "btn-primary"} ${compact ? "!px-3 !py-1.5 !text-xs" : ""}`}
+    >
+      {abonne ? <UserCheck size={compact ? 12 : 15} /> : <UserPlus size={compact ? 12 : 15} />}
       {abonne ? t("seDesabonner") : t("sabonner")}
     </button>
   );

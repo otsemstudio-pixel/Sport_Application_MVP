@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
-import { INCLUDE_POST_RELATIONS, auteurIdSession, formaterPost, idsPostsLikesParSession, resoudreNomsAuteurs } from "@/lib/posts";
+import {
+  INCLUDE_POST_RELATIONS,
+  auteurIdSession,
+  clesAuteursAbonnesParSession,
+  formaterPost,
+  idsPostsLikesParSession,
+  resoudreNomsAuteurs,
+} from "@/lib/posts";
 import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
 
 const PAGE_SIZE = 15;
@@ -67,10 +74,11 @@ export async function GET(req: NextRequest) {
 
   const noms = await resoudreNomsAuteurs(posts);
   const idsLikesParMoi = await idsPostsLikesParSession(posts.map((p) => p.id), session);
+  const clesAbonnes = await clesAuteursAbonnesParSession(posts, session);
   const fallbackNom = tCommun("utilisateur");
 
   return NextResponse.json({
-    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session, fallbackNom)),
+    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes)),
     nextCursor: posts.length === PAGE_SIZE ? posts[posts.length - 1].id : null,
   });
 }

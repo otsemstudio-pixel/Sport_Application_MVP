@@ -346,7 +346,12 @@
       "DEGRADE": "Reduced",
       "COMPLET": "Full"
     },
-    "effetsDescription": "In auto mode, rich effects (blur, transparency) only turn on if your device can display them without slowing the app down."
+    "effetsDescription": "In auto mode, rich effects (blur, transparency) only turn on if your device can display them without slowing the app down.",
+    "fondSportLabel": "Sport photo background",
+    "active": "On",
+    "inactive": "Off",
+    "netteteLabel": "Sharpness ({valeur}%)",
+    "creditsPhotos": "Photo credits"
   },
   "mascotte": {
     "bienvenue": "Welcome to ScoutApp! I'll be with you throughout your training.",
@@ -359,6 +364,12 @@
     "premierDefi": "Great job on your first challenge! You're ready to start.",
     "astuce": "Tip: log a session after every workout to track your progress.",
     "suggestionReductionCharge": "The last few sessions seem to have been tough: consider easing off the load a bit next time."
+  },
+  "creditsPhotos": {
+    "titre": "Photo credits",
+    "description": "The per-sport background photos come from Wikimedia Commons, under free licenses. Thanks to the photographers.",
+    "retourProfil": "Back to profile",
+    "voirSource": "View source"
   },
   "tacheDuJour": {
     "titre": "Task of the day",

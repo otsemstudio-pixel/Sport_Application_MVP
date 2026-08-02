@@ -78,6 +78,8 @@ model Athlete {
   preferenceEffetsVisuels PreferenceEffets @default(AUTO)
   themeFond               ThemeFond        @default(CLAIR)
   onboardingComplete      Boolean          @default(true)
+  afficherFondSport       Boolean          @default(true)
+  netteteFondSport        Int              @default(40)
 
   consentement        ConsentementParental?
   seancesEntrainement SeanceEntrainement[]

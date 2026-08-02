@@ -64,6 +64,23 @@ export async function idsPostsLikesParSession(postIds: string[], session: Sessio
   return new Set(mesLikes.map((l) => l.postId));
 }
 
+// Clés (`TYPE:id`) des auteurs, parmi ceux passés, auxquels la session est
+// abonnée — une seule requête pour tout un lot de posts plutôt qu'un appel
+// par auteur.
+export async function clesAuteursAbonnesParSession(auteurs: Auteur[], session: SessionInfo) {
+  const distinctsAuteurs = [...new Map(auteurs.map((a) => [`${a.auteurType}:${a.auteurId}`, a])).values()];
+  if (distinctsAuteurs.length === 0) return new Set<string>();
+  const mesAbonnements = await prisma.abonnement.findMany({
+    where: {
+      suiveurId: auteurIdSession(session),
+      suiveurType: session.role,
+      OR: distinctsAuteurs.map((a) => ({ suiviId: a.auteurId, suiviType: a.auteurType })),
+    },
+    select: { suiviId: true, suiviType: true },
+  });
+  return new Set(mesAbonnements.map((a) => `${a.suiviType}:${a.suiviId}`));
+}
+
 type SeanceRecapSource = {
   id: string;
   date: Date;
@@ -95,7 +112,8 @@ export function formaterPost(
   noms: Map<string, string>,
   idsLikesParMoi: Set<string>,
   session: SessionInfo,
-  fallbackNom = "Utilisateur"
+  fallbackNom = "Utilisateur",
+  clesAuteursAbonnes: Set<string> = new Set()
 ) {
   return {
     id: post.id,
@@ -109,6 +127,7 @@ export function formaterPost(
     nombreCommentaires: post._count.commentaires,
     nombreVues: post._count.vues,
     likeParMoi: idsLikesParMoi.has(post.id),
+    abonneParMoi: clesAuteursAbonnes.has(`${post.auteurType}:${post.auteurId}`),
     auteurCestMoi: `${post.auteurType}:${post.auteurId}` === cleAuteurSession(session),
     seance: post.seanceEntrainement
       ? {

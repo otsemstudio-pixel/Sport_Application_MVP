@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Athlete" ADD COLUMN "afficherFondSport" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "Athlete" ADD COLUMN "netteteFondSport" INTEGER NOT NULL DEFAULT 40;

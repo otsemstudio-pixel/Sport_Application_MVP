@@ -346,7 +346,12 @@
       "DEGRADE": "Ridotto",
       "COMPLET": "Completo"
     },
-    "effetsDescription": "In modalità auto, gli effetti ricchi (sfocatura, trasparenza) si attivano solo se il tuo dispositivo può mostrarli senza rallentare l'app."
+    "effetsDescription": "In modalità auto, gli effetti ricchi (sfocatura, trasparenza) si attivano solo se il tuo dispositivo può mostrarli senza rallentare l'app.",
+    "fondSportLabel": "Sfondo fotografico per sport",
+    "active": "Attivo",
+    "inactive": "Disattivato",
+    "netteteLabel": "Nitidezza ({valeur}%)",
+    "creditsPhotos": "Crediti foto"
   },
   "mascotte": {
     "bienvenue": "Benvenuto su ScoutApp! Ti accompagnerò nel tuo allenamento.",
@@ -359,6 +364,12 @@
     "premierDefi": "Complimenti per la tua prima sfida! Sei pronto per iniziare.",
     "astuce": "Consiglio: registra una sessione dopo ogni allenamento per seguire i tuoi progressi.",
     "suggestionReductionCharge": "Le ultime sessioni sembrano essere state difficili: pensa a ridurre un po' il carico la prossima volta."
+  },
+  "creditsPhotos": {
+    "titre": "Crediti foto",
+    "description": "Le foto di sfondo per sport provengono da Wikimedia Commons, con licenza libera. Grazie ai fotografi.",
+    "retourProfil": "Torna al profilo",
+    "voirSource": "Vedi la fonte"
   },
   "tacheDuJour": {
     "titre": "Compito del giorno",

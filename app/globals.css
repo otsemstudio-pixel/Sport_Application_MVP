@@ -329,8 +329,8 @@ body {
     transition: all 0.15s ease;
   }
   .pill-toggle-btn.active {
-    background: var(--foreground);
-    color: var(--background);
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 
   .progress-bar {

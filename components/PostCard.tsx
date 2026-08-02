@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
 import RecapSeance from "@/components/RecapSeance";
+import AbonnementBouton from "@/components/AbonnementBouton";
 import { hrefProfil } from "@/lib/routes";
 
 export type Post = {
@@ -21,6 +22,7 @@ export type Post = {
   nombreLikes: number;
   nombreCommentaires: number;
   likeParMoi: boolean;
+  abonneParMoi: boolean;
   auteurCestMoi: boolean;
   seance: {
     id: string;
@@ -162,11 +164,21 @@ export default function PostCard({ post }: { post: Post }) {
               </span>
             </div>
           </div>
-          {post.auteurCestMoi && (
-            <button onClick={supprimerPost} aria-label={t("supprimer")} className="btn btn-ghost !p-1.5">
-              <Trash2 size={15} />
-            </button>
-          )}
+          <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-1.5">
+            {!post.auteurCestMoi && (
+              <AbonnementBouton
+                type={post.auteurType === "ATHLETE" ? "athlete" : "organisateur"}
+                id={post.auteurId}
+                abonneInitial={post.abonneParMoi}
+                compact
+              />
+            )}
+            {post.auteurCestMoi && (
+              <button onClick={supprimerPost} aria-label={t("supprimer")} className="btn btn-ghost !p-1.5">
+                <Trash2 size={15} />
+              </button>
+            )}
+          </div>
         </div>
 
         <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.contenu}</p>
@@ -178,10 +190,14 @@ export default function PostCard({ post }: { post: Post }) {
 
       {erreur && <p className="chip chip-danger self-start">{erreur}</p>}
 
-      <div className="flex items-center gap-4 border-t pt-3" style={{ borderColor: "var(--border)" }}>
+      <div className="flex items-center gap-2 border-t pt-3" style={{ borderColor: "var(--border)" }}>
         <LikeButton postId={post.id} likeInitial={post.likeParMoi} nombreInitial={post.nombreLikes} />
-        <button onClick={ouvrirCommentaires} className="flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
-          <MessageCircle size={17} />
+        <button
+          onClick={ouvrirCommentaires}
+          className="chip chip-neutral"
+          style={afficherCommentaires ? { background: "var(--primary-soft)", color: "var(--primary)" } : undefined}
+        >
+          <MessageCircle size={14} />
           {nbCommentaires}
         </button>
       </div>
