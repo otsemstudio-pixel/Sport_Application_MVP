@@ -5,8 +5,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Images, ImageOff, Upload, X } from "lucide-react";
+import { convertirSiHeic } from "@/lib/heic";
 
 const TAILLE_MAX_FICHIER = 5 * 1024 * 1024;
+const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
 
 export default function SelecteurPhoto({
   champ,
@@ -24,6 +26,7 @@ export default function SelecteurPhoto({
   const router = useRouter();
   const t = useTranslations("apparence");
   const tErr = useTranslations("erreurs");
+  const tCommun = useTranslations("commun");
   const inputRef = useRef<HTMLInputElement>(null);
   const [valeur, setValeur] = useState(valeurInitiale);
   const [chargement, setChargement] = useState(false);
@@ -45,26 +48,43 @@ export default function SelecteurPhoto({
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? tErr("echecEnvoiImages"));
+      setErreur(data.error ?? tCommun("echecEnvoiImages"));
     }
   }
 
   async function handleFichier(fichiers: FileList | null) {
-    const fichier = fichiers?.[0];
-    if (!fichier) return;
+    const fichierBrut = fichiers?.[0];
+    if (!fichierBrut) return;
+    setChargement(true);
+    setErreur(null);
+
+    let fichier: File;
+    try {
+      fichier = await convertirSiHeic(fichierBrut);
+    } catch {
+      setChargement(false);
+      setErreur(tCommun("echecEnvoiImages"));
+      return;
+    }
+
     if (fichier.size > TAILLE_MAX_FICHIER) {
+      setChargement(false);
       setErreur(tErr("fichierTropLourd", { nom: fichier.name }));
       return;
     }
-    setChargement(true);
-    setErreur(null);
+    if (!FORMATS_ACCEPTES.includes(fichier.type.toLowerCase())) {
+      setChargement(false);
+      setErreur(tErr("fichierPasImage", { nom: fichier.name }));
+      return;
+    }
+
     const formData = new FormData();
     formData.append("files", fichier);
     const res = await fetch("/api/upload?dossier=profils", { method: "POST", body: formData });
     if (!res.ok) {
       setChargement(false);
       const data = await res.json().catch(() => ({}));
-      setErreur(data.error ?? tErr("echecEnvoiImages"));
+      setErreur(data.error ?? tCommun("echecEnvoiImages"));
       return;
     }
     const data = await res.json();
@@ -122,8 +142,18 @@ export default function SelecteurPhoto({
             </button>
           )}
         </div>
-        <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => handleFichier(e.target.files)} />
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/heic,image/heif"
+          hidden
+          onChange={(e) => handleFichier(e.target.files)}
+        />
       </div>
+
+      <p className="text-[11px]" style={{ color: "var(--muted)" }}>
+        {tCommun("formatsAcceptes")}
+      </p>
 
       {erreur && <p className="chip chip-danger self-start">{erreur}</p>}
 

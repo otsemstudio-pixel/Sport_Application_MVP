@@ -3,9 +3,11 @@
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertCircle, ImagePlus, Loader2, X } from "lucide-react";
+import { convertirSiHeic } from "@/lib/heic";
 
 const NOMBRE_MAX_IMAGES = 4;
 const TAILLE_MAX_FICHIER = 5 * 1024 * 1024;
+const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
 
 export default function ImageUploader({
   dossier,
@@ -26,19 +28,34 @@ export default function ImageUploader({
     if (!fichiers || fichiers.length === 0) return;
     setErreur(null);
 
-    const liste = Array.from(fichiers);
-    if (value.length + liste.length > NOMBRE_MAX_IMAGES) {
+    const brut = Array.from(fichiers);
+    if (value.length + brut.length > NOMBRE_MAX_IMAGES) {
       setErreur(tErr("maxImages", { n: NOMBRE_MAX_IMAGES }));
+      return;
+    }
+
+    setChargement(true);
+    let liste: File[];
+    try {
+      liste = await Promise.all(brut.map(convertirSiHeic));
+    } catch {
+      setChargement(false);
+      setErreur(t("echecEnvoiImages"));
       return;
     }
     for (const f of liste) {
       if (f.size > TAILLE_MAX_FICHIER) {
+        setChargement(false);
         setErreur(tErr("fichierTropLourd", { nom: f.name }));
+        return;
+      }
+      if (!FORMATS_ACCEPTES.includes(f.type.toLowerCase())) {
+        setChargement(false);
+        setErreur(tErr("fichierPasImage", { nom: f.name }));
         return;
       }
     }
 
-    setChargement(true);
     const formData = new FormData();
     liste.forEach((f) => formData.append("files", f));
 
@@ -85,20 +102,25 @@ export default function ImageUploader({
       )}
 
       {value.length < NOMBRE_MAX_IMAGES && (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={chargement}
-          className="btn btn-secondary self-start"
-        >
-          {chargement ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
-          {chargement ? t("envoiImagesEnCours") : t("ajouterImages")}
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={chargement}
+            className="btn btn-secondary self-start"
+          >
+            {chargement ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+            {chargement ? t("envoiImagesEnCours") : t("ajouterImages")}
+          </button>
+          <p className="text-[11px]" style={{ color: "var(--muted)" }}>
+            {t("formatsAcceptes")}
+          </p>
+        </>
       )}
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/heic,image/heif"
         multiple
         hidden
         onChange={(e) => handleFichiers(e.target.files)}

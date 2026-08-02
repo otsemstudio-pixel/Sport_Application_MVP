@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
-import { comprimerEtUploaderImage, NOMBRE_MAX_IMAGES, TAILLE_MAX_FICHIER } from "@/lib/upload";
+import { comprimerEtUploaderImage, FORMATS_ACCEPTES, NOMBRE_MAX_IMAGES, TAILLE_MAX_FICHIER } from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
   const t = await getTranslations("erreurs");
+  const tCommun = await getTranslations("commun");
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: t("nonAuthentifie") }, { status: 401 });
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (!fichier.type.startsWith("image/")) {
+    if (!FORMATS_ACCEPTES.includes(fichier.type.toLowerCase())) {
       return NextResponse.json(
         { error: t("fichierPasImage", { nom: fichier.name }) },
         { status: 400 }
@@ -54,12 +55,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const urls = await Promise.all(
-    fichiers.map(async (fichier) => {
-      const buffer = Buffer.from(await fichier.arrayBuffer());
-      return comprimerEtUploaderImage(buffer, dossier);
-    })
-  );
-
-  return NextResponse.json({ urls });
+  try {
+    const urls = await Promise.all(
+      fichiers.map(async (fichier) => {
+        const buffer = Buffer.from(await fichier.arrayBuffer());
+        return comprimerEtUploaderImage(buffer, dossier);
+      })
+    );
+    return NextResponse.json({ urls });
+  } catch {
+    // Format d'image illisible par le compresseur serveur (fichier corrompu,
+    // variante exotique non convertie côté client) — jamais un crash brut.
+    return NextResponse.json({ error: tCommun("echecEnvoiImages") }, { status: 422 });
+  }
 }

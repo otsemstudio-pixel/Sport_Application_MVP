@@ -7,7 +7,8 @@
     "ajouterImages": "Bilder hinzufügen",
     "envoiImagesEnCours": "Wird hochgeladen…",
     "retirerImage": "Bild entfernen",
-    "echecEnvoiImages": "Hochladen der Bilder fehlgeschlagen."
+    "echecEnvoiImages": "Hochladen der Bilder fehlgeschlagen.",
+    "formatsAcceptes": "Akzeptierte Formate: JPEG, JPG oder PNG."
   },
   "nav": {
     "entrainement": "Training",
@@ -339,7 +340,7 @@
     "aucunFichier": "Keine Datei empfangen.",
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 5 MB.",
-    "fichierPasImage": "{nom} ist kein Bild."
+    "fichierPasImage": "{nom}: akzeptierte Formate — JPEG, JPG oder PNG."
   },
   "apparence": {
     "titre": "Erscheinungsbild",

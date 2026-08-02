@@ -7,7 +7,8 @@
     "ajouterImages": "Add images",
     "envoiImagesEnCours": "Uploading…",
     "retirerImage": "Remove image",
-    "echecEnvoiImages": "Failed to upload images."
+    "echecEnvoiImages": "Failed to upload images.",
+    "formatsAcceptes": "Accepted formats: JPEG, JPG or PNG."
   },
   "nav": {
     "entrainement": "Training",
@@ -339,7 +340,7 @@
     "aucunFichier": "No file received.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} exceeds the maximum size of 5 MB.",
-    "fichierPasImage": "{nom} is not an image."
+    "fichierPasImage": "{nom}: accepted formats — JPEG, JPG or PNG."
   },
   "apparence": {
     "titre": "Appearance",

@@ -7,7 +7,8 @@
     "ajouterImages": "Aggiungi immagini",
     "envoiImagesEnCours": "Caricamento…",
     "retirerImage": "Rimuovi immagine",
-    "echecEnvoiImages": "Caricamento immagini non riuscito."
+    "echecEnvoiImages": "Caricamento immagini non riuscito.",
+    "formatsAcceptes": "Formati accettati: JPEG, JPG o PNG."
   },
   "nav": {
     "entrainement": "Allenamento",
@@ -339,7 +340,7 @@
     "aucunFichier": "Nessun file ricevuto.",
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 5 MB.",
-    "fichierPasImage": "{nom} non è un'immagine."
+    "fichierPasImage": "{nom}: formati accettati — JPEG, JPG o PNG."
   },
   "apparence": {
     "titre": "Aspetto",
