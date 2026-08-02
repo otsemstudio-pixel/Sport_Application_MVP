@@ -64,6 +64,18 @@ export async function idsPostsLikesParSession(postIds: string[], session: Sessio
   return new Set(mesLikes.map((l) => l.postId));
 }
 
+export async function idsPostsSauvegardesParSession(postIds: string[], session: SessionInfo) {
+  const mesSauvegardes = await prisma.postSauvegarde.findMany({
+    where: {
+      postId: { in: postIds },
+      auteurId: auteurIdSession(session),
+      auteurType: session.role,
+    },
+    select: { postId: true },
+  });
+  return new Set(mesSauvegardes.map((s) => s.postId));
+}
+
 // Clés (`TYPE:id`) des auteurs, parmi ceux passés, auxquels la session est
 // abonnée — une seule requête pour tout un lot de posts plutôt qu'un appel
 // par auteur.
@@ -113,7 +125,8 @@ export function formaterPost(
   idsLikesParMoi: Set<string>,
   session: SessionInfo,
   fallbackNom = "Utilisateur",
-  clesAuteursAbonnes: Set<string> = new Set()
+  clesAuteursAbonnes: Set<string> = new Set(),
+  idsSauvegardesParMoi: Set<string> = new Set()
 ) {
   return {
     id: post.id,
@@ -127,6 +140,7 @@ export function formaterPost(
     nombreCommentaires: post._count.commentaires,
     nombreVues: post._count.vues,
     likeParMoi: idsLikesParMoi.has(post.id),
+    sauvegardeParMoi: idsSauvegardesParMoi.has(post.id),
     abonneParMoi: clesAuteursAbonnes.has(`${post.auteurType}:${post.auteurId}`),
     auteurCestMoi: `${post.auteurType}:${post.auteurId}` === cleAuteurSession(session),
     seance: post.seanceEntrainement

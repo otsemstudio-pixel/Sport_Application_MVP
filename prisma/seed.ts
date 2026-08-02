@@ -602,6 +602,7 @@ async function reinitialiserPostsDemo(
   await prisma.postCommentaire.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postLike.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postVue.deleteMany({ where: { postId: { in: idsAnciens } } });
+  await prisma.postSauvegarde.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postImage.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.post.deleteMany({ where: { id: { in: idsAnciens } } });
 

@@ -9,10 +9,12 @@ import {
   clesAuteursAbonnesParSession,
   formaterPost,
   idsPostsLikesParSession,
+  idsPostsSauvegardesParSession,
   resoudreNomsAuteurs,
 } from "@/lib/posts";
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
+import SauvegarderBouton from "@/components/SauvegarderBouton";
 import CommentairesDetail from "@/components/CommentairesDetail";
 import RecapSeance from "@/components/RecapSeance";
 import { hrefProfil } from "@/lib/routes";
@@ -60,8 +62,9 @@ export default async function PostDetailPage({
   const noms = await resoudreNomsAuteurs([post, ...commentaires]);
   const idsLikesParMoi = await idsPostsLikesParSession([post.id], session);
   const clesAbonnes = await clesAuteursAbonnesParSession([post], session);
+  const idsSauvegardesParMoi = await idsPostsSauvegardesParSession([post.id], session);
   const fallbackNom = tCommun("utilisateur");
-  const postFormate = formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes);
+  const postFormate = formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes, idsSauvegardesParMoi);
 
   const commentairesFormates = commentaires.map((c) => ({
     id: c.id,
@@ -122,12 +125,15 @@ export default async function PostDetailPage({
         <ImageCarousel images={postFormate.images} />
 
         <div className="flex items-center justify-between border-t pt-3" style={{ borderColor: "var(--border)" }}>
-          <LikeButton
-            postId={postFormate.id}
-            likeInitial={postFormate.likeParMoi}
-            nombreInitial={postFormate.nombreLikes}
-            size={20}
-          />
+          <div className="flex items-center gap-3">
+            <LikeButton
+              postId={postFormate.id}
+              likeInitial={postFormate.likeParMoi}
+              nombreInitial={postFormate.nombreLikes}
+              size={20}
+            />
+            <SauvegarderBouton postId={postFormate.id} sauvegardeInitiale={postFormate.sauvegardeParMoi} />
+          </div>
           <span className="flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
             <Eye size={16} />
             {t("nombreVues", { n: postFormate.nombreVues })}

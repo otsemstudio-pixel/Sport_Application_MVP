@@ -397,6 +397,7 @@ model Post {
   commentaires PostCommentaire[]
   images       PostImage[]
   vues         PostVue[]
+  sauvegardes  PostSauvegarde[]
 
   @@index([createdAt])
   @@index([auteurId, auteurType])
@@ -412,6 +413,20 @@ model PostImage {
 }
 
 model PostLike {
+  id         String      @id @default(cuid())
+  postId     String
+  post       Post        @relation(fields: [postId], references: [id])
+  auteurId   String
+  auteurType RoleSession
+  createdAt  DateTime    @default(now())
+
+  @@unique([postId, auteurId, auteurType])
+}
+
+// Un post enregistré par un spectateur (bouton "Sauvegarder"), simple
+// marque-page personnel — n'affecte ni les compteurs ni la visibilité du
+// post pour les autres.
+model PostSauvegarde {
   id         String      @id @default(cuid())
   postId     String
   post       Post        @relation(fields: [postId], references: [id])

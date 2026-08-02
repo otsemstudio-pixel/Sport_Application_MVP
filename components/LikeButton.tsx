@@ -8,11 +8,13 @@ export default function LikeButton({
   likeInitial,
   nombreInitial,
   size = 17,
+  flottant = false,
 }: {
   postId: string;
   likeInitial: boolean;
   nombreInitial: number;
   size?: number;
+  flottant?: boolean;
 }) {
   const [liked, setLiked] = useState(likeInitial);
   const [nombre, setNombre] = useState(nombreInitial);
@@ -27,6 +29,22 @@ export default function LikeButton({
       setLiked(!prochainEtat);
       setNombre((n) => n - (prochainEtat ? 1 : -1));
     }
+  }
+
+  if (flottant) {
+    return (
+      <button
+        onClick={toggleLike}
+        aria-label="like"
+        className="flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-transform active:scale-90"
+        style={{
+          background: liked ? "var(--primary)" : "color-mix(in srgb, var(--surface) 85%, transparent)",
+          color: liked ? "var(--primary-foreground)" : "var(--foreground)",
+        }}
+      >
+        <Heart size={19} fill={liked ? "currentColor" : "none"} />
+      </button>
+    );
   }
 
   return (

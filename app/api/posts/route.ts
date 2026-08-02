@@ -8,6 +8,7 @@ import {
   clesAuteursAbonnesParSession,
   formaterPost,
   idsPostsLikesParSession,
+  idsPostsSauvegardesParSession,
   resoudreNomsAuteurs,
 } from "@/lib/posts";
 import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
@@ -75,10 +76,11 @@ export async function GET(req: NextRequest) {
   const noms = await resoudreNomsAuteurs(posts);
   const idsLikesParMoi = await idsPostsLikesParSession(posts.map((p) => p.id), session);
   const clesAbonnes = await clesAuteursAbonnesParSession(posts, session);
+  const idsSauvegardesParMoi = await idsPostsSauvegardesParSession(posts.map((p) => p.id), session);
   const fallbackNom = tCommun("utilisateur");
 
   return NextResponse.json({
-    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes)),
+    posts: posts.map((p) => formaterPost(p, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes, idsSauvegardesParMoi)),
     nextCursor: posts.length === PAGE_SIZE ? posts[posts.length - 1].id : null,
   });
 }

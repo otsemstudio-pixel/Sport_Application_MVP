@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { Dumbbell, Eye, Heart, Layers, Maximize2, MessageCircle, Send, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
 import RecapSeance from "@/components/RecapSeance";
 import AbonnementBouton from "@/components/AbonnementBouton";
+import SauvegarderBouton from "@/components/SauvegarderBouton";
 import { hrefProfil } from "@/lib/routes";
 
 export type Post = {
@@ -21,7 +22,9 @@ export type Post = {
   createdAt: string;
   nombreLikes: number;
   nombreCommentaires: number;
+  nombreVues: number;
   likeParMoi: boolean;
+  sauvegardeParMoi: boolean;
   abonneParMoi: boolean;
   auteurCestMoi: boolean;
   seance: {
@@ -53,14 +56,7 @@ type Commentaire = {
 };
 
 function GrillePhotos({ images }: { images: string[] }) {
-  if (images.length === 0) return null;
-  if (images.length === 1) {
-    return (
-      <div className="relative h-96 w-full overflow-hidden rounded-xl">
-        <Image src={images[0]} alt="" fill sizes="(max-width: 640px) 100vw, 600px" className="object-cover" />
-      </div>
-    );
-  }
+  if (images.length < 2) return null;
   return (
     <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-xl">
       {images.map((url) => (
@@ -68,6 +64,53 @@ function GrillePhotos({ images }: { images: string[] }) {
           <Image src={url} alt="" fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />
         </div>
       ))}
+    </div>
+  );
+}
+
+// Image unique : mise en avant avec actions flottantes (aime/enregistrer) et,
+// pour une séance partagée, un résumé chiffré en overlay — inspiré des
+// aperçus de réseaux fitness, mais uniquement avec des données réelles
+// (aucune calorie/score inventé, non suivis par l'app).
+function PhotoUnique({ post }: { post: Post }) {
+  const t = useTranslations("fil");
+  if (post.images.length !== 1) return null;
+  const nombreSeries = post.seance?.exercices.reduce((n, e) => n + e.series.length, 0) ?? 0;
+
+  return (
+    <div className="relative h-96 w-full overflow-hidden rounded-xl">
+      <Image src={post.images[0]} alt="" fill sizes="(max-width: 640px) 100vw, 600px" className="object-cover" />
+
+      <div
+        className="absolute left-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-white"
+        style={{ background: "color-mix(in srgb, black 35%, transparent)" }}
+      >
+        <Maximize2 size={13} />
+      </div>
+
+      <div className="absolute right-2.5 top-2.5" onClick={(e) => e.stopPropagation()}>
+        <LikeButton postId={post.id} likeInitial={post.likeParMoi} nombreInitial={post.nombreLikes} flottant />
+      </div>
+
+      <div className="absolute bottom-2.5 right-2.5" onClick={(e) => e.stopPropagation()}>
+        <SauvegarderBouton postId={post.id} sauvegardeInitiale={post.sauvegardeParMoi} flottant />
+      </div>
+
+      {post.seance && (
+        <div
+          className="absolute inset-x-0 bottom-0 flex items-center gap-4 px-3 py-2.5"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,.7), transparent)" }}
+        >
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-white">
+            <Dumbbell size={13} />
+            {t("nombreExercices", { n: post.seance.exercices.length })}
+          </span>
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-white">
+            <Layers size={13} />
+            {t("nombreSeries", { n: nombreSeries })}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -185,13 +228,16 @@ export default function PostCard({ post }: { post: Post }) {
 
         {post.seance && <RecapSeance exercices={post.seance.exercices} />}
 
+        <PhotoUnique post={post} />
         <GrillePhotos images={post.images} />
       </div>
 
       {erreur && <p className="chip chip-danger self-start">{erreur}</p>}
 
       <div className="flex items-center gap-2 border-t pt-3" style={{ borderColor: "var(--border)" }}>
-        <LikeButton postId={post.id} likeInitial={post.likeParMoi} nombreInitial={post.nombreLikes} />
+        {post.images.length !== 1 && (
+          <LikeButton postId={post.id} likeInitial={post.likeParMoi} nombreInitial={post.nombreLikes} />
+        )}
         <button
           onClick={ouvrirCommentaires}
           className="chip chip-neutral"
@@ -200,6 +246,16 @@ export default function PostCard({ post }: { post: Post }) {
           <MessageCircle size={14} />
           {nbCommentaires}
         </button>
+        {post.images.length === 1 && (
+          <span className="chip chip-neutral" style={{ color: "var(--muted)" }}>
+            <Heart size={13} fill={post.likeParMoi ? "var(--primary)" : "none"} style={post.likeParMoi ? { color: "var(--primary)" } : undefined} />
+            {post.nombreLikes}
+          </span>
+        )}
+        <span className="ml-auto flex items-center gap-1.5 text-xs" style={{ color: "var(--muted)" }}>
+          <Eye size={14} />
+          {post.nombreVues}
+        </span>
       </div>
 
       {afficherCommentaires && (

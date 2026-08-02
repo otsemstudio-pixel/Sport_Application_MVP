@@ -197,7 +197,11 @@
     "abonnements": "Following",
     "likesRecus": "Likes",
     "commentairesRecus": "Comments",
-    "vuesRecues": "Views"
+    "vuesRecues": "Views",
+    "posts": "Posts",
+    "membreDepuis": "Member since {date}",
+    "publicationsTitre": "Posts",
+    "aucunePublication": "No posts yet."
   },
   "evenement": {
     "titreTournois": "Tournaments",
@@ -259,6 +263,10 @@
     "filtreAbonnements": "Following",
     "aucunPostAbonnements": "No posts yet from accounts you follow.",
     "nombreVues": "{n} views",
+    "sauvegarder": "Save",
+    "sauvegarde": "Saved",
+    "nombreExercices": "{n} exercises",
+    "nombreSeries": "{n} sets",
     "filtreMonSport": "My sport",
     "filtreTousLesSports": "All sports"
   },

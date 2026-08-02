@@ -197,7 +197,11 @@
     "abonnements": "Folgt",
     "likesRecus": "Gefällt mir",
     "commentairesRecus": "Kommentare",
-    "vuesRecues": "Aufrufe"
+    "vuesRecues": "Aufrufe",
+    "posts": "Beiträge",
+    "membreDepuis": "Mitglied seit {date}",
+    "publicationsTitre": "Beiträge",
+    "aucunePublication": "Noch keine Beiträge."
   },
   "evenement": {
     "titreTournois": "Turniere",
@@ -259,6 +263,10 @@
     "filtreAbonnements": "Abonniert",
     "aucunPostAbonnements": "Noch keine Beiträge von Konten, denen du folgst.",
     "nombreVues": "{n} Aufrufe",
+    "sauvegarder": "Speichern",
+    "sauvegarde": "Gespeichert",
+    "nombreExercices": "{n} Übungen",
+    "nombreSeries": "{n} Sätze",
     "filtreMonSport": "Meine Sportart",
     "filtreTousLesSports": "Alle Sportarten"
   },

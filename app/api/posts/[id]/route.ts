@@ -8,6 +8,7 @@ import {
   clesAuteursAbonnesParSession,
   formaterPost,
   idsPostsLikesParSession,
+  idsPostsSauvegardesParSession,
   resoudreNomsAuteurs,
 } from "@/lib/posts";
 
@@ -51,10 +52,11 @@ export async function GET(
   const noms = await resoudreNomsAuteurs([post, ...commentaires]);
   const idsLikesParMoi = await idsPostsLikesParSession([post.id], session);
   const clesAbonnes = await clesAuteursAbonnesParSession([post], session);
+  const idsSauvegardesParMoi = await idsPostsSauvegardesParSession([post.id], session);
   const fallbackNom = tCommun("utilisateur");
 
   return NextResponse.json({
-    ...formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes),
+    ...formaterPost(post, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes, idsSauvegardesParMoi),
     commentaires: commentaires.map((c) => ({
       id: c.id,
       auteurType: c.auteurType,
@@ -89,6 +91,8 @@ export async function DELETE(
 
   await prisma.postCommentaire.deleteMany({ where: { postId: id } });
   await prisma.postLike.deleteMany({ where: { postId: id } });
+  await prisma.postVue.deleteMany({ where: { postId: id } });
+  await prisma.postSauvegarde.deleteMany({ where: { postId: id } });
   await prisma.postImage.deleteMany({ where: { postId: id } });
   await prisma.post.delete({ where: { id } });
 

@@ -11,6 +11,7 @@ import {
   clesAuteursAbonnesParSession,
   formaterPost,
   idsPostsLikesParSession,
+  idsPostsSauvegardesParSession,
   resoudreNomsAuteurs,
 } from "@/lib/posts";
 
@@ -62,10 +63,11 @@ export default async function FilPage() {
   const noms = await resoudreNomsAuteurs(posts);
   const idsLikesParMoi = await idsPostsLikesParSession(posts.map((p) => p.id), session);
   const clesAbonnes = await clesAuteursAbonnesParSession(posts, session);
+  const idsSauvegardesParMoi = await idsPostsSauvegardesParSession(posts.map((p) => p.id), session);
   const fallbackNom = tCommun("utilisateur");
 
   const postsFormates = posts.map((p) => {
-    const post = formaterPost(p, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes);
+    const post = formaterPost(p, noms, idsLikesParMoi, session, fallbackNom, clesAbonnes, idsSauvegardesParMoi);
     return {
       ...post,
       createdAt: post.createdAt.toISOString(),
