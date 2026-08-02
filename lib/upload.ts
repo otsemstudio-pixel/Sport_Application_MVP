@@ -9,7 +9,7 @@ const LARGEUR_MAX = 1200;
 // Compresse/redimensionne l'image puis l'envoie sur Vercel Blob.
 export async function comprimerEtUploaderImage(
   buffer: Buffer,
-  dossier: "posts" | "evenements"
+  dossier: "posts" | "evenements" | "profils"
 ): Promise<string> {
   const compresse = await sharp(buffer)
     .resize({ width: LARGEUR_MAX, withoutEnlargement: true })

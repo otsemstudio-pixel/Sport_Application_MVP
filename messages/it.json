@@ -360,7 +360,14 @@
     "active": "Attivo",
     "inactive": "Disattivato",
     "netteteLabel": "Nitidezza ({valeur}%)",
-    "creditsPhotos": "Crediti foto"
+    "creditsPhotos": "Crediti foto",
+    "photoProfil": "Foto del profilo",
+    "photoBanniere": "Foto della scheda profilo",
+    "photoFondEcran": "Foto di sfondo",
+    "depuisAppareil": "Dal dispositivo",
+    "depuisGalerie": "Dalla galleria",
+    "reinitialiser": "Reimposta",
+    "choisirDansGalerie": "Scegli una foto"
   },
   "mascotte": {
     "bienvenue": "Benvenuto su ScoutApp! Ti accompagnerò nel tuo allenamento.",

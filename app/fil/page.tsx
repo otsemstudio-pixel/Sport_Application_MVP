@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import PostComposer from "@/components/PostComposer";
 import FilFeed from "@/components/FilFeed";
 import FondSport from "@/components/FondSport";
-import { fondSportPour } from "@/lib/sportBackgrounds";
+import { resoudreFondEcran } from "@/lib/sportBackgrounds";
 import {
   INCLUDE_POST_RELATIONS,
   clesAuteursAbonnesParSession,
@@ -37,6 +37,7 @@ export default async function FilPage() {
         sportPrincipalId: true,
         afficherFondSport: true,
         netteteFondSport: true,
+        fondEcranUrl: true,
         sportPrincipal: { select: { nom: true } },
       },
     });
@@ -48,7 +49,7 @@ export default async function FilPage() {
       where = { auteurType: "ATHLETE", auteurId: { in: athletesDuSport.map((a) => a.id) } };
       netteteFondSport = athlete.netteteFondSport;
       if (athlete.afficherFondSport) {
-        fondSportUrl = fondSportPour(athlete.sportPrincipal.nom);
+        fondSportUrl = resoudreFondEcran(athlete);
       }
     }
   }

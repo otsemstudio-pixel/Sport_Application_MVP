@@ -17,6 +17,10 @@ export const INCLUDE_POST_RELATIONS = {
 
 type Auteur = { auteurId: string; auteurType: "ATHLETE" | "ORGANISATEUR" };
 
+type InfosAuteur = { nom: string; avatarUrl: string | null };
+
+// Organisateur n'a pas de champ avatarUrl (photo de profil réservée aux
+// athlètes pour l'instant) : ses entrées ont toujours avatarUrl=null.
 export async function resoudreNomsAuteurs(entites: Auteur[]) {
   const athleteIds = entites.filter((e) => e.auteurType === "ATHLETE").map((e) => e.auteurId);
   const organisateurIds = entites
@@ -27,7 +31,7 @@ export async function resoudreNomsAuteurs(entites: Auteur[]) {
     athleteIds.length
       ? prisma.athlete.findMany({
           where: { id: { in: athleteIds } },
-          select: { id: true, nom: true },
+          select: { id: true, nom: true, avatarUrl: true },
         })
       : Promise.resolve([]),
     organisateurIds.length
@@ -38,9 +42,9 @@ export async function resoudreNomsAuteurs(entites: Auteur[]) {
       : Promise.resolve([]),
   ]);
 
-  const noms = new Map<string, string>();
-  athletes.forEach((a) => noms.set(`ATHLETE:${a.id}`, a.nom));
-  organisateurs.forEach((o) => noms.set(`ORGANISATEUR:${o.id}`, o.nom));
+  const noms = new Map<string, InfosAuteur>();
+  athletes.forEach((a) => noms.set(`ATHLETE:${a.id}`, { nom: a.nom, avatarUrl: a.avatarUrl }));
+  organisateurs.forEach((o) => noms.set(`ORGANISATEUR:${o.id}`, { nom: o.nom, avatarUrl: null }));
   return noms;
 }
 
@@ -121,18 +125,20 @@ export function formaterPost(
     _count: { likes: number; commentaires: number; vues: number };
     seanceEntrainement?: SeanceRecapSource;
   },
-  noms: Map<string, string>,
+  noms: Map<string, InfosAuteur>,
   idsLikesParMoi: Set<string>,
   session: SessionInfo,
   fallbackNom = "Utilisateur",
   clesAuteursAbonnes: Set<string> = new Set(),
   idsSauvegardesParMoi: Set<string> = new Set()
 ) {
+  const infosAuteur = noms.get(`${post.auteurType}:${post.auteurId}`);
   return {
     id: post.id,
     auteurId: post.auteurId,
     auteurType: post.auteurType,
-    auteurNom: noms.get(`${post.auteurType}:${post.auteurId}`) ?? fallbackNom,
+    auteurNom: infosAuteur?.nom ?? fallbackNom,
+    auteurAvatarUrl: infosAuteur?.avatarUrl ?? null,
     contenu: post.contenu,
     images: [...post.images].sort((a, b) => a.ordre - b.ordre).map((i) => i.url),
     createdAt: post.createdAt,

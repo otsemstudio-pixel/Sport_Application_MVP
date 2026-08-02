@@ -88,8 +88,9 @@ export default async function AthleteProfilPage({
 
       <EnTeteProfilPublic
         nom={athlete.nom}
+        avatarUrl={athlete.avatarUrl}
         sousTitre={`${athlete.sportPrincipal.nom} · ${athlete.ville}`}
-        bannerUrl={fondSportPour(athlete.sportPrincipal.nom)}
+        bannerUrl={athlete.bannerUrl ?? fondSportPour(athlete.sportPrincipal.nom)}
         posts={nombrePosts}
         abonnes={abonnes}
         likes={likes}

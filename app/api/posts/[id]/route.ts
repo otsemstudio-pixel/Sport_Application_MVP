@@ -60,7 +60,7 @@ export async function GET(
     commentaires: commentaires.map((c) => ({
       id: c.id,
       auteurType: c.auteurType,
-      auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
+      auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`)?.nom ?? fallbackNom,
       contenu: c.contenu,
       createdAt: c.createdAt,
     })),

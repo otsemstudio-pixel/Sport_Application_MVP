@@ -8,7 +8,9 @@ import BasculeMensurations from "@/components/BasculeMensurations";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import ParametresApparence from "@/components/ParametresApparence";
 import ResumeActiviteProfil from "@/components/ResumeActiviteProfil";
+import Avatar from "@/components/Avatar";
 import { activiteParJour, activiteParSemaine } from "@/lib/activite";
+import { fondSportPour } from "@/lib/sportBackgrounds";
 import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
@@ -27,7 +29,7 @@ export default async function ProfilPage() {
   const tMensurations = await getTranslations("mensurations");
   const mineur = isMineur(athlete.dateNaissance);
   const consentementValide = athlete.consentement?.codeValide === true;
-  const initiale = athlete.nom.trim()[0]?.toUpperCase() ?? "?";
+  const bannerUrl = athlete.bannerUrl ?? fondSportPour(athlete.sportPrincipal.nom);
 
   const [abonnes, abonnements, likes, commentaires, vues, seancesRecentes] = await Promise.all([
     prisma.abonnement.count({ where: { suiviId: athlete.id, suiviType: "ATHLETE" } }),
@@ -46,24 +48,31 @@ export default async function ProfilPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="card flex items-center gap-4 p-6">
+      <div className="card overflow-hidden">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold"
-          style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-        >
-          {initiale}
-        </div>
-        <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold">{athlete.nom}</h1>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            {athlete.sportPrincipal.nom} · {athlete.ville}
-          </p>
-          {mineur && (
-            <span className={`chip mt-2 ${consentementValide ? "chip-success" : "chip-danger"}`}>
-              {consentementValide ? <ShieldCheck size={13} /> : <ShieldAlert size={13} />}
-              {consentementValide ? tConsentement("statutValide") : tConsentement("statutEnAttente")}
-            </span>
-          )}
+          className="h-28 w-full"
+          style={
+            bannerUrl
+              ? { backgroundImage: `url(${bannerUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+              : { background: "linear-gradient(135deg, var(--primary-soft), var(--gold-soft))" }
+          }
+        />
+        <div className="flex items-center gap-4 p-6 pt-0">
+          <div className="-mt-8 rounded-full border-4" style={{ borderColor: "var(--surface)" }}>
+            <Avatar url={athlete.avatarUrl} nom={athlete.nom} taille={64} />
+          </div>
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-bold">{athlete.nom}</h1>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              {athlete.sportPrincipal.nom} · {athlete.ville}
+            </p>
+            {mineur && (
+              <span className={`chip mt-2 ${consentementValide ? "chip-success" : "chip-danger"}`}>
+                {consentementValide ? <ShieldCheck size={13} /> : <ShieldAlert size={13} />}
+                {consentementValide ? tConsentement("statutValide") : tConsentement("statutEnAttente")}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -101,6 +110,10 @@ export default async function ProfilPage() {
         preferenceEffetsInitiale={athlete.preferenceEffetsVisuels}
         afficherFondSportInitial={athlete.afficherFondSport}
         netteteFondSportInitiale={athlete.netteteFondSport}
+        nomSport={athlete.sportPrincipal.nom}
+        avatarUrlInitiale={athlete.avatarUrl}
+        bannerUrlInitiale={athlete.bannerUrl}
+        fondEcranUrlInitiale={athlete.fondEcranUrl}
       />
 
       <BasculeMensurations activeInitial={athlete.suiviMensurationsActive} />

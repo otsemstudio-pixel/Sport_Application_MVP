@@ -7,7 +7,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import InscriptionButton from "@/components/InscriptionButton";
 import SportSelect from "@/components/SportSelect";
 import FondSport from "@/components/FondSport";
-import { fondSportPour } from "@/lib/sportBackgrounds";
+import { fondSportPour, resoudreFondEcran } from "@/lib/sportBackgrounds";
 import { Calendar, GraduationCap, MapPin, Search, ShieldAlert, Trophy, Users } from "lucide-react";
 
 export default async function TournoisPage({
@@ -55,7 +55,7 @@ export default async function TournoisPage({
       const sportFiltre = await prisma.sport.findUnique({ where: { id: sportId }, select: { nom: true } });
       fondSportUrl = sportFiltre ? fondSportPour(sportFiltre.nom) : null;
     } else {
-      fondSportUrl = fondSportPour(athlete.sportPrincipal.nom);
+      fondSportUrl = resoudreFondEcran(athlete);
     }
   }
 

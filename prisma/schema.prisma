@@ -80,6 +80,9 @@ model Athlete {
   onboardingComplete      Boolean          @default(true)
   afficherFondSport       Boolean          @default(true)
   netteteFondSport        Int              @default(40)
+  avatarUrl               String?
+  bannerUrl               String?
+  fondEcranUrl            String?
 
   consentement        ConsentementParental?
   seancesEntrainement SeanceEntrainement[]

@@ -1,0 +1,157 @@
+"use client";
+
+import { useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Images, ImageOff, Upload, X } from "lucide-react";
+
+const TAILLE_MAX_FICHIER = 5 * 1024 * 1024;
+
+export default function SelecteurPhoto({
+  champ,
+  label,
+  valeurInitiale,
+  galerie,
+  rond = false,
+}: {
+  champ: "avatarUrl" | "bannerUrl" | "fondEcranUrl";
+  label: string;
+  valeurInitiale: string | null;
+  galerie: string[];
+  rond?: boolean;
+}) {
+  const router = useRouter();
+  const t = useTranslations("apparence");
+  const tErr = useTranslations("erreurs");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [valeur, setValeur] = useState(valeurInitiale);
+  const [chargement, setChargement] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+  const [galerieOuverte, setGalerieOuverte] = useState(false);
+
+  async function sauvegarder(url: string | null) {
+    setChargement(true);
+    setErreur(null);
+    const res = await fetch("/api/profil/apparence", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [champ]: url }),
+    });
+    setChargement(false);
+    if (res.ok) {
+      setValeur(url);
+      setGalerieOuverte(false);
+      router.refresh();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setErreur(data.error ?? tErr("echecEnvoiImages"));
+    }
+  }
+
+  async function handleFichier(fichiers: FileList | null) {
+    const fichier = fichiers?.[0];
+    if (!fichier) return;
+    if (fichier.size > TAILLE_MAX_FICHIER) {
+      setErreur(tErr("fichierTropLourd", { nom: fichier.name }));
+      return;
+    }
+    setChargement(true);
+    setErreur(null);
+    const formData = new FormData();
+    formData.append("files", fichier);
+    const res = await fetch("/api/upload?dossier=profils", { method: "POST", body: formData });
+    if (!res.ok) {
+      setChargement(false);
+      const data = await res.json().catch(() => ({}));
+      setErreur(data.error ?? tErr("echecEnvoiImages"));
+      return;
+    }
+    const data = await res.json();
+    await sauvegarder(data.urls[0]);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  const formePreview = rond ? "h-14 w-14 rounded-full" : "h-14 w-20 rounded-lg";
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="field-label">{label}</span>
+      <div className="flex items-center gap-3">
+        {valeur ? (
+          <div className={`relative shrink-0 overflow-hidden ${formePreview}`}>
+            <Image src={valeur} alt="" fill sizes="80px" className="object-cover" />
+          </div>
+        ) : (
+          <div
+            className={`flex shrink-0 items-center justify-center ${formePreview}`}
+            style={{ background: "var(--surface-hover)", color: "var(--muted)" }}
+          >
+            <ImageOff size={18} />
+          </div>
+        )}
+        <div className="flex flex-1 flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={chargement}
+            className="btn btn-secondary !py-1.5 !text-xs"
+          >
+            <Upload size={13} />
+            {t("depuisAppareil")}
+          </button>
+          {galerie.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setGalerieOuverte(true)}
+              disabled={chargement}
+              className="btn btn-secondary !py-1.5 !text-xs"
+            >
+              <Images size={13} />
+              {t("depuisGalerie")}
+            </button>
+          )}
+          {valeur && (
+            <button
+              type="button"
+              onClick={() => sauvegarder(null)}
+              disabled={chargement}
+              className="btn btn-ghost !py-1.5 !text-xs"
+            >
+              {t("reinitialiser")}
+            </button>
+          )}
+        </div>
+        <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => handleFichier(e.target.files)} />
+      </div>
+
+      {erreur && <p className="chip chip-danger self-start">{erreur}</p>}
+
+      {galerieOuverte && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
+          onClick={() => setGalerieOuverte(false)}
+        >
+          <div
+            className="card flex max-h-[70vh] w-full max-w-md flex-col gap-3 overflow-y-auto p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">{t("choisirDansGalerie")}</h3>
+              <button onClick={() => setGalerieOuverte(false)} className="btn btn-ghost !p-1.5" aria-label="fermer">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {galerie.map((url) => (
+                <button key={url} onClick={() => sauvegarder(url)} className="relative h-24 overflow-hidden rounded-lg">
+                  <Image src={url} alt="" fill sizes="150px" className="object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import SelecteurPhoto from "@/components/SelecteurPhoto";
+import { galerieSportPour } from "@/lib/sportBackgrounds";
 
 type ThemeFond = "CLAIR" | "SOMBRE" | "SPORT";
 type PreferenceEffets = "AUTO" | "DEGRADE" | "COMPLET";
@@ -13,11 +15,19 @@ export default function ParametresApparence({
   preferenceEffetsInitiale,
   afficherFondSportInitial,
   netteteFondSportInitiale,
+  nomSport,
+  avatarUrlInitiale,
+  bannerUrlInitiale,
+  fondEcranUrlInitiale,
 }: {
   themeFondInitial: ThemeFond;
   preferenceEffetsInitiale: PreferenceEffets;
   afficherFondSportInitial: boolean;
   netteteFondSportInitiale: number;
+  nomSport: string;
+  avatarUrlInitiale: string | null;
+  bannerUrlInitiale: string | null;
+  fondEcranUrlInitiale: string | null;
 }) {
   const router = useRouter();
   const t = useTranslations("apparence");
@@ -26,6 +36,7 @@ export default function ParametresApparence({
   const [afficherFondSport, setAfficherFondSport] = useState(afficherFondSportInitial);
   const [nettete, setNettete] = useState(netteteFondSportInitiale);
   const [chargement, setChargement] = useState(false);
+  const galerie = galerieSportPour(nomSport);
 
   async function sauvegarder(champ: string, valeur: string | boolean | number) {
     setChargement(true);
@@ -121,6 +132,12 @@ export default function ParametresApparence({
         <Link href="/credits-photos" className="text-xs self-start" style={{ color: "var(--muted)" }}>
           {t("creditsPhotos")}
         </Link>
+      </div>
+
+      <div className="flex flex-col gap-4 border-t pt-4" style={{ borderColor: "var(--border)" }}>
+        <SelecteurPhoto champ="avatarUrl" label={t("photoProfil")} valeurInitiale={avatarUrlInitiale} galerie={galerie} rond />
+        <SelecteurPhoto champ="bannerUrl" label={t("photoBanniere")} valeurInitiale={bannerUrlInitiale} galerie={galerie} />
+        <SelecteurPhoto champ="fondEcranUrl" label={t("photoFondEcran")} valeurInitiale={fondEcranUrlInitiale} galerie={galerie} />
       </div>
     </div>
   );

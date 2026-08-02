@@ -29,7 +29,7 @@ export async function GET(
       id: c.id,
       auteurId: c.auteurId,
       auteurType: c.auteurType,
-      auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
+      auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`)?.nom ?? fallbackNom,
       contenu: c.contenu,
       createdAt: c.createdAt,
     }))
@@ -88,7 +88,7 @@ export async function POST(
       id: commentaire.id,
       auteurId: commentaire.auteurId,
       auteurType: commentaire.auteurType,
-      auteurNom: noms.get(`${commentaire.auteurType}:${commentaire.auteurId}`) ?? fallbackNom,
+      auteurNom: noms.get(`${commentaire.auteurType}:${commentaire.auteurId}`)?.nom ?? fallbackNom,
       contenu: commentaire.contenu,
       createdAt: commentaire.createdAt,
     },

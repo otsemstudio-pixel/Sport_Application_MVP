@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const dossierParam = req.nextUrl.searchParams.get("dossier");
-  const dossier = dossierParam === "evenements" ? "evenements" : "posts";
+  const dossier = dossierParam === "evenements" ? "evenements" : dossierParam === "profils" ? "profils" : "posts";
 
   const formData = await req.formData();
   const fichiers = formData.getAll("files").filter((f): f is File => f instanceof File);

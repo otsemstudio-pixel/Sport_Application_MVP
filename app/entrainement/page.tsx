@@ -10,7 +10,7 @@ import TacheDuJour from "@/components/TacheDuJour";
 import ProgressRing from "@/components/ProgressRing";
 import FondSport from "@/components/FondSport";
 import ProgressionJournaliere from "@/components/ProgressionJournaliere";
-import { fondSportPour } from "@/lib/sportBackgrounds";
+import { resoudreFondEcran } from "@/lib/sportBackgrounds";
 import { activiteParJour } from "@/lib/activite";
 import type { EvenementMascotte } from "@/lib/mascotte";
 import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
@@ -194,7 +194,7 @@ export default async function EntrainementPage() {
   }));
   const monRang = classement.find((c) => c.moi)?.rang ?? null;
 
-  const fondSportUrl = athlete.afficherFondSport ? fondSportPour(athlete.sportPrincipal.nom) : null;
+  const fondSportUrl = athlete.afficherFondSport ? resoudreFondEcran(athlete) : null;
 
   return (
     <div className="flex flex-col gap-8">

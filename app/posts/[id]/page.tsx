@@ -15,6 +15,7 @@ import {
 import ImageCarousel from "@/components/ImageCarousel";
 import LikeButton from "@/components/LikeButton";
 import SauvegarderBouton from "@/components/SauvegarderBouton";
+import Avatar from "@/components/Avatar";
 import CommentairesDetail from "@/components/CommentairesDetail";
 import RecapSeance from "@/components/RecapSeance";
 import { hrefProfil } from "@/lib/routes";
@@ -70,7 +71,7 @@ export default async function PostDetailPage({
     id: c.id,
     auteurId: c.auteurId,
     auteurType: c.auteurType,
-    auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`) ?? fallbackNom,
+    auteurNom: noms.get(`${c.auteurType}:${c.auteurId}`)?.nom ?? fallbackNom,
     contenu: c.contenu,
     createdAt: c.createdAt.toISOString(),
   }));
@@ -85,12 +86,7 @@ export default async function PostDetailPage({
       <div className="card flex flex-col gap-4 p-5">
         <div className="flex items-center gap-3">
           <Link href={hrefProfil(postFormate.auteurType, postFormate.auteurId)}>
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-full text-base font-bold"
-              style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-            >
-              {postFormate.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-            </div>
+            <Avatar url={postFormate.auteurAvatarUrl} nom={postFormate.auteurNom} taille={44} />
           </Link>
           <div>
             <div className="flex items-center gap-1.5">

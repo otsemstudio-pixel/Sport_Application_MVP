@@ -10,6 +10,7 @@ import LikeButton from "@/components/LikeButton";
 import RecapSeance from "@/components/RecapSeance";
 import AbonnementBouton from "@/components/AbonnementBouton";
 import SauvegarderBouton from "@/components/SauvegarderBouton";
+import Avatar from "@/components/Avatar";
 import { hrefProfil } from "@/lib/routes";
 
 export type Post = {
@@ -17,6 +18,7 @@ export type Post = {
   auteurId: string;
   auteurType: "ATHLETE" | "ORGANISATEUR";
   auteurNom: string;
+  auteurAvatarUrl: string | null;
   contenu: string;
   images: string[];
   createdAt: string;
@@ -176,12 +178,7 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
             <Link href={hrefProfil(post.auteurType, post.auteurId)}>
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
-                style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
-              >
-                {post.auteurNom.trim()[0]?.toUpperCase() ?? "?"}
-              </div>
+              <Avatar url={post.auteurAvatarUrl} nom={post.auteurNom} taille={36} />
             </Link>
             <div>
               <div className="flex items-center gap-1.5">

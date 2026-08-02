@@ -1,10 +1,12 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { FileText, ShieldCheck, Users, Heart } from "lucide-react";
 import AbonnementBouton from "@/components/AbonnementBouton";
+import Avatar from "@/components/Avatar";
 import { formaterNombreCompact } from "@/lib/format";
 
 export default async function EnTeteProfilPublic({
   nom,
+  avatarUrl,
   sousTitre,
   verifie = false,
   bannerUrl,
@@ -18,6 +20,7 @@ export default async function EnTeteProfilPublic({
   abonneInitial,
 }: {
   nom: string;
+  avatarUrl?: string | null;
   sousTitre?: string;
   verifie?: boolean;
   bannerUrl: string | null;
@@ -32,7 +35,6 @@ export default async function EnTeteProfilPublic({
 }) {
   const locale = await getLocale();
   const t = await getTranslations("profilPublic");
-  const initiale = nom.trim()[0]?.toUpperCase() ?? "?";
 
   return (
     <div className="card overflow-hidden">
@@ -46,11 +48,8 @@ export default async function EnTeteProfilPublic({
       />
 
       <div className="flex flex-col items-center gap-2 px-5 pb-5">
-        <div
-          className="-mt-10 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 text-2xl font-bold"
-          style={{ background: "var(--primary-soft)", color: "var(--primary)", borderColor: "var(--surface)" }}
-        >
-          {initiale}
+        <div className="-mt-10 rounded-full border-4" style={{ borderColor: "var(--surface)" }}>
+          <Avatar url={avatarUrl} nom={nom} taille={80} />
         </div>
 
         <div className="flex items-center gap-1.5">
