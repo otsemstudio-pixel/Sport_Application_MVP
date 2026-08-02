@@ -58,7 +58,13 @@ export async function POST(req: NextRequest) {
   try {
     const urls = await Promise.all(
       fichiers.map(async (fichier) => {
-        const buffer = Buffer.from(await fichier.arrayBuffer());
+        // Buffer.from() refuse un ArrayBuffer partagé (SharedArrayBuffer) :
+        // au-delà d'une certaine taille, undici (fetch/FormData de Node)
+        // peut renvoyer ce type de buffer depuis File.arrayBuffer(), d'où
+        // l'échec systématique sur les fichiers un peu volumineux (photos de
+        // téléphone) alors qu'un tout petit fichier de test passait. Passer
+        // par un Uint8Array copie les octets et évite le problème.
+        const buffer = Buffer.from(new Uint8Array(await fichier.arrayBuffer()));
         return comprimerEtUploaderImage(buffer, dossier);
       })
     );

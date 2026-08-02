@@ -2,7 +2,10 @@ import { randomUUID } from "crypto";
 import { put } from "@vercel/blob";
 import sharp from "sharp";
 
-export const TAILLE_MAX_FICHIER = 5 * 1024 * 1024; // 5 Mo
+// Volontairement sous la limite de charge utile des fonctions serverless
+// (Vercel plafonne autour de 4,5 Mo) : un fichier accepté ici doit toujours
+// pouvoir être envoyé sans être rejeté par la plateforme d'hébergement.
+export const TAILLE_MAX_FICHIER = 3 * 1024 * 1024; // 3 Mo
 export const NOMBRE_MAX_IMAGES = 4;
 // Le HEIC/HEIF (photos iPhone) est converti en JPEG côté client avant
 // d'arriver ici (voir lib/heic.ts) : seuls JPEG/JPG/PNG sont acceptés en

@@ -6,7 +6,7 @@ import { AlertCircle, ImagePlus, Loader2, X } from "lucide-react";
 import { convertirSiHeic } from "@/lib/heic";
 
 const NOMBRE_MAX_IMAGES = 4;
-const TAILLE_MAX_FICHIER = 5 * 1024 * 1024;
+const TAILLE_MAX_FICHIER = 3 * 1024 * 1024;
 const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
 
 export default function ImageUploader({

@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Images, ImageOff, Upload, X } from "lucide-react";
 import { convertirSiHeic } from "@/lib/heic";
 
-const TAILLE_MAX_FICHIER = 5 * 1024 * 1024;
+const TAILLE_MAX_FICHIER = 3 * 1024 * 1024;
 const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
 
 export default function SelecteurPhoto({

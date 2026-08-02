@@ -339,7 +339,7 @@
     "postIntrouvable": "Post introuvable.",
     "aucunFichier": "Aucun fichier reçu.",
     "maxImages": "Maximum {n} images.",
-    "fichierTropLourd": "{nom} dépasse la taille maximale de 5 Mo.",
+    "fichierTropLourd": "{nom} dépasse la taille maximale de 3 Mo.",
     "fichierPasImage": "{nom} : formats acceptés — JPEG, JPG ou PNG."
   },
   "apparence": {

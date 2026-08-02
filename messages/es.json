@@ -339,7 +339,7 @@
     "postIntrouvable": "Publicación no encontrada.",
     "aucunFichier": "No se recibió ningún archivo.",
     "maxImages": "Máximo {n} imágenes.",
-    "fichierTropLourd": "{nom} supera el tamaño máximo de 5 MB.",
+    "fichierTropLourd": "{nom} supera el tamaño máximo de 3 MB.",
     "fichierPasImage": "{nom}: formatos aceptados — JPEG, JPG o PNG."
   },
   "apparence": {
