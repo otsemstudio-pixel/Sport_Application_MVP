@@ -341,7 +341,9 @@
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} dépasse la taille maximale de 3 Mo.",
     "fichierPasImage": "{nom} : formats acceptés — JPEG, JPG, PNG ou WEBP.",
-    "fichierTropPetit": "{nom} : image trop petite (minimum {largeur} x {hauteur} pixels)."
+    "fichierTropPetit": "{nom} : image trop petite (minimum {largeur} x {hauteur} pixels).",
+    "imageIllisible": "Image illisible ou corrompue — essayez une autre photo.",
+    "echecStockage": "Échec de connexion au stockage. Réessayez dans un instant."
   },
   "apparence": {
     "titre": "Apparence",

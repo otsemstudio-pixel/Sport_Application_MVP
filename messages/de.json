@@ -341,7 +341,9 @@
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 3 MB.",
     "fichierPasImage": "{nom}: akzeptierte Formate — JPEG, JPG, PNG oder WEBP.",
-    "fichierTropPetit": "{nom}: Bild zu klein (mindestens {largeur} x {hauteur} Pixel)."
+    "fichierTropPetit": "{nom}: Bild zu klein (mindestens {largeur} x {hauteur} Pixel).",
+    "imageIllisible": "Unlesbares oder beschädigtes Bild — versuchen Sie ein anderes Foto.",
+    "echecStockage": "Verbindung zum Speicher fehlgeschlagen. Bitte in Kürze erneut versuchen."
   },
   "apparence": {
     "titre": "Erscheinungsbild",

@@ -341,7 +341,9 @@
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 3 MB.",
     "fichierPasImage": "{nom}: formati accettati — JPEG, JPG, PNG o WEBP.",
-    "fichierTropPetit": "{nom}: immagine troppo piccola (minimo {largeur} x {hauteur} pixel)."
+    "fichierTropPetit": "{nom}: immagine troppo piccola (minimo {largeur} x {hauteur} pixel).",
+    "imageIllisible": "Immagine illeggibile o corrotta — prova un'altra foto.",
+    "echecStockage": "Connessione all'archiviazione non riuscita. Riprova tra poco."
   },
   "apparence": {
     "titre": "Aspetto",

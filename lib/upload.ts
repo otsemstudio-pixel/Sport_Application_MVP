@@ -34,6 +34,13 @@ export const DIMENSIONS_MIN: Record<FormeRecadrage, { width: number; height: num
   libre: { width: 200, height: 200 },
 };
 
+// Distingue la cause d'un échec pour que la route puisse répondre avec un
+// message précis plutôt qu'un seul message générique pour tous les cas —
+// utile pour diagnostiquer un futur échec sans avoir à rejouer un test en
+// production.
+export class ErreurImageIllisible extends Error {}
+export class ErreurStockage extends Error {}
+
 // Compresse/redimensionne (et recadre au centre si demandé) puis envoie sur
 // Vercel Blob. Retourne `{ tropPetite: true }` sans rien envoyer si l'image
 // est en dessous du minimum requis pour la forme demandée.
@@ -42,31 +49,45 @@ export async function comprimerEtUploaderImage(
   dossier: "posts" | "evenements" | "profils",
   forme: FormeRecadrage = "libre"
 ): Promise<{ url: string } | { tropPetite: true }> {
-  const image = sharp(buffer);
-  const metadata = await image.metadata();
   const min = DIMENSIONS_MIN[forme];
-  if (!metadata.width || !metadata.height || metadata.width < min.width || metadata.height < min.height) {
-    return { tropPetite: true };
+  let compresse: Buffer;
+  try {
+    const image = sharp(buffer);
+    const metadata = await image.metadata();
+    if (!metadata.width || !metadata.height || metadata.width < min.width || metadata.height < min.height) {
+      return { tropPetite: true };
+    }
+
+    // Le recadrage vers une forme fixe doit toujours produire exactement les
+    // dimensions cibles, y compris en agrandissant si besoin — withoutEnlargement
+    // empêcherait sharp d'agrandir le côté le plus court, cassant le recadrage
+    // (ex. une source 1600x400 recadrée en "carre" 500x500 ressortait en
+    // 500x400 au lieu de 500x500). Le contrôle qualité est déjà assuré par le
+    // minimum requis ci-dessus, pas par withoutEnlargement.
+    const redimensionnee =
+      forme === "libre"
+        ? image.resize({ width: LARGEUR_MAX, withoutEnlargement: true })
+        : image.resize({ ...DIMENSIONS_CIBLES[forme], fit: "cover", position: "center" });
+
+    compresse = await redimensionnee.jpeg({ quality: 80 }).toBuffer();
+  } catch (e) {
+    throw new ErreurImageIllisible(e instanceof Error ? e.message : String(e));
   }
 
-  // Le recadrage vers une forme fixe doit toujours produire exactement les
-  // dimensions cibles, y compris en agrandissant si besoin — withoutEnlargement
-  // empêcherait sharp d'agrandir le côté le plus court, cassant le recadrage
-  // (ex. une source 1600x400 recadrée en "carre" 500x500 ressortait en
-  // 500x400 au lieu de 500x500). Le contrôle qualité est déjà assuré par le
-  // minimum requis ci-dessus, pas par withoutEnlargement.
-  const redimensionnee =
-    forme === "libre"
-      ? image.resize({ width: LARGEUR_MAX, withoutEnlargement: true })
-      : image.resize({ ...DIMENSIONS_CIBLES[forme], fit: "cover", position: "center" });
-
-  const compresse = await redimensionnee.jpeg({ quality: 80 }).toBuffer();
-
-  const nomFichier = `${dossier}/${randomUUID()}.jpg`;
-  const blob = await put(nomFichier, compresse, {
-    access: "public",
-    contentType: "image/jpeg",
-  });
-
-  return { url: blob.url };
+  try {
+    // Le buffer produit par sharp déclenche la même erreur que celle déjà
+    // rencontrée en lecture du fichier entrant (« ArrayBuffer: SharedArrayBuffer
+    // is not allowed ») une fois transmis au fetch interne de @vercel/blob : ce
+    // n'est plus notre code qui échoue mais leur appel fetch(), sur le buffer
+    // qu'on leur passe. Une copie fraîche via Uint8Array évite tout ArrayBuffer
+    // potentiellement partagé, comme pour la lecture du fichier entrant.
+    const nomFichier = `${dossier}/${randomUUID()}.jpg`;
+    const blob = await put(nomFichier, Buffer.from(new Uint8Array(compresse)), {
+      access: "public",
+      contentType: "image/jpeg",
+    });
+    return { url: blob.url };
+  } catch (e) {
+    throw new ErreurStockage(e instanceof Error ? e.message : String(e));
+  }
 }

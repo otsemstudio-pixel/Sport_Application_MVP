@@ -5,6 +5,8 @@ import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import {
   comprimerEtUploaderImage,
   DIMENSIONS_MIN,
+  ErreurImageIllisible,
+  ErreurStockage,
   FORMATS_ACCEPTES,
   NOMBRE_MAX_IMAGES,
   TAILLE_MAX_FICHIER,
@@ -90,9 +92,29 @@ export async function POST(req: NextRequest) {
 
     const urls = resultats.map((r) => (r as { url: string }).url);
     return NextResponse.json({ urls });
-  } catch {
-    // Format d'image illisible par le compresseur serveur (fichier corrompu,
-    // variante exotique non convertie côté client) — jamais un crash brut.
+  } catch (e) {
+    // Le message générique ci-dessous est ce que voit l'utilisateur, mais il
+    // masquait jusqu'ici la vraie exception dans les logs Vercel (aucun
+    // console.error n'était émis) — impossible de diagnostiquer un échec en
+    // production sans ça.
+    console.error(
+      "Echec upload /api/upload — dossier:",
+      dossier,
+      "forme:",
+      forme,
+      "fichiers:",
+      fichiers.map((f) => `${f.name} (${f.type}, ${f.size} o)`),
+      "erreur:",
+      e instanceof Error ? { message: e.message, stack: e.stack, name: e.name } : e
+    );
+    // Message distinct selon la cause réelle plutôt qu'un seul message
+    // générique pour tout échec — évite de rediagnostiquer à l'aveugle.
+    if (e instanceof ErreurImageIllisible) {
+      return NextResponse.json({ error: t("imageIllisible") }, { status: 422 });
+    }
+    if (e instanceof ErreurStockage) {
+      return NextResponse.json({ error: t("echecStockage") }, { status: 502 });
+    }
     return NextResponse.json({ error: tCommun("echecEnvoiImages") }, { status: 422 });
   }
 }
