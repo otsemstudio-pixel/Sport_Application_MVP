@@ -15,11 +15,26 @@ export async function GET(req: NextRequest) {
 
   const cursor = req.nextUrl.searchParams.get("cursor") ?? undefined;
   const sportId = req.nextUrl.searchParams.get("sport");
+  const recherche = req.nextUrl.searchParams.get("q")?.trim();
+
+  const where = {
+    ...(sportId ? { sportId } : {}),
+    ...(recherche
+      ? {
+          OR: [
+            { titre: { contains: recherche, mode: "insensitive" as const } },
+            { chapo: { contains: recherche, mode: "insensitive" as const } },
+            { contenu: { contains: recherche, mode: "insensitive" as const } },
+            { source: { contains: recherche, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
 
   const articles = await prisma.article.findMany({
     take: PAGE_SIZE,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    where: sportId ? { sportId } : undefined,
+    where,
     orderBy: { publieLe: "desc" },
     include: INCLUDE_ARTICLE_RELATIONS,
   });

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Search, X } from "lucide-react";
 import ArticleCard, { type Article } from "@/components/ArticleCard";
 import MatchScoreCard, { type MatchDemo } from "@/components/MatchScoreCard";
 
@@ -20,44 +21,81 @@ export default function ActualitesFeed({
 }) {
   const t = useTranslations("actualites");
   const [sportId, setSportId] = useState<string | null>(null);
+  const [recherche, setRecherche] = useState("");
   const [articles, setArticles] = useState(articlesInitiaux);
   const [curseur, setCurseur] = useState(curseurInitial);
   const [chargement, setChargement] = useState(false);
+  const premierRendu = useRef(true);
 
   const matchsFiltres = useMemo(
     () => (sportId ? matchsInitiaux.filter((m) => m.sport.id === sportId) : matchsInitiaux),
     [matchsInitiaux, sportId]
   );
 
-  async function changerSport(nouveauSportId: string | null) {
-    if (nouveauSportId === sportId || chargement) return;
-    setSportId(nouveauSportId);
+  async function charger(cursorActuel: string | null, sportActuel: string | null, rechercheActuelle: string, remplacer: boolean) {
     setChargement(true);
     const params = new URLSearchParams();
-    if (nouveauSportId) params.set("sport", nouveauSportId);
+    if (cursorActuel) params.set("cursor", cursorActuel);
+    if (sportActuel) params.set("sport", sportActuel);
+    if (rechercheActuelle.trim()) params.set("q", rechercheActuelle.trim());
     const res = await fetch(`/api/articles?${params.toString()}`);
     setChargement(false);
     if (!res.ok) return;
     const data = await res.json();
-    setArticles(data.articles);
+    setArticles((prev) => (remplacer ? data.articles : [...prev, ...data.articles]));
     setCurseur(data.nextCursor);
   }
 
-  async function chargerPlus() {
+  // Débounce : évite un appel API à chaque frappe au clavier.
+  useEffect(() => {
+    if (premierRendu.current) {
+      premierRendu.current = false;
+      return;
+    }
+    const id = setTimeout(() => {
+      charger(null, sportId, recherche, true);
+    }, 350);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recherche]);
+
+  function changerSport(nouveauSportId: string | null) {
+    if (nouveauSportId === sportId || chargement) return;
+    setSportId(nouveauSportId);
+    charger(null, nouveauSportId, recherche, true);
+  }
+
+  function chargerPlus() {
     if (!curseur) return;
-    setChargement(true);
-    const params = new URLSearchParams({ cursor: curseur });
-    if (sportId) params.set("sport", sportId);
-    const res = await fetch(`/api/articles?${params.toString()}`);
-    setChargement(false);
-    if (!res.ok) return;
-    const data = await res.json();
-    setArticles((prev) => [...prev, ...data.articles]);
-    setCurseur(data.nextCursor);
+    charger(curseur, sportId, recherche, false);
   }
 
   return (
     <div className="flex min-w-0 flex-col gap-5">
+      <div className="relative">
+        <Search
+          size={16}
+          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
+          style={{ color: "var(--muted)" }}
+        />
+        <input
+          value={recherche}
+          onChange={(e) => setRecherche(e.target.value)}
+          placeholder={t("rechercherPlaceholder")}
+          className="input w-full !pl-10 !pr-9"
+        />
+        {recherche && (
+          <button
+            onClick={() => setRecherche("")}
+            aria-label={t("effacerRecherche")}
+            className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full surface-hover"
+            style={{ color: "var(--muted)" }}
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
       <div className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
         <button
           onClick={() => changerSport(null)}
@@ -102,7 +140,7 @@ export default function ActualitesFeed({
       <div className="flex flex-col gap-3">
         {articles.length === 0 && !chargement && (
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            {t("aucunArticle")}
+            {recherche.trim() ? t("aucunResultat") : t("aucunArticle")}
           </p>
         )}
         {articles.map((article) => (
