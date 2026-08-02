@@ -8,7 +8,7 @@
     "envoiImagesEnCours": "Envoi…",
     "retirerImage": "Retirer l'image",
     "echecEnvoiImages": "Échec de l'envoi des images.",
-    "formatsAcceptes": "Formats acceptés : JPEG, JPG ou PNG."
+    "formatsAcceptes": "Formats acceptés : JPEG, JPG, PNG ou WEBP."
   },
   "nav": {
     "entrainement": "Entraînement",
@@ -340,7 +340,8 @@
     "aucunFichier": "Aucun fichier reçu.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} dépasse la taille maximale de 3 Mo.",
-    "fichierPasImage": "{nom} : formats acceptés — JPEG, JPG ou PNG."
+    "fichierPasImage": "{nom} : formats acceptés — JPEG, JPG, PNG ou WEBP.",
+    "fichierTropPetit": "{nom} : image trop petite (minimum {largeur} x {hauteur} pixels)."
   },
   "apparence": {
     "titre": "Apparence",

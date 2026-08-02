@@ -7,7 +7,7 @@ import { convertirSiHeic } from "@/lib/heic";
 
 const NOMBRE_MAX_IMAGES = 4;
 const TAILLE_MAX_FICHIER = 3 * 1024 * 1024;
-const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
+const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function ImageUploader({
   dossier,
@@ -120,7 +120,7 @@ export default function ImageUploader({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/heic,image/heif"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
         multiple
         hidden
         onChange={(e) => handleFichiers(e.target.files)}

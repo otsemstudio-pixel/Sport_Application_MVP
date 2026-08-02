@@ -8,7 +8,7 @@ import { Images, ImageOff, Upload, X } from "lucide-react";
 import { convertirSiHeic } from "@/lib/heic";
 
 const TAILLE_MAX_FICHIER = 3 * 1024 * 1024;
-const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png"];
+const FORMATS_ACCEPTES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function SelecteurPhoto({
   champ,
@@ -28,6 +28,11 @@ export default function SelecteurPhoto({
   const tErr = useTranslations("erreurs");
   const tCommun = useTranslations("commun");
   const inputRef = useRef<HTMLInputElement>(null);
+  // Recadrage centré côté serveur vers un ratio fixe pour l'avatar (carré) et
+  // la bannière (large) — le fond d'écran reste "libre" car il est déjà
+  // recouvert dynamiquement en CSS (background-size: cover) quel que soit
+  // son ratio d'origine.
+  const forme = champ === "avatarUrl" ? "carre" : champ === "bannerUrl" ? "large" : "libre";
   const [valeur, setValeur] = useState(valeurInitiale);
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -80,7 +85,7 @@ export default function SelecteurPhoto({
 
     const formData = new FormData();
     formData.append("files", fichier);
-    const res = await fetch("/api/upload?dossier=profils", { method: "POST", body: formData });
+    const res = await fetch(`/api/upload?dossier=profils&forme=${forme}`, { method: "POST", body: formData });
     if (!res.ok) {
       setChargement(false);
       const data = await res.json().catch(() => ({}));
@@ -145,7 +150,7 @@ export default function SelecteurPhoto({
         <input
           ref={inputRef}
           type="file"
-          accept="image/jpeg,image/png,image/heic,image/heif"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
           hidden
           onChange={(e) => handleFichier(e.target.files)}
         />

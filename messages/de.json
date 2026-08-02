@@ -8,7 +8,7 @@
     "envoiImagesEnCours": "Wird hochgeladen…",
     "retirerImage": "Bild entfernen",
     "echecEnvoiImages": "Hochladen der Bilder fehlgeschlagen.",
-    "formatsAcceptes": "Akzeptierte Formate: JPEG, JPG oder PNG."
+    "formatsAcceptes": "Akzeptierte Formate: JPEG, JPG, PNG oder WEBP."
   },
   "nav": {
     "entrainement": "Training",
@@ -340,7 +340,8 @@
     "aucunFichier": "Keine Datei empfangen.",
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 3 MB.",
-    "fichierPasImage": "{nom}: akzeptierte Formate — JPEG, JPG oder PNG."
+    "fichierPasImage": "{nom}: akzeptierte Formate — JPEG, JPG, PNG oder WEBP.",
+    "fichierTropPetit": "{nom}: Bild zu klein (mindestens {largeur} x {hauteur} Pixel)."
   },
   "apparence": {
     "titre": "Erscheinungsbild",

@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
-import { comprimerEtUploaderImage, FORMATS_ACCEPTES, NOMBRE_MAX_IMAGES, TAILLE_MAX_FICHIER } from "@/lib/upload";
+import {
+  comprimerEtUploaderImage,
+  DIMENSIONS_MIN,
+  FORMATS_ACCEPTES,
+  NOMBRE_MAX_IMAGES,
+  TAILLE_MAX_FICHIER,
+  type FormeRecadrage,
+} from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
   const t = await getTranslations("erreurs");
@@ -27,6 +34,9 @@ export async function POST(req: NextRequest) {
 
   const dossierParam = req.nextUrl.searchParams.get("dossier");
   const dossier = dossierParam === "evenements" ? "evenements" : dossierParam === "profils" ? "profils" : "posts";
+
+  const formeParam = req.nextUrl.searchParams.get("forme");
+  const forme: FormeRecadrage = formeParam === "carre" || formeParam === "large" ? formeParam : "libre";
 
   const formData = await req.formData();
   const fichiers = formData.getAll("files").filter((f): f is File => f instanceof File);
@@ -56,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const urls = await Promise.all(
+    const resultats = await Promise.all(
       fichiers.map(async (fichier) => {
         // Buffer.from() refuse un ArrayBuffer partagé (SharedArrayBuffer) :
         // au-delà d'une certaine taille, undici (fetch/FormData de Node)
@@ -65,9 +75,20 @@ export async function POST(req: NextRequest) {
         // téléphone) alors qu'un tout petit fichier de test passait. Passer
         // par un Uint8Array copie les octets et évite le problème.
         const buffer = Buffer.from(new Uint8Array(await fichier.arrayBuffer()));
-        return comprimerEtUploaderImage(buffer, dossier);
+        return comprimerEtUploaderImage(buffer, dossier, forme);
       })
     );
+
+    const indexTropPetite = resultats.findIndex((r) => "tropPetite" in r);
+    if (indexTropPetite !== -1) {
+      const min = DIMENSIONS_MIN[forme];
+      return NextResponse.json(
+        { error: t("fichierTropPetit", { nom: fichiers[indexTropPetite].name, largeur: min.width, hauteur: min.height }) },
+        { status: 400 }
+      );
+    }
+
+    const urls = resultats.map((r) => (r as { url: string }).url);
     return NextResponse.json({ urls });
   } catch {
     // Format d'image illisible par le compresseur serveur (fichier corrompu,
