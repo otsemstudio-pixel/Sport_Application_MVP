@@ -4,6 +4,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Anime les changements de route avec l'API View Transitions native
+    // (voir app/layout.tsx et le CSS ::view-transition-* dans globals.css) —
+    // pas de librairie tierce.
+    viewTransition: true,
+  },
   images: {
     remotePatterns: [
       // Photos uploadées par les utilisateurs (posts, événements).

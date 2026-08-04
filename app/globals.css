@@ -505,6 +505,50 @@ body {
   animation: bounce-feedback 0.4s ease-out;
 }
 
+/* Transition entre pages (API View Transitions native, activée par
+   experimental.viewTransition dans next.config.ts + <ViewTransition> dans
+   app/layout.tsx). Volontairement pas de fondu au blanc/noir : l'ancienne
+   page glisse légèrement vers le haut en s'estompant pendant que la
+   nouvelle arrive du bas en s'affichant — jamais d'écran vide entre les
+   deux. La sidebar/barre du bas ne bougent pas : elles vivent en dehors de
+   <main> dans app/layout.tsx, React ne les remonte donc jamais au
+   changement de route. */
+::view-transition-old(.page-exit) {
+  animation: 130ms ease-in both view-fade-out, 130ms ease-in both view-slide-out;
+}
+::view-transition-new(.page-enter) {
+  animation: 220ms ease-out 50ms both view-fade-in, 260ms ease-out both view-slide-in;
+}
+@keyframes view-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes view-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes view-slide-out {
+  to {
+    transform: translateY(-10px);
+  }
+}
+@keyframes view-slide-in {
+  from {
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 ::selection {
   background: var(--primary-soft);
   color: var(--primary);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -100,7 +101,9 @@ export default async function RootLayout({
               <div className="flex min-h-full min-w-0 flex-1 flex-col sm:pl-64">
                 <MobileTopBar role={session.role} />
                 <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
-                  {children}
+                  <ViewTransition enter="page-enter" exit="page-exit">
+                    {children}
+                  </ViewTransition>
                 </main>
               </div>
               <BottomTabBar liens={liens} />
@@ -109,7 +112,9 @@ export default async function RootLayout({
             <>
               <PublicHeader />
               <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-8">
-                {children}
+                <ViewTransition enter="page-enter" exit="page-exit">
+                  {children}
+                </ViewTransition>
               </main>
             </>
           )}
