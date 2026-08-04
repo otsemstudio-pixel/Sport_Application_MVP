@@ -2,6 +2,7 @@ import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { recalculerRecordPersonnel } from "../lib/records";
+import { traiterHashtagsEtMentions } from "../lib/hashtagsMentions";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -257,9 +258,9 @@ async function seedProgrammes() {
 
 async function seedOrganisateurs() {
   const donnees = [
-    { email: "club.basket.dakar@demo.scoutapp", nom: "Club Basket Dakar", verifie: true },
-    { email: "federation.lutte.sn@demo.scoutapp", nom: "Fédération Lutte Sénégalaise", verifie: true },
-    { email: "academie.sport.lagos@demo.scoutapp", nom: "Académie Sport Lagos", verifie: false },
+    { email: "club.basket.dakar@demo.scoutapp", nom: "Club Basket Dakar", nomUtilisateur: "clubbasketdakar", verifie: true },
+    { email: "federation.lutte.sn@demo.scoutapp", nom: "Fédération Lutte Sénégalaise", nomUtilisateur: "federationlutteseneg", verifie: true },
+    { email: "academie.sport.lagos@demo.scoutapp", nom: "Académie Sport Lagos", nomUtilisateur: "academiesportlagos", verifie: false },
   ];
 
   const passwordHash = await bcrypt.hash(MOT_DE_PASSE_DEMO, 10);
@@ -281,6 +282,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
     {
       email: "mamadou.diallo@demo.scoutapp",
       nom: "Mamadou Diallo",
+      nomUtilisateur: "mamadoudiallo",
       ville: "Dakar",
       sport: "Basketball",
       dateNaissance: new Date("2005-03-12"),
@@ -290,6 +292,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
     {
       email: "modou.fall@demo.scoutapp",
       nom: "Modou Fall",
+      nomUtilisateur: "modoufall",
       ville: "Thiès",
       sport: "Lutte sénégalaise",
       dateNaissance: new Date("2001-09-02"),
@@ -298,6 +301,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
     {
       email: "aicha.kone@demo.scoutapp",
       nom: "Aïcha Koné",
+      nomUtilisateur: "aichakone",
       ville: "Abidjan",
       sport: "Athlétisme (fond/demi-fond)",
       dateNaissance: new Date("2003-11-20"),
@@ -306,6 +310,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
     {
       email: "chinedu.okafor@demo.scoutapp",
       nom: "Chinedu Okafor",
+      nomUtilisateur: "chineduokafor",
       ville: "Lagos",
       sport: "Handball",
       dateNaissance: new Date("2010-06-15"),
@@ -314,6 +319,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
     {
       email: "ibrahim.musa@demo.scoutapp",
       nom: "Ibrahim Musa",
+      nomUtilisateur: "ibrahimmusa",
       ville: "Kano",
       sport: "Dambe (boxe traditionnelle nigériane)",
       dateNaissance: new Date("1999-01-30"),
@@ -337,6 +343,7 @@ async function seedAthletes(sportParNom: Map<string, { id: string }>) {
         email: a.email,
         passwordHash,
         nom: a.nom,
+        nomUtilisateur: a.nomUtilisateur,
         ville: a.ville,
         dateNaissance: a.dateNaissance,
         sportPrincipalId: sportParNom.get(a.sport)!.id,
@@ -612,7 +619,8 @@ async function reinitialiserPostsDemo(
   const contenus: { auteur: (typeof auteurs)[number]; contenu: string; likes: (typeof auteurs)[number][]; commentaires?: { auteur: (typeof auteurs)[number]; contenu: string }[]; images?: string[] }[] = [
     {
       auteur: { id: mamadou.id, type: "ATHLETE" },
-      contenu: "Séance de tirs ce matin à Dakar, 18/20 sur les lancers ! On continue de progresser 🏀",
+      contenu:
+        "Séance de tirs ce matin à Dakar, 18/20 sur les lancers ! On continue de progresser 🏀 #basketball @modoufall tu me rejoins la prochaine fois ?",
       likes: [{ id: modou.id, type: "ATHLETE" }, { id: aicha.id, type: "ATHLETE" }, { id: clubBasket.id, type: "ORGANISATEUR" }],
       commentaires: [{ auteur: { id: clubBasket.id, type: "ORGANISATEUR" }, contenu: "Excellent Mamadou, continue comme ça !" }],
       images: [
@@ -622,17 +630,19 @@ async function reinitialiserPostsDemo(
     },
     {
       auteur: { id: clubBasket.id, type: "ORGANISATEUR" },
-      contenu: "Le Tournoi Quartier Basketball ouvre ses inscriptions ! Ouvert à tous, débutants bienvenus, sans club requis.",
+      contenu:
+        "Le Tournoi Quartier Basketball ouvre ses inscriptions ! Ouvert à tous, débutants bienvenus, sans club requis. #tournoi #basketball",
       likes: [{ id: mamadou.id, type: "ATHLETE" }, { id: chinedu.id, type: "ATHLETE" }],
       images: ["https://picsum.photos/seed/tournoi-quartier/900/700"],
     },
     {
       auteur: { id: modou.id, type: "ATHLETE" },
-      contenu: "Entraînement de déséquilibres avec les anciens du quartier à Thiès. La lutte sénégalaise, c'est aussi une école de patience.",
+      contenu:
+        "Entraînement de déséquilibres avec les anciens du quartier à Thiès. La lutte sénégalaise, c'est aussi une école de patience. #luttesenegalaise @mamadoudiallo tu devrais venir un jour !",
       likes: [{ id: fedLutte.id, type: "ORGANISATEUR" }],
       commentaires: [
         { auteur: { id: fedLutte.id, type: "ORGANISATEUR" }, contenu: "Beau travail, on te suit pour la sélection nationale." },
-        { auteur: { id: ibrahim.id, type: "ATHLETE" }, contenu: "Respect grand frère 💪" },
+        { auteur: { id: ibrahim.id, type: "ATHLETE" }, contenu: "Respect grand frère 💪 @chineduokafor toi aussi tu gères !" },
       ],
       images: [
         "https://picsum.photos/seed/lutte-1/900/700",
@@ -642,7 +652,8 @@ async function reinitialiserPostsDemo(
     },
     {
       auteur: { id: aicha.id, type: "ATHLETE" },
-      contenu: "5km bouclés ce matin à Abidjan sous la pluie. La régularité paie, badge Assidu débloqué cette semaine !",
+      contenu:
+        "5km bouclés ce matin à Abidjan sous la pluie. La régularité paie, badge Assidu débloqué cette semaine ! #course #endurance",
       likes: [{ id: mamadou.id, type: "ATHLETE" }, { id: modou.id, type: "ATHLETE" }, { id: chinedu.id, type: "ATHLETE" }],
     },
     {
@@ -663,7 +674,8 @@ async function reinitialiserPostsDemo(
     },
     {
       auteur: { id: ibrahim.id, type: "ATHLETE" },
-      contenu: "8 rounds tenus aujourd'hui à Kano. Le Dambe demande une préparation physique complète, pas seulement technique.",
+      contenu:
+        "8 rounds tenus aujourd'hui à Kano. Le Dambe demande une préparation physique complète, pas seulement technique. #dambe @chineduokafor prêt pour un sparring un jour ?",
       likes: [{ id: modou.id, type: "ATHLETE" }, { id: chinedu.id, type: "ATHLETE" }],
     },
     {
@@ -683,6 +695,7 @@ async function reinitialiserPostsDemo(
     const post = await prisma.post.create({
       data: { auteurId: c.auteur.id, auteurType: c.auteur.type, contenu: c.contenu },
     });
+    await traiterHashtagsEtMentions(c.contenu, { postId: post.id });
     for (const [index, url] of (c.images ?? []).entries()) {
       await prisma.postImage.create({ data: { postId: post.id, url, ordre: index } });
     }
@@ -692,7 +705,7 @@ async function reinitialiserPostsDemo(
       });
     }
     for (const commentaire of c.commentaires ?? []) {
-      await prisma.postCommentaire.create({
+      const commentaireCree = await prisma.postCommentaire.create({
         data: {
           postId: post.id,
           auteurId: commentaire.auteur.id,
@@ -700,6 +713,7 @@ async function reinitialiserPostsDemo(
           contenu: commentaire.contenu,
         },
       });
+      await traiterHashtagsEtMentions(commentaire.contenu, { commentaireId: commentaireCree.id });
     }
   }
 

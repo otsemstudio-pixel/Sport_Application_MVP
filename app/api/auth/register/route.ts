@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { createSession, hashPassword } from "@/lib/auth";
+import { genererNomUtilisateurUnique } from "@/lib/nomUtilisateur";
 
 export async function POST(req: NextRequest) {
   const t = await getTranslations("erreurs");
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
         email,
         passwordHash: await hashPassword(password),
         nom,
+        nomUtilisateur: await genererNomUtilisateurUnique(nom),
         dateNaissance: new Date(dateNaissance),
         ville,
         sportPrincipalId: sportId,
@@ -58,6 +60,7 @@ export async function POST(req: NextRequest) {
         email,
         passwordHash: await hashPassword(password),
         nom,
+        nomUtilisateur: await genererNomUtilisateurUnique(nom),
       },
     });
 

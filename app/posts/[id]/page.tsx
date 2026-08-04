@@ -17,6 +17,7 @@ import LikeButton from "@/components/LikeButton";
 import SauvegarderBouton from "@/components/SauvegarderBouton";
 import Avatar from "@/components/Avatar";
 import CommentairesDetail from "@/components/CommentairesDetail";
+import TexteEnrichi from "@/components/TexteEnrichi";
 import RecapSeance from "@/components/RecapSeance";
 import { hrefProfil } from "@/lib/routes";
 import { ArrowLeft, Eye, ShieldCheck, UserRound } from "lucide-react";
@@ -114,7 +115,9 @@ export default async function PostDetailPage({
           </div>
         </div>
 
-        <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{postFormate.contenu}</p>
+        <p className="whitespace-pre-wrap text-[15px] leading-relaxed">
+          <TexteEnrichi texte={postFormate.contenu} />
+        </p>
 
         {postFormate.seance && <RecapSeance exercices={postFormate.seance.exercices} />}
 

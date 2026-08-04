@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
 import CreateEventForm from "@/components/CreateEventForm";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
-import { Calendar, CalendarDays, ChevronRight, MapPin, ShieldCheck, Users } from "lucide-react";
+import { AtSign, Calendar, CalendarDays, ChevronRight, MapPin, ShieldCheck, Users } from "lucide-react";
 
 export default async function OrganisateurPage() {
   const session = await getSession();
@@ -27,6 +27,7 @@ export default async function OrganisateurPage() {
 
   const locale = await getLocale();
   const t = await getTranslations("organisateur");
+  const tMentions = await getTranslations("mentions");
   const totalInscrits = evenements.reduce((acc, e) => acc + e._count.inscriptions, 0);
 
   return (
@@ -71,6 +72,16 @@ export default async function OrganisateurPage() {
           </span>
         </div>
       </section>
+
+      <Link href="/profil/mentions" className="card surface-hover flex items-center gap-3 p-4">
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+          style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+        >
+          <AtSign size={16} />
+        </div>
+        <span className="text-sm font-semibold">{tMentions("voirMesMentions")}</span>
+      </Link>
 
       <CreateEventForm />
 

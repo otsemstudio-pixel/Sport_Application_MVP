@@ -75,6 +75,14 @@ model Athlete {
   email            String   @unique
   passwordHash     String
   nom              String
+  // Identifiant stable pour les mentions (@nomUtilisateur), distinct du nom
+  // d'affichage qui peut changer. Unicité appliquée au niveau applicatif à
+  // travers Athlete ET Organisateur ensemble (une contrainte @unique Prisma
+  // ne porte que sur une seule table) — même principe que le blocage de
+  // l'auto-abonnement, déjà vérifié en application plutôt qu'en contrainte
+  // SQL. Toujours en minuscules pour une résolution des mentions sans
+  // ambiguïté de casse.
+  nomUtilisateur   String   @unique
   dateNaissance    DateTime
   ville            String
   sportPrincipalId String
@@ -292,12 +300,14 @@ model AthleteBadge {
 }
 
 model Organisateur {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  nom          String
-  verifie      Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  nom            String
+  // Voir le commentaire équivalent sur Athlete.nomUtilisateur.
+  nomUtilisateur String   @unique
+  verifie        Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
   evenements Evenement[]
   sessions   Session[]
@@ -408,6 +418,8 @@ model Post {
   images       PostImage[]
   vues         PostVue[]
   sauvegardes  PostSauvegarde[]
+  hashtags     PostHashtag[]
+  mentions     Mention[]
 
   @@index([createdAt])
   @@index([auteurId, auteurType])
@@ -455,6 +467,51 @@ model PostCommentaire {
   auteurType RoleSession
   contenu    String
   createdAt  DateTime    @default(now())
+
+  mentions Mention[]
+}
+
+// Un hashtag n'existe qu'une fois (texte normalisé, sans le #), réutilisé
+// par tous les posts qui le mentionnent — pas de lien vers les commentaires
+// (le doc ne prévoit ce croisement que pour les posts, l'écran /hashtag/[tag]
+// n'a de sens que pour un contenu qui a sa propre page de destination).
+model Hashtag {
+  id        String        @id @default(cuid())
+  tag       String        @unique
+  createdAt DateTime      @default(now())
+  posts     PostHashtag[]
+}
+
+model PostHashtag {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  hashtagId String
+  hashtag   Hashtag  @relation(fields: [hashtagId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([postId, hashtagId])
+  @@index([hashtagId])
+}
+
+// Une mention appartient soit à un post soit à un commentaire, jamais les
+// deux (contrainte CHECK ajoutée en SQL, voir la migration). Contrairement
+// à Hashtag, sans réutilisation possible : une ligne par occurrence, comme
+// PostVue/PostLike (mêmes champs auteur/spectateur polymorphes déjà utilisés
+// partout ailleurs dans l'app).
+model Mention {
+  id              String           @id @default(cuid())
+  postId          String?
+  post            Post?            @relation(fields: [postId], references: [id])
+  commentaireId   String?
+  commentaire     PostCommentaire? @relation(fields: [commentaireId], references: [id])
+  mentionneId     String
+  mentionneType   RoleSession
+  createdAt       DateTime         @default(now())
+
+  @@index([mentionneId, mentionneType])
+  @@index([postId])
+  @@index([commentaireId])
 }
 
 // Une vue est enregistrée à l'ouverture de la vue détaillée d'un post

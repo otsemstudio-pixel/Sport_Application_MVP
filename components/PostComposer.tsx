@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Send } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
+import ChampAvecAutocompletion from "@/components/ChampAvecAutocompletion";
 
 export default function PostComposer() {
   const router = useRouter();
@@ -41,13 +42,13 @@ export default function PostComposer() {
 
   return (
     <form onSubmit={handleSubmit} className="card flex flex-col gap-3 p-4">
-      <textarea
+      <ChampAvecAutocompletion
         value={contenu}
-        onChange={(e) => setContenu(e.target.value)}
+        onChange={setContenu}
         placeholder={t("placeholderComposer")}
         maxLength={500}
         rows={3}
-        className="input resize-none"
+        className="input resize-none w-full"
       />
       <ImageUploader dossier="posts" value={images} onChange={setImages} />
       {erreur && (

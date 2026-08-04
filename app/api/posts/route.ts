@@ -12,6 +12,7 @@ import {
   resoudreNomsAuteurs,
 } from "@/lib/posts";
 import { NOMBRE_MAX_IMAGES } from "@/lib/upload";
+import { traiterHashtagsEtMentions } from "@/lib/hashtagsMentions";
 
 const PAGE_SIZE = 15;
 
@@ -125,6 +126,8 @@ export async function POST(req: NextRequest) {
     },
     include: { images: true },
   });
+
+  await traiterHashtagsEtMentions(post.contenu, { postId: post.id });
 
   return NextResponse.json(post, { status: 201 });
 }

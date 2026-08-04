@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, estBloquePourConsentement } from "@/lib/auth";
 import { auteurIdSession, resoudreNomsAuteurs } from "@/lib/posts";
+import { traiterHashtagsEtMentions } from "@/lib/hashtagsMentions";
 
 export async function GET(
   _req: Request,
@@ -79,6 +80,8 @@ export async function POST(
       contenu: contenu.trim(),
     },
   });
+
+  await traiterHashtagsEtMentions(commentaire.contenu, { commentaireId: commentaire.id });
 
   const noms = await resoudreNomsAuteurs([commentaire]);
   const fallbackNom = tCommun("utilisateur");

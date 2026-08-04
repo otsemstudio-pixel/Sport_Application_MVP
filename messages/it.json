@@ -8,7 +8,8 @@
     "envoiImagesEnCours": "Caricamento…",
     "retirerImage": "Rimuovi immagine",
     "echecEnvoiImages": "Caricamento immagini non riuscito.",
-    "formatsAcceptes": "Formati accettati: JPEG, JPG, PNG o WEBP."
+    "formatsAcceptes": "Formati accettati: JPEG, JPG, PNG o WEBP.",
+    "enregistrer": "Salva"
   },
   "nav": {
     "entrainement": "Allenamento",
@@ -272,6 +273,24 @@
     "filtreMonSport": "Il mio sport",
     "filtreTousLesSports": "Tutti gli sport"
   },
+  "hashtag": {
+    "retourFil": "Torna alla bacheca",
+    "nombrePosts": "{n} pubblicazioni",
+    "aucunPost": "Ancora nessuna pubblicazione con questo hashtag.",
+    "chargerPlus": "Carica altro",
+    "chargementEnCours": "Caricamento…"
+  },
+  "mentions": {
+    "voirMesMentions": "Vedi le mie menzioni",
+    "retour": "Indietro",
+    "titre": "Menzioni",
+    "aucuneMention": "Nessuno ti ha ancora menzionato.",
+    "chargerPlus": "Carica altro",
+    "chargementEnCours": "Caricamento…",
+    "nomUtilisateurLabel": "Nome utente",
+    "nomUtilisateurDescription": "Usato per essere menzionato con @ nella bacheca. Solo lettere minuscole, numeri e underscore.",
+    "voirLePost": "Vedi il post"
+  },
   "actualites": {
     "titre": "Notizie & Opportunità",
     "sousTitre": "Risultati di tornei, borse sportive e convocazioni in nazionale, raccolti da fonti esterne.",
@@ -359,7 +378,9 @@
     "fichierPasImage": "{nom}: formati accettati — JPEG, JPG, PNG o WEBP.",
     "fichierTropPetit": "{nom}: immagine troppo piccola (minimo {largeur} x {hauteur} pixel).",
     "imageIllisible": "Immagine illeggibile o corrotta — prova un'altra foto.",
-    "echecStockage": "Connessione all'archiviazione non riuscita. Riprova tra poco."
+    "echecStockage": "Connessione all'archiviazione non riuscita. Riprova tra poco.",
+    "nomUtilisateurInvalide": "Il nome utente deve contenere da 3 a 20 lettere minuscole, numeri o underscore.",
+    "nomUtilisateurPris": "Questo nome utente è già utilizzato."
   },
   "apparence": {
     "titre": "Aspetto",

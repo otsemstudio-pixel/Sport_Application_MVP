@@ -89,6 +89,10 @@ export async function DELETE(
     return NextResponse.json({ error: t("nonAutorise") }, { status: 403 });
   }
 
+  const idsCommentaires = (await prisma.postCommentaire.findMany({ where: { postId: id }, select: { id: true } })).map((c) => c.id);
+  await prisma.mention.deleteMany({ where: { commentaireId: { in: idsCommentaires } } });
+  await prisma.mention.deleteMany({ where: { postId: id } });
+  await prisma.postHashtag.deleteMany({ where: { postId: id } });
   await prisma.postCommentaire.deleteMany({ where: { postId: id } });
   await prisma.postLike.deleteMany({ where: { postId: id } });
   await prisma.postVue.deleteMany({ where: { postId: id } });

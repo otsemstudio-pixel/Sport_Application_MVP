@@ -8,7 +8,8 @@
     "envoiImagesEnCours": "Uploading…",
     "retirerImage": "Remove image",
     "echecEnvoiImages": "Failed to upload images.",
-    "formatsAcceptes": "Accepted formats: JPEG, JPG, PNG or WEBP."
+    "formatsAcceptes": "Accepted formats: JPEG, JPG, PNG or WEBP.",
+    "enregistrer": "Save"
   },
   "nav": {
     "entrainement": "Training",
@@ -272,6 +273,24 @@
     "filtreMonSport": "My sport",
     "filtreTousLesSports": "All sports"
   },
+  "hashtag": {
+    "retourFil": "Back to feed",
+    "nombrePosts": "{n} posts",
+    "aucunPost": "No posts with this hashtag yet.",
+    "chargerPlus": "Load more",
+    "chargementEnCours": "Loading…"
+  },
+  "mentions": {
+    "voirMesMentions": "See my mentions",
+    "retour": "Back",
+    "titre": "Mentions",
+    "aucuneMention": "No one has mentioned you yet.",
+    "chargerPlus": "Load more",
+    "chargementEnCours": "Loading…",
+    "nomUtilisateurLabel": "Username",
+    "nomUtilisateurDescription": "Used to be mentioned with @ in the feed. Lowercase letters, digits and underscores only.",
+    "voirLePost": "View post"
+  },
   "actualites": {
     "titre": "News & Opportunities",
     "sousTitre": "Tournament results, sports scholarships and national selections, gathered from external sources.",
@@ -359,7 +378,9 @@
     "fichierPasImage": "{nom}: accepted formats — JPEG, JPG, PNG or WEBP.",
     "fichierTropPetit": "{nom}: image too small (minimum {largeur} x {hauteur} pixels).",
     "imageIllisible": "Unreadable or corrupted image — try another photo.",
-    "echecStockage": "Failed to connect to storage. Please try again shortly."
+    "echecStockage": "Failed to connect to storage. Please try again shortly.",
+    "nomUtilisateurInvalide": "Username must be 3 to 20 lowercase letters, digits or underscores.",
+    "nomUtilisateurPris": "This username is already taken."
   },
   "apparence": {
     "titre": "Appearance",

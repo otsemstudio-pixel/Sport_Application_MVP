@@ -8,7 +8,8 @@
     "envoiImagesEnCours": "Envoi…",
     "retirerImage": "Retirer l'image",
     "echecEnvoiImages": "Échec de l'envoi des images.",
-    "formatsAcceptes": "Formats acceptés : JPEG, JPG, PNG ou WEBP."
+    "formatsAcceptes": "Formats acceptés : JPEG, JPG, PNG ou WEBP.",
+    "enregistrer": "Enregistrer"
   },
   "nav": {
     "entrainement": "Entraînement",
@@ -272,6 +273,24 @@
     "filtreMonSport": "Mon sport",
     "filtreTousLesSports": "Tous les sports"
   },
+  "hashtag": {
+    "retourFil": "Retour au fil",
+    "nombrePosts": "{n} publications",
+    "aucunPost": "Aucune publication avec ce hashtag pour l'instant.",
+    "chargerPlus": "Charger plus",
+    "chargementEnCours": "Chargement…"
+  },
+  "mentions": {
+    "voirMesMentions": "Voir mes mentions",
+    "retour": "Retour",
+    "titre": "Mentions",
+    "aucuneMention": "Personne ne t'a encore mentionné.",
+    "chargerPlus": "Charger plus",
+    "chargementEnCours": "Chargement…",
+    "nomUtilisateurLabel": "Nom d'utilisateur",
+    "nomUtilisateurDescription": "Utilisé pour être mentionné avec @ dans le fil. Lettres minuscules, chiffres et underscores uniquement.",
+    "voirLePost": "Voir le post"
+  },
   "actualites": {
     "titre": "Actualités & Opportunités",
     "sousTitre": "Résultats de tournois, bourses sportives et sélections nationales, glanés depuis des sources externes.",
@@ -359,7 +378,9 @@
     "fichierPasImage": "{nom} : formats acceptés — JPEG, JPG, PNG ou WEBP.",
     "fichierTropPetit": "{nom} : image trop petite (minimum {largeur} x {hauteur} pixels).",
     "imageIllisible": "Image illisible ou corrompue — essayez une autre photo.",
-    "echecStockage": "Échec de connexion au stockage. Réessayez dans un instant."
+    "echecStockage": "Échec de connexion au stockage. Réessayez dans un instant.",
+    "nomUtilisateurInvalide": "Le nom d'utilisateur doit contenir entre 3 et 20 lettres minuscules, chiffres ou underscores.",
+    "nomUtilisateurPris": "Ce nom d'utilisateur est déjà pris."
   },
   "apparence": {
     "titre": "Apparence",

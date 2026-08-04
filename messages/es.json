@@ -8,7 +8,8 @@
     "envoiImagesEnCours": "Subiendo…",
     "retirerImage": "Quitar imagen",
     "echecEnvoiImages": "Error al subir las imágenes.",
-    "formatsAcceptes": "Formatos aceptados: JPEG, JPG, PNG o WEBP."
+    "formatsAcceptes": "Formatos aceptados: JPEG, JPG, PNG o WEBP.",
+    "enregistrer": "Guardar"
   },
   "nav": {
     "entrainement": "Entrenamiento",
@@ -272,6 +273,24 @@
     "filtreMonSport": "Mi deporte",
     "filtreTousLesSports": "Todos los deportes"
   },
+  "hashtag": {
+    "retourFil": "Volver al feed",
+    "nombrePosts": "{n} publicaciones",
+    "aucunPost": "Aún no hay publicaciones con este hashtag.",
+    "chargerPlus": "Cargar más",
+    "chargementEnCours": "Cargando…"
+  },
+  "mentions": {
+    "voirMesMentions": "Ver mis menciones",
+    "retour": "Volver",
+    "titre": "Menciones",
+    "aucuneMention": "Nadie te ha mencionado todavía.",
+    "chargerPlus": "Cargar más",
+    "chargementEnCours": "Cargando…",
+    "nomUtilisateurLabel": "Nombre de usuario",
+    "nomUtilisateurDescription": "Se usa para que te mencionen con @ en el feed. Solo letras minúsculas, números y guiones bajos.",
+    "voirLePost": "Ver la publicación"
+  },
   "actualites": {
     "titre": "Noticias & Oportunidades",
     "sousTitre": "Resultados de torneos, becas deportivas y convocatorias a selecciones nacionales, recopilados de fuentes externas.",
@@ -359,7 +378,9 @@
     "fichierPasImage": "{nom}: formatos aceptados — JPEG, JPG, PNG o WEBP.",
     "fichierTropPetit": "{nom}: imagen demasiado pequeña (mínimo {largeur} x {hauteur} píxeles).",
     "imageIllisible": "Imagen ilegible o dañada — prueba con otra foto.",
-    "echecStockage": "Error de conexión con el almacenamiento. Vuelve a intentarlo en un momento."
+    "echecStockage": "Error de conexión con el almacenamiento. Vuelve a intentarlo en un momento.",
+    "nomUtilisateurInvalide": "El nombre de usuario debe tener entre 3 y 20 letras minúsculas, números o guiones bajos.",
+    "nomUtilisateurPris": "Este nombre de usuario ya está en uso."
   },
   "apparence": {
     "titre": "Apariencia",

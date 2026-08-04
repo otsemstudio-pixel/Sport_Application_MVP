@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, Send } from "lucide-react";
+import TexteEnrichi from "@/components/TexteEnrichi";
+import ChampAvecAutocompletion from "@/components/ChampAvecAutocompletion";
 import { hrefProfil } from "@/lib/routes";
 
 type Commentaire = {
@@ -58,12 +60,15 @@ export default function CommentairesDetail({
       <h2 className="font-semibold">{t("commentairesTitre", { n: commentaires.length })}</h2>
 
       <form onSubmit={envoyerCommentaire} className="flex gap-2">
-        <input
-          value={nouveauCommentaire}
-          onChange={(e) => setNouveauCommentaire(e.target.value)}
-          placeholder={t("ajouterCommentaire")}
-          className="input flex-1"
-        />
+        <div className="flex-1">
+          <ChampAvecAutocompletion
+            multiline={false}
+            value={nouveauCommentaire}
+            onChange={setNouveauCommentaire}
+            placeholder={t("ajouterCommentaire")}
+            className="input w-full"
+          />
+        </div>
         <button type="submit" disabled={chargement} className="btn btn-primary !px-3">
           <Send size={15} />
         </button>
@@ -95,7 +100,9 @@ export default function CommentairesDetail({
               <Link href={hrefProfil(c.auteurType, c.auteurId)} className="font-semibold hover:underline">
                 {c.auteurNom}
               </Link>{" "}
-              <span>{c.contenu}</span>
+              <span>
+                <TexteEnrichi texte={c.contenu} />
+              </span>
               <div className="text-xs" style={{ color: "var(--muted)" }}>
                 {new Date(c.createdAt).toLocaleDateString(locale, {
                   day: "numeric",

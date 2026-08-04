@@ -7,11 +7,12 @@ import ConsentementFlow from "@/components/ConsentementFlow";
 import BasculeMensurations from "@/components/BasculeMensurations";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import ParametresApparence from "@/components/ParametresApparence";
+import ParametresNomUtilisateur from "@/components/ParametresNomUtilisateur";
 import ResumeActiviteProfil from "@/components/ResumeActiviteProfil";
 import Avatar from "@/components/Avatar";
 import { activiteParJour, activiteParSemaine } from "@/lib/activite";
 import { fondSportPour } from "@/lib/sportBackgrounds";
-import { Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
+import { AtSign, Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
   const session = await getSession();
@@ -27,6 +28,7 @@ export default async function ProfilPage() {
   const t = await getTranslations("auth");
   const tConsentement = await getTranslations("consentement");
   const tMensurations = await getTranslations("mensurations");
+  const tMentions = await getTranslations("mentions");
   const mineur = isMineur(athlete.dateNaissance);
   const consentementValide = athlete.consentement?.codeValide === true;
   const bannerUrl = athlete.bannerUrl ?? fondSportPour(athlete.sportPrincipal.nom);
@@ -87,6 +89,16 @@ export default async function ProfilPage() {
 
       <ResumeActiviteProfil donneesSemaine={donneesSemaine} donneesMois={donneesMois} />
 
+      <Link href="/profil/mentions" className="card surface-hover flex items-center gap-3 p-4">
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+          style={{ background: "var(--primary-soft)", color: "var(--primary)" }}
+        >
+          <AtSign size={16} />
+        </div>
+        <span className="text-sm font-semibold">{tMentions("voirMesMentions")}</span>
+      </Link>
+
       <div className="card flex flex-col divide-y p-2" style={{ borderColor: "var(--border)" }}>
         <InfoLigne icon={Mail} label={t("email")} valeur={athlete.email} />
         <InfoLigne
@@ -104,6 +116,8 @@ export default async function ProfilPage() {
           codeDejaEnvoye={!!athlete.consentement}
         />
       )}
+
+      <ParametresNomUtilisateur nomUtilisateurInitial={athlete.nomUtilisateur} />
 
       <ParametresApparence
         themeFondInitial={athlete.themeFond}

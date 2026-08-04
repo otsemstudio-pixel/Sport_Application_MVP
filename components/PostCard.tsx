@@ -11,6 +11,8 @@ import RecapSeance from "@/components/RecapSeance";
 import AbonnementBouton from "@/components/AbonnementBouton";
 import SauvegarderBouton from "@/components/SauvegarderBouton";
 import Avatar from "@/components/Avatar";
+import TexteEnrichi from "@/components/TexteEnrichi";
+import ChampAvecAutocompletion from "@/components/ChampAvecAutocompletion";
 import { hrefProfil } from "@/lib/routes";
 
 export type Post = {
@@ -221,7 +223,9 @@ export default function PostCard({ post }: { post: Post }) {
           </div>
         </div>
 
-        <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.contenu}</p>
+        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+          <TexteEnrichi texte={post.contenu} />
+        </p>
 
         {post.seance && <RecapSeance exercices={post.seance.exercices} />}
 
@@ -271,16 +275,21 @@ export default function PostCard({ post }: { post: Post }) {
               >
                 {c.auteurNom}
               </Link>{" "}
-              <span style={{ color: "var(--foreground)" }}>{c.contenu}</span>
+              <span style={{ color: "var(--foreground)" }}>
+                <TexteEnrichi texte={c.contenu} />
+              </span>
             </div>
           ))}
           <form onSubmit={envoyerCommentaire} className="flex gap-2 pt-1">
-            <input
-              value={nouveauCommentaire}
-              onChange={(e) => setNouveauCommentaire(e.target.value)}
-              placeholder={t("ajouterCommentaire")}
-              className="input flex-1 !py-1.5 text-sm"
-            />
+            <div className="flex-1">
+              <ChampAvecAutocompletion
+                multiline={false}
+                value={nouveauCommentaire}
+                onChange={setNouveauCommentaire}
+                placeholder={t("ajouterCommentaire")}
+                className="input w-full !py-1.5 text-sm"
+              />
+            </div>
             <button type="submit" className="btn btn-primary !px-3">
               <Send size={14} />
             </button>

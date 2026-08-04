@@ -8,7 +8,8 @@
     "envoiImagesEnCours": "Wird hochgeladen…",
     "retirerImage": "Bild entfernen",
     "echecEnvoiImages": "Hochladen der Bilder fehlgeschlagen.",
-    "formatsAcceptes": "Akzeptierte Formate: JPEG, JPG, PNG oder WEBP."
+    "formatsAcceptes": "Akzeptierte Formate: JPEG, JPG, PNG oder WEBP.",
+    "enregistrer": "Speichern"
   },
   "nav": {
     "entrainement": "Training",
@@ -272,6 +273,24 @@
     "filtreMonSport": "Meine Sportart",
     "filtreTousLesSports": "Alle Sportarten"
   },
+  "hashtag": {
+    "retourFil": "Zurück zum Feed",
+    "nombrePosts": "{n} Beiträge",
+    "aucunPost": "Noch keine Beiträge mit diesem Hashtag.",
+    "chargerPlus": "Mehr laden",
+    "chargementEnCours": "Wird geladen…"
+  },
+  "mentions": {
+    "voirMesMentions": "Meine Erwähnungen ansehen",
+    "retour": "Zurück",
+    "titre": "Erwähnungen",
+    "aucuneMention": "Noch niemand hat dich erwähnt.",
+    "chargerPlus": "Mehr laden",
+    "chargementEnCours": "Wird geladen…",
+    "nomUtilisateurLabel": "Benutzername",
+    "nomUtilisateurDescription": "Wird verwendet, um mit @ im Feed erwähnt zu werden. Nur Kleinbuchstaben, Ziffern und Unterstriche.",
+    "voirLePost": "Beitrag ansehen"
+  },
   "actualites": {
     "titre": "Neuigkeiten & Chancen",
     "sousTitre": "Turnierergebnisse, Sportstipendien und Nationalmannschaftsnominierungen aus externen Quellen.",
@@ -359,7 +378,9 @@
     "fichierPasImage": "{nom}: akzeptierte Formate — JPEG, JPG, PNG oder WEBP.",
     "fichierTropPetit": "{nom}: Bild zu klein (mindestens {largeur} x {hauteur} Pixel).",
     "imageIllisible": "Unlesbares oder beschädigtes Bild — versuchen Sie ein anderes Foto.",
-    "echecStockage": "Verbindung zum Speicher fehlgeschlagen. Bitte in Kürze erneut versuchen."
+    "echecStockage": "Verbindung zum Speicher fehlgeschlagen. Bitte in Kürze erneut versuchen.",
+    "nomUtilisateurInvalide": "Der Benutzername muss 3 bis 20 Kleinbuchstaben, Ziffern oder Unterstriche enthalten.",
+    "nomUtilisateurPris": "Dieser Benutzername ist bereits vergeben."
   },
   "apparence": {
     "titre": "Erscheinungsbild",
