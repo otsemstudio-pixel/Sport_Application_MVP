@@ -2,7 +2,6 @@ import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { recalculerRecordPersonnel } from "../lib/records";
-import { galerieSportPour } from "../lib/sportBackgrounds";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -917,490 +916,128 @@ async function reinitialiserVuesDemo(
   }
 }
 
-// Contenu éditorial du menu Actualités : un article par sport du catalogue,
-// signé par des médias fictifs (pas de nom de vraie rédaction, pour ne pas
-// attribuer du contenu inventé à un organe de presse réel). Photo tirée de
-// la même galerie par sport que les fonds d'écran (CREDITS_PHOTOS_SPORT),
-// pour rester cohérent avec le reste de l'app et rester sur des images déjà
-// vérifiées.
-async function reinitialiserArticlesDemo(sportParNom: Map<string, { id: string }>) {
-  const idsAnciens = (await prisma.article.findMany({ select: { id: true } })).map((a) => a.id);
-  await prisma.articleCommentaire.deleteMany({ where: { articleId: { in: idsAnciens } } });
-  await prisma.articleLike.deleteMany({ where: { articleId: { in: idsAnciens } } });
-  await prisma.articleVue.deleteMany({ where: { articleId: { in: idsAnciens } } });
-  await prisma.article.deleteMany({ where: { id: { in: idsAnciens } } });
+// Quelques entrées de démonstration pour que l'écran Actualités &
+// Opportunités ne soit pas vide avant le premier passage réel du job cron
+// (app/api/cron/actualites) — mélange NEWSDATA/RSS et des 4 catégories.
+// `urlSource` utilise le TLD .invalid (réservé par l'IANA pour des adresses
+// qui ne doivent jamais résoudre) : ce sont des exemples, pas de vrais
+// articles, remplacés dès le premier passage réel du job.
+async function reinitialiserActualitesDemo() {
+  await prisma.actualite.deleteMany({ where: { urlSource: { contains: ".invalid/" } } });
 
-  const photo = (nomSport: string, index = 0) => galerieSportPour(nomSport)[index] ?? galerieSportPour(nomSport)[0];
-
-  const ARTICLES: {
-    sport: string;
+  const ENTREES: {
     titre: string;
-    chapo: string;
-    contenu: string;
-    source: string;
+    resume: string;
+    urlSource: string;
+    imageUrl?: string;
+    sourceNom: string;
+    sourceType: "NEWSDATA" | "RSS";
+    categorie: "RESULTAT_TOURNOI" | "BOURSE_OPPORTUNITE" | "SELECTION_NATIONALE" | "GENERAL";
     joursAvant: number;
-    photoIndex?: number;
   }[] = [
     {
-      sport: "Football",
-      titre: "Les Lions locaux enchaînent une troisième victoire de rang",
-      chapo:
-        "La sélection nationale basée sur le championnat local confirme sa bonne forme avant les éliminatoires, avec un jeu collectif retrouvé.",
-      contenu:
-        "Portée par un milieu de terrain retrouvé et une défense plus solide, l'équipe a dominé la rencontre de bout en bout. Le sélectionneur a salué « une équipe qui a enfin trouvé son équilibre » et a insisté sur l'importance de garder ce collectif pour les prochaines échéances.\n\nLes prochains matchs amicaux serviront à roder les automatismes avant le début officiel des éliminatoires, avec plusieurs joueurs évoluant à l'étranger attendus en renfort.",
-      source: "Teranga Sport",
+      titre: "La BAL annonce le calendrier de sa prochaine saison régulière",
+      resume: "La Basketball Africa League a dévoilé le calendrier de sa saison à venir, avec des rencontres réparties dans plusieurs villes du continent.",
+      urlSource: "https://exemple-actualite-demo.invalid/bal-calendrier-saison",
+      sourceNom: "NewsData.io — Africa Sport Wire",
+      sourceType: "NEWSDATA",
+      categorie: "RESULTAT_TOURNOI",
       joursAvant: 1,
     },
     {
-      sport: "Basketball",
-      titre: "Le championnat régional s'ouvre sur une belle affluence",
-      chapo:
-        "Le coup d'envoi de la saison a rassemblé un public nombreux, signe de l'engouement grandissant pour la discipline dans la sous-région.",
-      contenu:
-        "Plusieurs clubs historiques ont dévoilé des effectifs renforcés, avec un accent mis sur la formation des jeunes joueurs. Les organisateurs espèrent que cette dynamique permettra de faire émerger de nouveaux talents en vue des prochaines compétitions continentales.\n\nLe format de la compétition reste inchangé cette saison, avec une phase de poules suivie de playoffs à élimination directe.",
-      source: "AfriSport Mag",
+      titre: "Une fédération ouest-africaine lance un programme de bourses pour jeunes athlètes",
+      resume: "Le programme vise à accompagner financièrement une trentaine d'athlètes prometteurs sur deux ans, avec un accès à un encadrement sportif renforcé.",
+      urlSource: "https://exemple-actualite-demo.invalid/bourses-jeunes-athletes",
+      sourceNom: "RSS — Africanews",
+      sourceType: "RSS",
+      categorie: "BOURSE_OPPORTUNITE",
       joursAvant: 2,
     },
     {
-      sport: "Athlétisme (sprint/sauts)",
-      titre: "Un temps prometteur sur 100m lors du meeting national",
-      chapo:
-        "Un jeune sprinteur s'est illustré lors du meeting national avec un temps proche de son record personnel, confirmant sa progression cette saison.",
-      contenu:
-        "Encadré par un nouveau préparateur physique depuis le début de l'année, l'athlète explique avoir revu entièrement sa phase de départ. « Le travail sur les premiers appuis commence à payer », a-t-il confié après la course.\n\nLa fédération voit dans ces résultats un signal encourageant à quelques mois des sélections pour les compétitions internationales.",
-      source: "Dakar Sport Actu",
+      titre: "Sélection nationale de handball : la liste des joueuses convoquées dévoilée",
+      resume: "Le sélectionneur a communiqué la liste des joueuses retenues pour le prochain rassemblement, avec plusieurs nouvelles venues du championnat local.",
+      urlSource: "https://exemple-actualite-demo.invalid/selection-handball-convocations",
+      sourceNom: "RSS — RFI Sports",
+      sourceType: "RSS",
+      categorie: "SELECTION_NATIONALE",
       joursAvant: 1,
     },
     {
-      sport: "Handball",
-      titre: "La sélection féminine termine invaincue le tournoi de préparation",
-      chapo:
-        "L'équipe nationale féminine a bouclé son tournoi de préparation sans défaite, avec une défense particulièrement solide sur l'ensemble de la compétition.",
-      contenu:
-        "Le staff technique a profité de ces matchs pour tester plusieurs systèmes défensifs, avec une rotation importante sur l'ensemble de l'effectif. Les résultats collectifs sont jugés encourageants avant le tournoi qualificatif à venir.\n\nUne dernière session d'entraînement en altitude est prévue avant le grand rendez-vous.",
-      source: "Sud Sport Hebdo",
+      titre: "Résultats du week-end en championnat national de football",
+      resume: "Retour sur les principales rencontres de la journée, marquée par plusieurs surprises en milieu de tableau.",
+      urlSource: "https://exemple-actualite-demo.invalid/resultats-week-end-football",
+      sourceNom: "NewsData.io — Africa Sport Wire",
+      sourceType: "NEWSDATA",
+      categorie: "RESULTAT_TOURNOI",
       joursAvant: 3,
     },
     {
-      sport: "Volleyball",
-      titre: "Un nouveau pôle de formation ouvre ses portes",
-      chapo:
-        "Un centre de formation dédié au volleyball a ouvert ses portes cette semaine, avec pour objectif de structurer la détection des jeunes talents.",
-      contenu:
-        "Le centre accueillera une première promotion d'une trentaine de jeunes joueuses et joueurs, encadrés par des entraîneurs formés aux méthodes internationales les plus récentes.\n\nLes responsables espèrent que cette structure permettra, à terme, d'alimenter directement les sélections nationales jeunes.",
-      source: "Continental Sport",
+      titre: "Un centre de formation régional ouvre ses candidatures pour la prochaine saison",
+      resume: "Le centre accueillera une nouvelle promotion de jeunes espoirs sélectionnés sur dossier et détection sur le terrain.",
+      urlSource: "https://exemple-actualite-demo.invalid/candidatures-centre-formation",
+      sourceNom: "RSS — Africanews",
+      sourceType: "RSS",
+      categorie: "BOURSE_OPPORTUNITE",
+      joursAvant: 4,
+    },
+    {
+      titre: "Athlétisme : plusieurs records nationaux tombent lors du meeting continental",
+      resume: "Le meeting a été marqué par des performances remarquées sur plusieurs épreuves, avec des athlètes en pleine forme à quelques mois des grandes échéances.",
+      urlSource: "https://exemple-actualite-demo.invalid/records-meeting-continental",
+      sourceNom: "NewsData.io — Africa Sport Wire",
+      sourceType: "NEWSDATA",
+      categorie: "RESULTAT_TOURNOI",
+      joursAvant: 2,
+    },
+    {
+      titre: "Lutte sénégalaise : la fédération annonce la date du prochain grand combat",
+      resume: "L'affiche, très attendue par les amateurs de la discipline, devrait rassembler un large public dans l'arène.",
+      urlSource: "https://exemple-actualite-demo.invalid/lutte-annonce-grand-combat",
+      sourceNom: "RSS — RFI Sports",
+      sourceType: "RSS",
+      categorie: "GENERAL",
       joursAvant: 5,
     },
     {
-      sport: "Rugby à 7",
-      titre: "Le circuit régional annonce une nouvelle étape",
-      chapo:
-        "Une nouvelle étape du circuit régional de rugby à 7 a été annoncée, avec l'espoir d'attirer davantage d'équipes universitaires cette saison.",
-      contenu:
-        "La discipline continue de gagner du terrain, portée notamment par sa présence aux Jeux Olympiques qui inspire de nouvelles vocations chez les jeunes joueurs.\n\nLes organisateurs misent sur un format rapide et spectaculaire pour continuer à élargir le public de ce sport encore émergent dans la région.",
-      source: "Teranga Sport",
-      joursAvant: 4,
-    },
-    {
-      sport: "Cyclisme sur piste",
-      titre: "Un vélodrome flambant neuf accueille ses premières compétitions",
-      chapo:
-        "Le tout nouveau vélodrome de la capitale a accueilli ses premières compétitions officielles, une infrastructure très attendue par les coureurs locaux.",
-      contenu:
-        "Longtemps contraints de s'entraîner sur route faute d'infrastructure adaptée, les spécialistes de la piste saluent unanimement cette avancée. Plusieurs records nationaux pourraient tomber dans les prochains mois grâce à ces nouvelles conditions d'entraînement.\n\nUn stage de détection est prévu dès la rentrée pour repérer de nouveaux talents.",
-      source: "AfriSport Mag",
-      joursAvant: 6,
-    },
-    {
-      sport: "Athlétisme (fond/demi-fond)",
-      titre: "Le semi-marathon urbain attire un record de participants",
-      chapo:
-        "La dernière édition du semi-marathon urbain a rassemblé un nombre record de coureurs, entre athlètes confirmés et amateurs venus découvrir la discipline.",
-      contenu:
-        "Le tracé, redessiné cette année pour traverser plusieurs quartiers emblématiques de la ville, a été salué par les participants. Le vainqueur a bouclé le parcours dans des conditions climatiques difficiles, saluant « un public venu très nombreux encourager les coureurs ».\n\nLes organisateurs annoncent déjà vouloir doubler la capacité d'accueil pour l'édition suivante.",
-      source: "Dakar Sport Actu",
-      joursAvant: 2,
-    },
-    {
-      sport: "Cyclisme sur route",
-      titre: "Une étape de montagne a fait la différence au classement général",
-      chapo:
-        "L'étape reine du tour national, disputée en altitude, a rebattu les cartes du classement général à deux jours de l'arrivée.",
-      contenu:
-        "Isolé dans les derniers kilomètres, le coureur qui s'est emparé du maillot de leader a dû gérer un écart serré avec son plus proche poursuivant. « C'est dans ce genre d'étape que se gagnent les tours », a-t-il expliqué à l'arrivée.\n\nLe classement pourrait encore évoluer lors du contre-la-montre final.",
-      source: "Sud Sport Hebdo",
+      titre: "Sélection nationale de basketball : premier rassemblement de préparation",
+      resume: "Le groupe élargi s'est retrouvé pour une première session d'entraînement en vue des prochaines échéances internationales.",
+      urlSource: "https://exemple-actualite-demo.invalid/selection-basket-preparation",
+      sourceNom: "NewsData.io — Africa Sport Wire",
+      sourceType: "NEWSDATA",
+      categorie: "SELECTION_NATIONALE",
       joursAvant: 3,
     },
     {
-      sport: "Natation",
-      titre: "Une nageuse s'approche du record national du 200m nage libre",
-      chapo:
-        "À seulement quelques centièmes du record national, la jeune nageuse confirme une saison de progrès constants en bassin.",
-      contenu:
-        "Son entraîneur évoque une préparation axée sur l'endurance spécifique et le travail technique des virages, souvent négligé par les nageurs plus jeunes. « Le record est clairement à sa portée d'ici la fin de la saison », estime-t-il.\n\nLa nageuse participera prochainement à une compétition régionale qualificative.",
-      source: "Continental Sport",
-      joursAvant: 1,
+      titre: "Une bourse d'études sportives ouverte aux lycéens pratiquant l'athlétisme",
+      resume: "Le dispositif combine suivi scolaire et encadrement sportif pour les élèves identifiés comme prometteurs par leur club.",
+      urlSource: "https://exemple-actualite-demo.invalid/bourse-etudes-athletisme",
+      sourceNom: "RSS — Africanews",
+      sourceType: "RSS",
+      categorie: "BOURSE_OPPORTUNITE",
+      joursAvant: 6,
     },
     {
-      sport: "Lutte sénégalaise",
-      titre: "Un combat très attendu programmé pour la fin de saison",
-      chapo:
-        "Deux lutteurs parmi les plus populaires du moment se sont officiellement engagés pour un combat qui s'annonce comme l'un des évènements majeurs de la saison.",
-      contenu:
-        "L'annonce a été accueillie avec enthousiasme par les amateurs de la discipline, qui attendaient cette confrontation depuis plusieurs mois. Les deux camps ont d'ores et déjà entamé leur préparation dans des écuries reconnues.\n\nLa billetterie devrait ouvrir dans les prochaines semaines, avec une forte affluence attendue dans l'arène.",
-      source: "Teranga Sport",
-      joursAvant: 4,
-    },
-    {
-      sport: "Dambe (boxe traditionnelle nigériane)",
-      titre: "Le dambe gagne en visibilité au-delà de ses terres d'origine",
-      chapo:
-        "Longtemps cantonné à certaines régions, le dambe attire un public de plus en plus large, porté par une nouvelle génération de combattants.",
-      contenu:
-        "Les organisateurs de galas mettent en avant l'intensité et le spectacle offerts par cette discipline traditionnelle, qui combine puissance de frappe et rituels ancestraux avant chaque combat.\n\nPlusieurs académies de formation commencent à voir le jour dans les grandes villes, loin des bassins historiques de la discipline.",
-      source: "AfriSport Mag",
+      titre: "Volleyball : le tournoi régional se conclut sur une large affluence",
+      resume: "L'édition de cette année a attiré un public record, un signe encourageant pour les organisateurs en vue des prochaines éditions.",
+      urlSource: "https://exemple-actualite-demo.invalid/tournoi-volleyball-affluence",
+      sourceNom: "RSS — RFI Sports",
+      sourceType: "RSS",
+      categorie: "RESULTAT_TOURNOI",
       joursAvant: 7,
     },
-    {
-      sport: "Judo",
-      titre: "Une médaille d'or au tournoi international des jeunes espoirs",
-      chapo:
-        "Le judoka, âgé de 17 ans seulement, a créé la surprise en s'imposant face à des adversaires plus expérimentés lors du tournoi international des jeunes espoirs.",
-      contenu:
-        "Son club salue « un travail acharné depuis plusieurs saisons » qui commence enfin à porter ses fruits au plus haut niveau international junior. Le jeune athlète devrait intégrer le groupe de préparation olympique dès la rentrée.\n\nLa fédération y voit un signe positif pour le renouvellement des générations dans la discipline.",
-      source: "Dakar Sport Actu",
-      joursAvant: 5,
-    },
-    {
-      sport: "Taekwondo",
-      titre: "Le championnat national se dispute ce week-end",
-      chapo:
-        "Toutes les catégories de poids seront représentées lors du championnat national, avec une forte participation de clubs venus de tout le pays.",
-      contenu:
-        "Le comité d'organisation a mis l'accent sur la sécurité des combattants, avec un dispositif médical renforcé pour cette édition. Les meilleurs athlètes de chaque catégorie intégreront la présélection en vue des prochaines compétitions internationales.\n\nL'entrée sera gratuite pour les familles des athlètes engagés.",
-      source: "Sud Sport Hebdo",
-      joursAvant: 2,
-    },
-    {
-      sport: "Boxe",
-      titre: "Un boxeur local décroche sa ceinture régionale",
-      chapo:
-        "Après un combat disputé sur la distance, le boxeur local est reparti avec la ceinture régionale de sa catégorie, une première pour son club.",
-      contenu:
-        "Le combat, longtemps indécis, a basculé dans les derniers rounds grâce à un gros travail au corps qui a fini par payer aux points. « C'est toute une salle qui gagne cette ceinture avec moi », a déclaré le boxeur à l'issue de la rencontre.\n\nUne défense de titre est déjà évoquée pour la fin d'année.",
-      source: "Continental Sport",
-      joursAvant: 6,
-    },
   ];
 
-  for (const a of ARTICLES) {
-    const sport = sportParNom.get(a.sport);
-    if (!sport) continue;
-    await prisma.article.create({
+  for (const e of ENTREES) {
+    await prisma.actualite.create({
       data: {
-        titre: a.titre,
-        chapo: a.chapo,
-        contenu: a.contenu,
-        source: a.source,
-        imageUrl: photo(a.sport, a.photoIndex),
-        sportId: sport.id,
-        publieLe: joursAvant(a.joursAvant),
-      },
-    });
-  }
-}
-
-// Scores/progressions de démonstration pour la carte "en direct" du menu
-// Actualités — instantané figé (pas de flux temps réel). Trois formats selon
-// la discipline : EQUIPE (score classique), DUEL (combat individuel, avec ou
-// sans points selon la discipline) et COURSE (plusieurs concurrents classés,
-// pas de face-à-face) — un score à deux équipes n'a pas de sens pour
-// l'athlétisme, la natation, le cyclisme ou la lutte/dambe.
-async function reinitialiserMatchsDemo(sportParNom: Map<string, { id: string }>) {
-  const idsAnciens = (await prisma.matchDemo.findMany({ select: { id: true } })).map((m) => m.id);
-  await prisma.matchParticipant.deleteMany({ where: { matchId: { in: idsAnciens } } });
-  await prisma.matchDemo.deleteMany({ where: { id: { in: idsAnciens } } });
-
-  const photo = (nomSport: string, index = 0) => galerieSportPour(nomSport)[index] ?? galerieSportPour(nomSport)[0];
-
-  const MATCHS: {
-    sport: string;
-    type: "EQUIPE" | "DUEL" | "COURSE";
-    equipeA: string;
-    equipeB: string;
-    scoreA: number;
-    scoreB: number;
-    statutTexte: string | null;
-    statut: "A_VENIR" | "EN_COURS" | "TERMINE";
-    minuteAffichee: string | null;
-    lieu: string;
-    joursDecalage: number;
-    photoIndex?: number;
-    participants?: { position: number; nom: string; resultat: string }[];
-  }[] = [
-    {
-      sport: "Football",
-      type: "EQUIPE",
-      equipeA: "AS Douanes",
-      equipeB: "Jaraaf",
-      scoreA: 1,
-      scoreB: 1,
-      statutTexte: null,
-      statut: "EN_COURS",
-      minuteAffichee: "67'",
-      lieu: "Stade Iba Mar Diop",
-      joursDecalage: 0,
-      photoIndex: 1,
-    },
-    {
-      sport: "Basketball",
-      type: "EQUIPE",
-      equipeA: "DUC",
-      equipeB: "AS Douanes",
-      scoreA: 58,
-      scoreB: 54,
-      statutTexte: null,
-      statut: "EN_COURS",
-      minuteAffichee: "3e quart-temps",
-      lieu: "Salle Marius Ndiaye",
-      joursDecalage: 0,
-      photoIndex: 2,
-    },
-    {
-      sport: "Handball",
-      type: "EQUIPE",
-      equipeA: "Sénégal",
-      equipeB: "Côte d'Ivoire",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: null,
-      statut: "A_VENIR",
-      minuteAffichee: "Coup d'envoi 18h00",
-      lieu: "Dakar Arena",
-      joursDecalage: -1,
-    },
-    {
-      sport: "Volleyball",
-      type: "EQUIPE",
-      equipeA: "Sénégal",
-      equipeB: "Cameroun",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: null,
-      statut: "A_VENIR",
-      minuteAffichee: "Coup d'envoi 20h00",
-      lieu: "Complexe Léopold Sédar Senghor",
-      joursDecalage: -2,
-    },
-    {
-      sport: "Rugby à 7",
-      type: "EQUIPE",
-      equipeA: "Sénégal",
-      equipeB: "Kenya",
-      scoreA: 21,
-      scoreB: 14,
-      statutTexte: null,
-      statut: "TERMINE",
-      minuteAffichee: "Match terminé",
-      lieu: "Stade Léopold Sédar Senghor",
-      joursDecalage: 1,
-    },
-    {
-      sport: "Football",
-      type: "EQUIPE",
-      equipeA: "Casa Sports",
-      equipeB: "Teungueth FC",
-      scoreA: 2,
-      scoreB: 0,
-      statutTexte: null,
-      statut: "TERMINE",
-      minuteAffichee: "Match terminé",
-      lieu: "Stade Aline Sitoé Diatta",
-      joursDecalage: 2,
-    },
-    // Duels individuels : pas de "vs équipe", un athlète contre un autre.
-    {
-      sport: "Lutte sénégalaise",
-      type: "DUEL",
-      equipeA: "El Hadji Ndoye",
-      equipeB: "Serigne Fall",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Combat engagé",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Arène nationale",
-      joursDecalage: 0,
-      photoIndex: 0,
-    },
-    {
-      sport: "Dambe (boxe traditionnelle nigériane)",
-      type: "DUEL",
-      equipeA: "Yusuf Danladi",
-      equipeB: "Chukwu Okoro",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Round 2",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Kano",
-      joursDecalage: 0,
-      photoIndex: 0,
-    },
-    {
-      sport: "Judo",
-      type: "DUEL",
-      equipeA: "Aissatou Ba",
-      equipeB: "Fatou Sarr",
-      scoreA: 1,
-      scoreB: 0,
-      statutTexte: "Waza-ari",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Dojo national",
-      joursDecalage: 0,
-      photoIndex: 1,
-    },
-    {
-      sport: "Taekwondo",
-      type: "DUEL",
-      equipeA: "Cheikh Diouf",
-      equipeB: "Omar Thiam",
-      scoreA: 12,
-      scoreB: 9,
-      statutTexte: "3e round",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Gymnase Marius Ndiaye",
-      joursDecalage: 0,
-    },
-    {
-      sport: "Boxe",
-      type: "DUEL",
-      equipeA: "Pape Ndiaye",
-      equipeB: "Souleymane Camara",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Ceinture régionale — vainqueur aux points",
-      statut: "TERMINE",
-      minuteAffichee: null,
-      lieu: "Salle Alioune Coly",
-      joursDecalage: 3,
-    },
-    // Courses/épreuves à plusieurs concurrents : pas de face-à-face, un
-    // classement en direct à la place (voir MatchParticipant).
-    {
-      sport: "Athlétisme (sprint/sauts)",
-      type: "COURSE",
-      equipeA: "Finale 100m Messieurs",
-      equipeB: "",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Ligne d'arrivée franchie",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Stade Léopold Sédar Senghor",
-      joursDecalage: 0,
-      photoIndex: 1,
-      participants: [
-        { position: 1, nom: "Amadou Sy", resultat: "10.14s" },
-        { position: 2, nom: "Bouba Diatta", resultat: "10.22s" },
-        { position: 3, nom: "Landry Mbeki", resultat: "10.31s" },
-      ],
-    },
-    {
-      sport: "Natation",
-      type: "COURSE",
-      equipeA: "Finale 200m nage libre",
-      equipeB: "",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "2e longueur sur 4",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Piscine olympique de Dakar",
-      joursDecalage: 0,
-      photoIndex: 0,
-      participants: [
-        { position: 1, nom: "Khady Diagne", resultat: "En tête" },
-        { position: 2, nom: "Mariam Toure", resultat: "+0.4s" },
-        { position: 3, nom: "Nadia Fofana", resultat: "+0.9s" },
-      ],
-    },
-    {
-      sport: "Cyclisme sur route",
-      type: "COURSE",
-      equipeA: "Tour national — Étape 4",
-      equipeB: "",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Reste 18 km",
-      statut: "EN_COURS",
-      minuteAffichee: null,
-      lieu: "Thiès — Mbour",
-      joursDecalage: 0,
-      photoIndex: 1,
-      participants: [
-        { position: 1, nom: "Idrissa Sow", resultat: "Leader" },
-        { position: 2, nom: "Moustapha Gueye", resultat: "+00:18" },
-        { position: 3, nom: "Habib Kane", resultat: "+00:41" },
-      ],
-    },
-    {
-      sport: "Athlétisme (fond/demi-fond)",
-      type: "COURSE",
-      equipeA: "Finale 5000m",
-      equipeB: "",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Résultats définitifs",
-      statut: "TERMINE",
-      minuteAffichee: null,
-      lieu: "Stade Iba Mar Diop",
-      joursDecalage: 1,
-      participants: [
-        { position: 1, nom: "Ousmane Faye", resultat: "13:58.2" },
-        { position: 2, nom: "Ibrahima Ndoye", resultat: "13:59.7" },
-        { position: 3, nom: "Cheikh Ba", resultat: "14:03.5" },
-      ],
-    },
-    {
-      sport: "Cyclisme sur piste",
-      type: "COURSE",
-      equipeA: "Finale vitesse individuelle",
-      equipeB: "",
-      scoreA: 0,
-      scoreB: 0,
-      statutTexte: "Qualifications en cours",
-      statut: "A_VENIR",
-      minuteAffichee: null,
-      lieu: "Vélodrome de Dakar",
-      joursDecalage: -1,
-      participants: [
-        { position: 1, nom: "Serigne Mbaye", resultat: "10.9s (série)" },
-        { position: 2, nom: "Alpha Diallo", resultat: "11.1s (série)" },
-      ],
-    },
-  ];
-
-  for (const m of MATCHS) {
-    const sport = sportParNom.get(m.sport);
-    if (!sport) continue;
-    await prisma.matchDemo.create({
-      data: {
-        sportId: sport.id,
-        type: m.type,
-        equipeA: m.equipeA,
-        equipeB: m.equipeB,
-        scoreA: m.scoreA,
-        scoreB: m.scoreB,
-        statutTexte: m.statutTexte,
-        statut: m.statut,
-        minuteAffichee: m.minuteAffichee,
-        lieu: m.lieu,
-        dateMatch: joursAvant(m.joursDecalage),
-        imageUrl: photo(m.sport, m.photoIndex),
-        participants: m.participants ? { create: m.participants } : undefined,
+        titre: e.titre,
+        resume: e.resume,
+        urlSource: e.urlSource,
+        imageUrl: e.imageUrl ?? null,
+        sourceNom: e.sourceNom,
+        sourceType: e.sourceType,
+        categorie: e.categorie,
+        publieLe: joursAvant(e.joursAvant),
       },
     });
   }
@@ -1415,8 +1052,7 @@ async function main() {
   const { seancePartageable } = await reinitialiserSeancesDemo(athletes, programmesParNom, seancesParCle);
   await reinitialiserPostsDemo(athletes, organisateurs, seancePartageable);
   await reinitialiserEvenementsDemo(organisateurs, athletes, sportParNom);
-  await reinitialiserArticlesDemo(sportParNom);
-  await reinitialiserMatchsDemo(sportParNom);
+  await reinitialiserActualitesDemo();
   await reinitialiserMensurationsDemo(athletes);
   await reinitialiserAbonnementsDemo(athletes, organisateurs);
   await reinitialiserVuesDemo(athletes, organisateurs);

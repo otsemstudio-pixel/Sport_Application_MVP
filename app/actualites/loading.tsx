@@ -1,19 +1,14 @@
 export default function ChargementActualites() {
   return (
-    <div className="flex flex-col gap-5">
-      <div className="skeleton h-7 w-32" />
-
-      <div className="skeleton h-11 w-full" />
-
-      <div className="flex gap-2">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton h-8 w-24 shrink-0 rounded-full" />
-        ))}
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1.5">
+        <div className="skeleton h-7 w-56" />
+        <div className="skeleton h-4 w-72" />
       </div>
 
-      <div className="flex gap-3 overflow-hidden">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="skeleton h-40 w-64 shrink-0" />
+      <div className="flex gap-2">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="skeleton h-8 w-28 shrink-0 rounded-full" />
         ))}
       </div>
 

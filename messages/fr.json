@@ -273,24 +273,18 @@
     "filtreTousLesSports": "Tous les sports"
   },
   "actualites": {
-    "titre": "Actualités",
-    "tousLesSports": "Tous les sports",
-    "scoresEnDirect": "Scores en direct",
-    "enDirect": "Direct",
-    "aVenir": "À venir",
-    "termine": "Terminé",
-    "aucunArticle": "Aucun article pour l'instant.",
-    "rechercherPlaceholder": "Rechercher un article...",
-    "effacerRecherche": "Effacer la recherche",
-    "aucunResultat": "Aucun article ne correspond à cette recherche.",
+    "titre": "Actualités & Opportunités",
+    "sousTitre": "Résultats de tournois, bourses sportives et sélections nationales, glanés depuis des sources externes.",
+    "toutesCategories": "Toutes",
+    "categorie": {
+      "RESULTAT_TOURNOI": "Résultats",
+      "BOURSE_OPPORTUNITE": "Bourses & opportunités",
+      "SELECTION_NATIONALE": "Sélections nationales",
+      "GENERAL": "Général"
+    },
+    "aucuneActualite": "Aucune actualité pour l'instant.",
     "chargerPlus": "Charger plus",
-    "chargementEnCours": "Chargement…",
-    "retourActualites": "Retour aux actualités",
-    "source": "Source",
-    "nombreVues": "{n} vues",
-    "ajouterCommentaire": "Ajouter un commentaire…",
-    "commentairesTitre": "Commentaires ({n})",
-    "aucunCommentaire": "Aucun commentaire pour l'instant."
+    "chargementEnCours": "Chargement…"
   },
   "organisateur": {
     "titreTableauDeBord": "Tableau de bord",
@@ -358,7 +352,6 @@
     "contenuRequis": "Contenu requis.",
     "contenuTropLong": "Le contenu est limité à 500 caractères.",
     "postIntrouvable": "Post introuvable.",
-    "articleIntrouvable": "Article introuvable.",
     "aucunFichier": "Aucun fichier reçu.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} dépasse la taille maximale de 3 Mo.",

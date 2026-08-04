@@ -1,150 +1,87 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Search, X } from "lucide-react";
-import ArticleCard, { type Article } from "@/components/ArticleCard";
-import MatchScoreCard, { type MatchDemo } from "@/components/MatchScoreCard";
+import ActualiteCard, { type Actualite } from "@/components/ActualiteCard";
 
-type Sport = { id: string; nom: string };
+type Categorie = Actualite["categorie"];
+const CATEGORIES: Categorie[] = ["RESULTAT_TOURNOI", "BOURSE_OPPORTUNITE", "SELECTION_NATIONALE", "GENERAL"];
 
 export default function ActualitesFeed({
-  sports,
-  matchsInitiaux,
-  articlesInitiaux,
+  actualitesInitiales,
   curseurInitial,
 }: {
-  sports: Sport[];
-  matchsInitiaux: MatchDemo[];
-  articlesInitiaux: Article[];
+  actualitesInitiales: Actualite[];
   curseurInitial: string | null;
 }) {
   const t = useTranslations("actualites");
-  const [sportId, setSportId] = useState<string | null>(null);
-  const [recherche, setRecherche] = useState("");
-  const [articles, setArticles] = useState(articlesInitiaux);
+  const [categorie, setCategorie] = useState<Categorie | null>(null);
+  const [actualites, setActualites] = useState(actualitesInitiales);
   const [curseur, setCurseur] = useState(curseurInitial);
   const [chargement, setChargement] = useState(false);
-  const premierRendu = useRef(true);
 
-  const matchsFiltres = useMemo(
-    () => (sportId ? matchsInitiaux.filter((m) => m.sport.id === sportId) : matchsInitiaux),
-    [matchsInitiaux, sportId]
-  );
-
-  async function charger(cursorActuel: string | null, sportActuel: string | null, rechercheActuelle: string, remplacer: boolean) {
+  async function charger(cursorActuel: string | null, categorieActuelle: Categorie | null, remplacer: boolean) {
     setChargement(true);
     const params = new URLSearchParams();
     if (cursorActuel) params.set("cursor", cursorActuel);
-    if (sportActuel) params.set("sport", sportActuel);
-    if (rechercheActuelle.trim()) params.set("q", rechercheActuelle.trim());
-    const res = await fetch(`/api/articles?${params.toString()}`);
+    if (categorieActuelle) params.set("categorie", categorieActuelle);
+    const res = await fetch(`/api/actualites?${params.toString()}`);
     setChargement(false);
     if (!res.ok) return;
     const data = await res.json();
-    setArticles((prev) => (remplacer ? data.articles : [...prev, ...data.articles]));
+    setActualites((prev) => (remplacer ? data.actualites : [...prev, ...data.actualites]));
     setCurseur(data.nextCursor);
   }
 
-  // Débounce : évite un appel API à chaque frappe au clavier.
-  useEffect(() => {
-    if (premierRendu.current) {
-      premierRendu.current = false;
-      return;
-    }
-    const id = setTimeout(() => {
-      charger(null, sportId, recherche, true);
-    }, 350);
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recherche]);
-
-  function changerSport(nouveauSportId: string | null) {
-    if (nouveauSportId === sportId || chargement) return;
-    setSportId(nouveauSportId);
-    charger(null, nouveauSportId, recherche, true);
+  function changerCategorie(nouvelle: Categorie | null) {
+    if (nouvelle === categorie || chargement) return;
+    setCategorie(nouvelle);
+    charger(null, nouvelle, true);
   }
 
   function chargerPlus() {
     if (!curseur) return;
-    charger(curseur, sportId, recherche, false);
+    charger(curseur, categorie, false);
   }
 
   return (
     <div className="flex min-w-0 flex-col gap-5">
-      <div className="relative">
-        <Search
-          size={16}
-          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
-          style={{ color: "var(--muted)" }}
-        />
-        <input
-          value={recherche}
-          onChange={(e) => setRecherche(e.target.value)}
-          placeholder={t("rechercherPlaceholder")}
-          className="input w-full !pl-10 !pr-9"
-        />
-        {recherche && (
-          <button
-            onClick={() => setRecherche("")}
-            aria-label={t("effacerRecherche")}
-            className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full surface-hover"
-            style={{ color: "var(--muted)" }}
-          >
-            <X size={14} />
-          </button>
-        )}
-      </div>
-
       <div className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
         <button
-          onClick={() => changerSport(null)}
+          onClick={() => changerCategorie(null)}
           disabled={chargement}
           className="chip shrink-0"
           style={{
-            background: sportId === null ? "var(--primary)" : "var(--surface-hover)",
-            color: sportId === null ? "var(--primary-foreground)" : "var(--muted)",
+            background: categorie === null ? "var(--primary)" : "var(--surface-hover)",
+            color: categorie === null ? "var(--primary-foreground)" : "var(--muted)",
           }}
         >
-          {t("tousLesSports")}
+          {t("toutesCategories")}
         </button>
-        {sports.map((s) => (
+        {CATEGORIES.map((c) => (
           <button
-            key={s.id}
-            onClick={() => changerSport(s.id)}
+            key={c}
+            onClick={() => changerCategorie(c)}
             disabled={chargement}
             className="chip shrink-0"
             style={{
-              background: sportId === s.id ? "var(--primary)" : "var(--surface-hover)",
-              color: sportId === s.id ? "var(--primary-foreground)" : "var(--muted)",
+              background: categorie === c ? "var(--primary)" : "var(--surface-hover)",
+              color: categorie === c ? "var(--primary-foreground)" : "var(--muted)",
             }}
           >
-            {s.nom}
+            {t(`categorie.${c}`)}
           </button>
         ))}
       </div>
 
-      {matchsFiltres.length > 0 && (
-        <div className="flex min-w-0 flex-col gap-2.5">
-          <h2 className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            {t("scoresEnDirect")}
-          </h2>
-          <div className="-mx-4 flex min-w-0 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-            {matchsFiltres.map((m) => (
-              <MatchScoreCard key={m.id} match={m} />
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col gap-3">
-        {articles.length === 0 && !chargement && (
+        {actualites.length === 0 && !chargement && (
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            {recherche.trim() ? t("aucunResultat") : t("aucunArticle")}
+            {t("aucuneActualite")}
           </p>
         )}
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
+        {actualites.map((a) => (
+          <ActualiteCard key={a.id} actualite={a} />
         ))}
       </div>
 

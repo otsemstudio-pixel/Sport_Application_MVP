@@ -273,24 +273,18 @@
     "filtreTousLesSports": "Alle Sportarten"
   },
   "actualites": {
-    "titre": "Neuigkeiten",
-    "tousLesSports": "Alle Sportarten",
-    "scoresEnDirect": "Live-Ergebnisse",
-    "enDirect": "Live",
-    "aVenir": "Bevorstehend",
-    "termine": "Beendet",
-    "aucunArticle": "Noch keine Artikel.",
-    "rechercherPlaceholder": "Einen Artikel suchen...",
-    "effacerRecherche": "Suche löschen",
-    "aucunResultat": "Kein Artikel entspricht dieser Suche.",
+    "titre": "Neuigkeiten & Chancen",
+    "sousTitre": "Turnierergebnisse, Sportstipendien und Nationalmannschaftsnominierungen aus externen Quellen.",
+    "toutesCategories": "Alle",
+    "categorie": {
+      "RESULTAT_TOURNOI": "Ergebnisse",
+      "BOURSE_OPPORTUNITE": "Stipendien & Chancen",
+      "SELECTION_NATIONALE": "Nationalmannschaftsnominierungen",
+      "GENERAL": "Allgemein"
+    },
+    "aucuneActualite": "Noch keine Neuigkeiten.",
     "chargerPlus": "Mehr laden",
-    "chargementEnCours": "Wird geladen…",
-    "retourActualites": "Zurück zu den Neuigkeiten",
-    "source": "Quelle",
-    "nombreVues": "{n} Aufrufe",
-    "ajouterCommentaire": "Kommentar hinzufügen…",
-    "commentairesTitre": "Kommentare ({n})",
-    "aucunCommentaire": "Noch keine Kommentare."
+    "chargementEnCours": "Wird geladen…"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -358,7 +352,6 @@
     "contenuRequis": "Inhalt erforderlich.",
     "contenuTropLong": "Der Inhalt ist auf 500 Zeichen begrenzt.",
     "postIntrouvable": "Beitrag nicht gefunden.",
-    "articleIntrouvable": "Artikel nicht gefunden.",
     "aucunFichier": "Keine Datei empfangen.",
     "maxImages": "Maximal {n} Bilder.",
     "fichierTropLourd": "{nom} überschreitet die maximale Größe von 3 MB.",

@@ -273,24 +273,18 @@
     "filtreTousLesSports": "Tutti gli sport"
   },
   "actualites": {
-    "titre": "Notizie",
-    "tousLesSports": "Tutti gli sport",
-    "scoresEnDirect": "Risultati in diretta",
-    "enDirect": "Diretta",
-    "aVenir": "In arrivo",
-    "termine": "Terminato",
-    "aucunArticle": "Ancora nessun articolo.",
-    "rechercherPlaceholder": "Cerca un articolo...",
-    "effacerRecherche": "Cancella ricerca",
-    "aucunResultat": "Nessun articolo corrisponde a questa ricerca.",
+    "titre": "Notizie & Opportunità",
+    "sousTitre": "Risultati di tornei, borse sportive e convocazioni in nazionale, raccolti da fonti esterne.",
+    "toutesCategories": "Tutte",
+    "categorie": {
+      "RESULTAT_TOURNOI": "Risultati",
+      "BOURSE_OPPORTUNITE": "Borse & opportunità",
+      "SELECTION_NATIONALE": "Convocazioni in nazionale",
+      "GENERAL": "Generale"
+    },
+    "aucuneActualite": "Ancora nessuna notizia.",
     "chargerPlus": "Carica altro",
-    "chargementEnCours": "Caricamento…",
-    "retourActualites": "Torna alle notizie",
-    "source": "Fonte",
-    "nombreVues": "{n} visualizzazioni",
-    "ajouterCommentaire": "Aggiungi un commento…",
-    "commentairesTitre": "Commenti ({n})",
-    "aucunCommentaire": "Ancora nessun commento."
+    "chargementEnCours": "Caricamento…"
   },
   "organisateur": {
     "titreTableauDeBord": "Pannello di controllo",
@@ -358,7 +352,6 @@
     "contenuRequis": "Contenuto richiesto.",
     "contenuTropLong": "Il contenuto è limitato a 500 caratteri.",
     "postIntrouvable": "Post non trovato.",
-    "articleIntrouvable": "Articolo non trovato.",
     "aucunFichier": "Nessun file ricevuto.",
     "maxImages": "Massimo {n} immagini.",
     "fichierTropLourd": "{nom} supera la dimensione massima di 3 MB.",

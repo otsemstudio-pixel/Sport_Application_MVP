@@ -273,24 +273,18 @@
     "filtreTousLesSports": "All sports"
   },
   "actualites": {
-    "titre": "News",
-    "tousLesSports": "All sports",
-    "scoresEnDirect": "Live scores",
-    "enDirect": "Live",
-    "aVenir": "Upcoming",
-    "termine": "Finished",
-    "aucunArticle": "No articles yet.",
-    "rechercherPlaceholder": "Search for an article...",
-    "effacerRecherche": "Clear search",
-    "aucunResultat": "No articles match this search.",
+    "titre": "News & Opportunities",
+    "sousTitre": "Tournament results, sports scholarships and national selections, gathered from external sources.",
+    "toutesCategories": "All",
+    "categorie": {
+      "RESULTAT_TOURNOI": "Results",
+      "BOURSE_OPPORTUNITE": "Scholarships & opportunities",
+      "SELECTION_NATIONALE": "National selections",
+      "GENERAL": "General"
+    },
+    "aucuneActualite": "No news yet.",
     "chargerPlus": "Load more",
-    "chargementEnCours": "Loading…",
-    "retourActualites": "Back to news",
-    "source": "Source",
-    "nombreVues": "{n} views",
-    "ajouterCommentaire": "Add a comment…",
-    "commentairesTitre": "Comments ({n})",
-    "aucunCommentaire": "No comments yet."
+    "chargementEnCours": "Loading…"
   },
   "organisateur": {
     "titreTableauDeBord": "Dashboard",
@@ -358,7 +352,6 @@
     "contenuRequis": "Content required.",
     "contenuTropLong": "Content is limited to 500 characters.",
     "postIntrouvable": "Post not found.",
-    "articleIntrouvable": "Article not found.",
     "aucunFichier": "No file received.",
     "maxImages": "Maximum {n} images.",
     "fichierTropLourd": "{nom} exceeds the maximum size of 3 MB.",

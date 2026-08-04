@@ -53,24 +53,6 @@ enum StatutProgramme {
   ABANDONNE
 }
 
-enum StatutMatch {
-  A_VENIR
-  EN_COURS
-  TERMINE
-}
-
-// EQUIPE : deux équipes, score classique (foot, basket, hand, volley, rugby).
-// DUEL : deux athlètes (combat individuel) — score utilisé si la discipline
-// compte des points (judo/taekwondo/boxe), sinon 0/0 avec statutTexte pour
-// décrire la phase (lutte sénégalaise, dambe).
-// COURSE : épreuve à plusieurs concurrents (athlétisme, natation, cyclisme) —
-// pas de face-à-face, classement via MatchParticipant.
-enum TypeMatch {
-  EQUIPE
-  DUEL
-  COURSE
-}
-
 model Sport {
   id                   String               @id @default(cuid())
   nom                  String               @unique
@@ -79,8 +61,6 @@ model Sport {
 
   athletes   Athlete[]
   evenements Evenement[]
-  articles   Article[]
-  matchs     MatchDemo[]
 }
 
 model Athlete {
@@ -498,111 +478,37 @@ model Abonnement {
   @@index([suiviId, suiviType])
 }
 
-// Contenu éditorial (rédigé par la plateforme, pas par les utilisateurs) —
-// pas de champ auteur polymorphe contrairement à Post, mais rattaché à un
-// sport pour permettre le filtrage par sport dans le menu Actualités.
-model Article {
-  id        String   @id @default(cuid())
-  titre     String
-  chapo     String
-  contenu   String
-  source    String
-  imageUrl  String
-  sportId   String
-  sport     Sport    @relation(fields: [sportId], references: [id])
-  publieLe  DateTime @default(now())
-  createdAt DateTime @default(now())
+enum SourceActualite {
+  NEWSDATA
+  RSS
+}
 
-  likes        ArticleLike[]
-  commentaires ArticleCommentaire[]
-  vues         ArticleVue[]
+enum CategorieActualite {
+  RESULTAT_TOURNOI
+  BOURSE_OPPORTUNITE
+  SELECTION_NATIONALE
+  GENERAL
+}
+
+// Actualité/opportunité externe (résultats de tournois, bourses sportives,
+// sélections nationales), récupérée périodiquement par un job cron
+// (app/api/cron/actualites) depuis NewsData.io et des flux RSS — jamais en
+// direct depuis une requête utilisateur. Le contenu intégral n'est jamais
+// republié : seuls titre/résumé sont stockés, `urlSource` renvoie vers
+// l'article original. `urlSource` est unique pour dédupliquer entre passages
+// successifs du job et entre les deux sources.
+model Actualite {
+  id         String             @id @default(cuid())
+  titre      String
+  resume     String
+  urlSource  String             @unique
+  imageUrl   String?
+  sourceNom  String
+  sourceType SourceActualite
+  categorie  CategorieActualite
+  publieLe   DateTime
+  recupereLe DateTime           @default(now())
 
   @@index([publieLe])
-  @@index([sportId])
-}
-
-model ArticleLike {
-  id         String      @id @default(cuid())
-  articleId  String
-  article    Article     @relation(fields: [articleId], references: [id])
-  auteurId   String
-  auteurType RoleSession
-  createdAt  DateTime    @default(now())
-
-  @@unique([articleId, auteurId, auteurType])
-}
-
-model ArticleCommentaire {
-  id         String      @id @default(cuid())
-  articleId  String
-  article    Article     @relation(fields: [articleId], references: [id])
-  auteurId   String
-  auteurType RoleSession
-  contenu    String
-  createdAt  DateTime    @default(now())
-
-  @@index([articleId, createdAt])
-}
-
-// Une vue par compte et par article, comme PostVue — enregistrée à
-// l'ouverture de la vue détaillée uniquement.
-model ArticleVue {
-  id             String      @id @default(cuid())
-  articleId      String
-  article        Article     @relation(fields: [articleId], references: [id])
-  spectateurId   String
-  spectateurType RoleSession
-  vuLe           DateTime    @default(now())
-
-  @@unique([articleId, spectateurId, spectateurType])
-}
-
-// Score/progression de démonstration (pas de vrai flux live) : un instantané
-// figé par le seed, affiché tel quel sur la carte "en direct" du menu
-// Actualités. equipeA/equipeB en toutes lettres (pas de relation vers un
-// club ni un athlète, aucun modèle "équipe" n'existe dans l'app).
-//
-// Le sens de equipeA/equipeB/scoreA/scoreB dépend de `type` :
-// - EQUIPE : deux équipes et leur score.
-// - DUEL   : deux athlètes ; score si la discipline en a un, sinon 0/0 et
-//            `statutTexte` décrit la phase du combat.
-// - COURSE : equipeA = nom de l'épreuve, equipeB/scoreA/scoreB inutilisés
-//            (chaîne vide / 0), le classement vit dans `participants`.
-model MatchDemo {
-  id             String      @id @default(cuid())
-  sportId        String
-  sport          Sport       @relation(fields: [sportId], references: [id])
-  type           TypeMatch   @default(EQUIPE)
-  equipeA        String
-  equipeB        String
-  scoreA         Int
-  scoreB         Int
-  statutTexte    String?
-  statut         StatutMatch
-  minuteAffichee String?
-  lieu           String
-  dateMatch      DateTime
-  imageUrl       String
-  createdAt      DateTime    @default(now())
-
-  participants MatchParticipant[]
-
-  @@index([sportId])
-  @@index([statut])
-}
-
-// Classement d'une épreuve de type COURSE (athlétisme, natation, cyclisme) :
-// plusieurs concurrents, pas un face-à-face — resultat en texte libre
-// (temps, écart, distance) car le format diffère trop d'une discipline à
-// l'autre pour une colonne numérique unique.
-model MatchParticipant {
-  id        String    @id @default(cuid())
-  matchId   String
-  match     MatchDemo @relation(fields: [matchId], references: [id])
-  position  Int
-  nom       String
-  resultat  String
-  createdAt DateTime  @default(now())
-
-  @@index([matchId])
+  @@index([categorie])
 }
