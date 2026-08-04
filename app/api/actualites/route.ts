@@ -24,11 +24,15 @@ export async function GET(req: NextRequest) {
   const categorie = CATEGORIES_VALIDES.includes(categorieParam as CategorieActualite)
     ? (categorieParam as CategorieActualite)
     : undefined;
+  const sportId = req.nextUrl.searchParams.get("sportId") ?? undefined;
 
   const actualites = await prisma.actualite.findMany({
     take: PAGE_SIZE,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    where: categorie ? { categorie } : undefined,
+    where: {
+      ...(categorie ? { categorie } : {}),
+      ...(sportId ? { sportId } : {}),
+    },
     orderBy: { publieLe: "desc" },
   });
 

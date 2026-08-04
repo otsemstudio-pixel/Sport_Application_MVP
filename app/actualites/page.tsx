@@ -35,10 +35,10 @@ export default async function ActualitesPage() {
     }
   }
 
-  const actualites = await prisma.actualite.findMany({
-    take: PAGE_SIZE,
-    orderBy: { publieLe: "desc" },
-  });
+  const [sports, actualites] = await Promise.all([
+    prisma.sport.findMany({ orderBy: { nom: "asc" }, select: { id: true, nom: true } }),
+    prisma.actualite.findMany({ take: PAGE_SIZE, orderBy: { publieLe: "desc" } }),
+  ]);
   const actualitesFormatees = actualites.map((a) => {
     const f = formaterActualite(a);
     return { ...f, publieLe: f.publieLe.toISOString() };
@@ -54,6 +54,7 @@ export default async function ActualitesPage() {
         </p>
       </div>
       <ActualitesFeed
+        sports={sports}
         actualitesInitiales={actualitesFormatees}
         curseurInitial={actualites.length === PAGE_SIZE ? actualites[actualites.length - 1].id : null}
       />

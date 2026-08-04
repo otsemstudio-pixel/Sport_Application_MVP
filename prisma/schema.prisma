@@ -59,8 +59,15 @@ model Sport {
   categoriePerformance CategoriePerformance
   createdAt            DateTime             @default(now())
 
+  // Dernière fois que ce sport a servi de mot-clé pour interroger
+  // NewsData.io (voir lib/newsdata.ts) — permet une rotation qui priorise
+  // les sports les moins récemment interrogés plutôt que de tout requêter à
+  // chaque passage, pour ne pas épuiser le quota gratuit.
+  derniereRechercheActualite DateTime?
+
   athletes   Athlete[]
   evenements Evenement[]
+  actualites Actualite[]
 }
 
 model Athlete {
@@ -506,9 +513,15 @@ model Actualite {
   sourceNom  String
   sourceType SourceActualite
   categorie  CategorieActualite
+  // Renseigné seulement quand l'entrée provient d'une requête NewsData.io
+  // liée à un sport précis (pas pour RSS, ni pour la requête complémentaire
+  // structurée category+country qui n'est pas rattachée à un sport unique).
+  sportId    String?
+  sport      Sport?             @relation(fields: [sportId], references: [id])
   publieLe   DateTime
   recupereLe DateTime           @default(now())
 
   @@index([publieLe])
   @@index([categorie])
+  @@index([sportId])
 }

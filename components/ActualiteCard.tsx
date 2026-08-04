@@ -12,6 +12,7 @@ export type Actualite = {
   sourceNom: string;
   sourceType: "NEWSDATA" | "RSS";
   categorie: "RESULTAT_TOURNOI" | "BOURSE_OPPORTUNITE" | "SELECTION_NATIONALE" | "GENERAL";
+  sportId: string | null;
   publieLe: string;
 };
 
@@ -22,7 +23,7 @@ const CHIP_CATEGORIE: Record<Actualite["categorie"], string> = {
   GENERAL: "chip-neutral",
 };
 
-export default function ActualiteCard({ actualite }: { actualite: Actualite }) {
+export default function ActualiteCard({ actualite, sportNom }: { actualite: Actualite; sportNom?: string }) {
   const locale = useLocale();
   const t = useTranslations("actualites");
 
@@ -52,6 +53,7 @@ export default function ActualiteCard({ actualite }: { actualite: Actualite }) {
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
           <span className={`chip ${CHIP_CATEGORIE[actualite.categorie]}`}>{t(`categorie.${actualite.categorie}`)}</span>
+          {sportNom && <span className="chip chip-neutral">{sportNom}</span>}
         </div>
         <h3 className="font-semibold leading-snug">{actualite.titre}</h3>
         <p className="line-clamp-2 text-sm" style={{ color: "var(--muted)" }}>

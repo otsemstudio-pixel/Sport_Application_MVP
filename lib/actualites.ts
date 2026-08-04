@@ -3,16 +3,22 @@
 // requête utilisateur en direct (voir app/api/cron/actualites/route.ts).
 import type { Actualite, CategorieActualite } from "@/app/generated/prisma/client";
 
-// Mots-clés utilisés pour interroger NewsData.io ET pour filtrer les flux
-// RSS généralistes (Africanews) qui ne sont pas déjà limités au sport —
-// RFI Sports n'a pas besoin de ce filtre, son flux est déjà sport uniquement.
-export const MOTS_CLES_RECHERCHE = [
-  "BAL basketball Afrique",
-  "bourse sportive Afrique",
-  "sélection nationale football Afrique",
-  "lutte sénégalaise",
-  "scouting sportif Afrique",
-];
+// Équivalent anglais du nom du sport, uniquement quand le nom français ne
+// serait pas reconnu tel quel dans un article anglophone (ex. "athlétisme"
+// n'a aucune chance de matcher "athletics") — les sports déjà proches ou
+// identiques en anglais (Football, Basketball, Handball, Volleyball, Judo,
+// Taekwondo) n'ont pas besoin d'entrée ici, une seule requête FR suffit.
+export const EQUIVALENT_ANGLAIS_SPORT: Record<string, string> = {
+  "Athlétisme (sprint/sauts)": "athletics",
+  "Athlétisme (fond/demi-fond)": "athletics distance running",
+  "Rugby à 7": "rugby sevens",
+  "Cyclisme sur piste": "track cycling",
+  "Cyclisme sur route": "road cycling",
+  Natation: "swimming",
+  "Lutte sénégalaise": "senegalese wrestling",
+  "Dambe (boxe traditionnelle nigériane)": "dambe boxing",
+  Boxe: "boxing",
+};
 
 // Pas de "can"/"bal" isolés : même avec une limite de mot, ce sont des mots
 // anglais/français ordinaires ("Africa CAN achieve...", "un bal populaire")
@@ -109,6 +115,7 @@ export function formaterActualite(a: Actualite) {
     sourceNom: a.sourceNom,
     sourceType: a.sourceType,
     categorie: a.categorie,
+    sportId: a.sportId,
     publieLe: a.publieLe,
   };
 }

@@ -922,7 +922,7 @@ async function reinitialiserVuesDemo(
 // `urlSource` utilise le TLD .invalid (réservé par l'IANA pour des adresses
 // qui ne doivent jamais résoudre) : ce sont des exemples, pas de vrais
 // articles, remplacés dès le premier passage réel du job.
-async function reinitialiserActualitesDemo() {
+async function reinitialiserActualitesDemo(sportParNom: Map<string, { id: string }>) {
   await prisma.actualite.deleteMany({ where: { urlSource: { contains: ".invalid/" } } });
 
   const ENTREES: {
@@ -934,6 +934,7 @@ async function reinitialiserActualitesDemo() {
     sourceType: "NEWSDATA" | "RSS";
     categorie: "RESULTAT_TOURNOI" | "BOURSE_OPPORTUNITE" | "SELECTION_NATIONALE" | "GENERAL";
     joursAvant: number;
+    sport?: string;
   }[] = [
     {
       titre: "La BAL annonce le calendrier de sa prochaine saison régulière",
@@ -943,6 +944,7 @@ async function reinitialiserActualitesDemo() {
       sourceType: "NEWSDATA",
       categorie: "RESULTAT_TOURNOI",
       joursAvant: 1,
+      sport: "Basketball",
     },
     {
       titre: "Une fédération ouest-africaine lance un programme de bourses pour jeunes athlètes",
@@ -961,6 +963,7 @@ async function reinitialiserActualitesDemo() {
       sourceType: "RSS",
       categorie: "SELECTION_NATIONALE",
       joursAvant: 1,
+      sport: "Handball",
     },
     {
       titre: "Résultats du week-end en championnat national de football",
@@ -970,6 +973,7 @@ async function reinitialiserActualitesDemo() {
       sourceType: "NEWSDATA",
       categorie: "RESULTAT_TOURNOI",
       joursAvant: 3,
+      sport: "Football",
     },
     {
       titre: "Un centre de formation régional ouvre ses candidatures pour la prochaine saison",
@@ -997,6 +1001,7 @@ async function reinitialiserActualitesDemo() {
       sourceType: "RSS",
       categorie: "GENERAL",
       joursAvant: 5,
+      sport: "Lutte sénégalaise",
     },
     {
       titre: "Sélection nationale de basketball : premier rassemblement de préparation",
@@ -1006,6 +1011,7 @@ async function reinitialiserActualitesDemo() {
       sourceType: "NEWSDATA",
       categorie: "SELECTION_NATIONALE",
       joursAvant: 3,
+      sport: "Basketball",
     },
     {
       titre: "Une bourse d'études sportives ouverte aux lycéens pratiquant l'athlétisme",
@@ -1037,6 +1043,7 @@ async function reinitialiserActualitesDemo() {
         sourceNom: e.sourceNom,
         sourceType: e.sourceType,
         categorie: e.categorie,
+        sportId: e.sport ? (sportParNom.get(e.sport)?.id ?? null) : null,
         publieLe: joursAvant(e.joursAvant),
       },
     });
@@ -1052,7 +1059,7 @@ async function main() {
   const { seancePartageable } = await reinitialiserSeancesDemo(athletes, programmesParNom, seancesParCle);
   await reinitialiserPostsDemo(athletes, organisateurs, seancePartageable);
   await reinitialiserEvenementsDemo(organisateurs, athletes, sportParNom);
-  await reinitialiserActualitesDemo();
+  await reinitialiserActualitesDemo(sportParNom);
   await reinitialiserMensurationsDemo(athletes);
   await reinitialiserAbonnementsDemo(athletes, organisateurs);
   await reinitialiserVuesDemo(athletes, organisateurs);
