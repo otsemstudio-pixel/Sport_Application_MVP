@@ -1,7 +1,7 @@
 // Récupération depuis NewsData.io — appelée uniquement par le job cron
 // (app/api/cron/actualites), jamais par une requête utilisateur en direct.
 import { prisma } from "@/lib/prisma";
-import { MOTS_CLES_RECHERCHE, categoriser } from "@/lib/actualites";
+import { MOTS_CLES_RECHERCHE, categoriser, estPertinentSport } from "@/lib/actualites";
 
 const URL_BASE = "https://newsdata.io/api/1/latest";
 
@@ -73,6 +73,11 @@ export async function recupererNewsData(): Promise<{ ajoutes: number; ignore: bo
       if (!r.link || !r.title) continue;
       const titre = r.title.trim();
       const resume = (r.description ?? r.content ?? "").trim().slice(0, 500) || titre;
+      // Le paramètre `q` de NewsData.io n'est pas un filtre exact fiable en
+      // toutes circonstances (constaté en test : une requête sportive a
+      // remonté un article sur un boycott artistique, sans rapport) — même
+      // filtre de pertinence que pour le flux RSS généraliste Africanews.
+      if (!estPertinentSport(titre, resume)) continue;
       try {
         const { count } = await prisma.actualite.updateMany({
           where: { urlSource: r.link },
