@@ -43,10 +43,7 @@ export default function MatchScoreCard({ match }: { match: MatchDemo }) {
 
   return (
     <div className="relative h-40 w-64 shrink-0 overflow-hidden rounded-xl">
-      {/* unoptimized : voir ArticleCard.tsx, même contournement du blocage
-          429 de Wikimedia observé quand plusieurs images distinctes passent
-          par l'optimiseur d'images du serveur en même temps. */}
-      <Image src={match.imageUrl} alt="" fill sizes="256px" className="object-cover" unoptimized />
+      <Image src={match.imageUrl} alt="" fill sizes="256px" className="object-cover" />
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.25) 55%, rgba(0,0,0,.15))" }}

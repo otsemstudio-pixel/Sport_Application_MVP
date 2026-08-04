@@ -30,13 +30,7 @@ export default function ArticleCard({ article }: { article: Article }) {
       className="card flex cursor-pointer flex-col gap-3 overflow-hidden p-4 sm:flex-row"
     >
       <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-40">
-        {/* Beaucoup d'articles (sources Wikimedia Commons distinctes) sur une
-            même page : passer par l'optimiseur d'images de Next.js regrouperait
-            toutes ces requêtes derrière l'IP unique du serveur, ce qui a
-            déclenché un blocage 429 de Wikimedia en test. En laissant le
-            navigateur de chaque visiteur charger l'image directement, la charge
-            est répartie comme pour une page classique. */}
-        <Image src={article.imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 160px" className="object-cover" unoptimized />
+        <Image src={article.imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 160px" className="object-cover" />
         <span className="chip chip-primary absolute left-2 top-2 max-w-[calc(100%-1rem)] truncate">{article.sport.nom}</span>
       </div>
 

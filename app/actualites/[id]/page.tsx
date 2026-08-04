@@ -70,9 +70,7 @@ export default async function ArticleDetailPage({
 
       <div className="card flex flex-col gap-4 overflow-hidden p-0">
         <div className="relative h-56 w-full sm:h-72">
-          {/* unoptimized : voir ArticleCard.tsx (contournement du blocage 429
-              de Wikimedia observé avec de nombreuses images distinctes). */}
-          <Image src={articleFormate.imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 700px" className="object-cover" unoptimized />
+          <Image src={articleFormate.imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 700px" className="object-cover" />
           <span className="chip chip-primary absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate">{articleFormate.sport.nom}</span>
         </div>
 

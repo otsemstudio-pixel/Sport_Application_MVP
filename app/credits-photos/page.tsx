@@ -30,7 +30,7 @@ export default async function CreditsPhotosPage() {
               </p>
             </div>
             <a
-              href={c.url}
+              href={c.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost !p-1.5 shrink-0"
