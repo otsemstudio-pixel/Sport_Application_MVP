@@ -11,7 +11,10 @@ export type EvenementMascotte =
   | "OBJECTIF_ATTEINT"
   | "NOUVEAU_RECORD"
   | "PREMIER_DEFI"
-  | "ASTUCE";
+  | "ASTUCE"
+  | "SERIE_JOUR_REPOS"
+  | "RESUME_HEBDO"
+  | "RAPPEL_QUOTIDIEN";
 
 export const CLES_MESSAGE_MASCOTTE: Record<EvenementMascotte, string> = {
   BIENVENUE: "bienvenue",
@@ -23,4 +26,12 @@ export const CLES_MESSAGE_MASCOTTE: Record<EvenementMascotte, string> = {
   NOUVEAU_RECORD: "nouveauRecord",
   PREMIER_DEFI: "premierDefi",
   ASTUCE: "astuce",
+  // Système d'engagement quotidien : repos planifié pris normalement (le
+  // repos fait partie du programme, jamais une excuse tolérée), présentation
+  // du résumé hebdomadaire, et contenu du rappel push quotidien (ton jamais
+  // culpabilisant — distinct de INACTIVITE_3J qui reste réservé à la carte
+  // in-app "3 jours d'inactivité").
+  SERIE_JOUR_REPOS: "serieJourRepos",
+  RESUME_HEBDO: "resumeHebdo",
+  RAPPEL_QUOTIDIEN: "rappelQuotidien",
 };

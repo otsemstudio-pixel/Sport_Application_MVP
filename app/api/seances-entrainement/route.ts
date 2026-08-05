@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { evaluerBadges } from "@/lib/badges";
 import { recalculerRecordPersonnel } from "@/lib/records";
+import { determinerTacheDuJour } from "@/lib/tacheDuJour";
+import { attribuerXp } from "@/lib/xp";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -89,6 +91,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Capturée AVANT la création de la séance : la suggestion d'exercice se
+  // base sur les réalisations des 7 derniers jours, et la séance qu'on est
+  // en train d'enregistrer ne doit pas s'auto-influencer.
+  const athlete = await prisma.athlete.findUnique({
+    where: { id: session.athleteId },
+    include: { sportPrincipal: true },
+  });
+  const tacheDuJour = athlete
+    ? await determinerTacheDuJour(session.athleteId, athlete.sportPrincipal.categoriePerformance)
+    : null;
+
   const seance = await prisma.seanceEntrainement.create({
     data: {
       athleteId: session.athleteId,
@@ -130,6 +143,12 @@ export async function POST(req: NextRequest) {
       resultat?.estNouveauRecord ? { exerciceId: idsExercicesUniques[index], valeur: resultat.record.valeur } : null
     )
     .filter((r): r is { exerciceId: string; valeur: number } => r !== null);
+
+  const defiDuJourReleve = !!tacheDuJour?.exerciceId && idsExercices.includes(tacheDuJour.exerciceId);
+  await attribuerXp(session.athleteId, "SEANCE_COMPLETEE");
+  if (defiDuJourReleve) await attribuerXp(session.athleteId, "DEFI_DUJOUR");
+  await Promise.all(nouveauxBadges.map(() => attribuerXp(session.athleteId, "BADGE_DEBLOQUE")));
+  await Promise.all(nouveauxRecords.map(() => attribuerXp(session.athleteId, "RECORD_PERSONNEL")));
 
   return NextResponse.json({ seance, nouveauxBadges, nouveauxRecords }, { status: 201 });
 }

@@ -10,21 +10,19 @@ import TacheDuJour from "@/components/TacheDuJour";
 import ProgressRing from "@/components/ProgressRing";
 import FondSport from "@/components/FondSport";
 import ProgressionJournaliere from "@/components/ProgressionJournaliere";
+import SerieAssiduite from "@/components/SerieAssiduite";
+import LigueHebdomadaire from "@/components/LigueHebdomadaire";
+import ResumeHebdomadaire from "@/components/ResumeHebdomadaire";
 import { resoudreFondEcran } from "@/lib/sportBackgrounds";
 import { activiteParJour } from "@/lib/activite";
 import type { EvenementMascotte } from "@/lib/mascotte";
-import { CalendarRange, Flame, Lock, Medal, Target, Trophy } from "lucide-react";
+import { determinerSeanceDuJourProgramme, determinerTacheDuJour } from "@/lib/tacheDuJour";
+import { calculerAssiduite } from "@/lib/assiduite";
+import { cleSemaineISO } from "@/lib/ligues";
+import { CalendarRange, Lock, Medal, Target, Trophy } from "lucide-react";
 
 const TROIS_JOURS_MS = 3 * 86_400_000;
 const QUATORZE_JOURS_MS = 14 * 86_400_000;
-
-function calculerSeanceDuJour(dateDebut: Date, dureeSemaines: number) {
-  const joursEcoules = Math.floor((Date.now() - dateDebut.getTime()) / 86_400_000);
-  const numeroSemaine = Math.floor(joursEcoules / 7) + 1;
-  const numeroJour = (joursEcoules % 7) + 1;
-  if (numeroSemaine < 1 || numeroSemaine > dureeSemaines) return null;
-  return { numeroSemaine, numeroJour };
-}
 
 export default async function EntrainementPage() {
   const session = await getSession();
@@ -38,36 +36,48 @@ export default async function EntrainementPage() {
 
   const t = await getTranslations("entrainement");
 
-  const [exercices, badges, groupes, totalSeances, records, programmeSuivi, seancesRecentes] = await Promise.all([
-    prisma.exercice.findMany({
-      where: {
-        OR: [
-          { categoriePerformance: athlete.sportPrincipal.categoriePerformance },
-          { categoriePerformance: "RENFORCEMENT_GENERAL" },
-        ],
-      },
-      orderBy: { nom: "asc" },
-    }),
-    prisma.badge.findMany({ orderBy: { seuilSeances: "asc" } }),
-    prisma.seanceEntrainement.groupBy({
-      by: ["athleteId"],
-      where: { athlete: { ville: athlete.ville, sportPrincipalId: athlete.sportPrincipalId } },
-      _count: { _all: true },
-      orderBy: { _count: { athleteId: "desc" } },
-      take: 20,
-    }),
-    prisma.seanceEntrainement.count({ where: { athleteId: athlete.id } }),
-    prisma.recordPersonnel.findMany({ where: { athleteId: athlete.id } }),
-    prisma.athleteProgramme.findFirst({
-      where: { athleteId: athlete.id, statut: "EN_COURS" },
-      include: { programme: true },
-      orderBy: { dateDebut: "desc" },
-    }),
-    prisma.seanceEntrainement.findMany({
-      where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - QUATORZE_JOURS_MS) } },
-      select: { date: true },
-    }),
-  ]);
+  const [
+    exercices,
+    badges,
+    groupes,
+    totalSeances,
+    records,
+    programmeSuivi,
+    seancesRecentes,
+    seanceDuJourProgramme,
+    assiduite,
+  ] = await Promise.all([
+      prisma.exercice.findMany({
+        where: {
+          OR: [
+            { categoriePerformance: athlete.sportPrincipal.categoriePerformance },
+            { categoriePerformance: "RENFORCEMENT_GENERAL" },
+          ],
+        },
+        orderBy: { nom: "asc" },
+      }),
+      prisma.badge.findMany({ orderBy: { seuilSeances: "asc" } }),
+      prisma.seanceEntrainement.groupBy({
+        by: ["athleteId"],
+        where: { athlete: { ville: athlete.ville, sportPrincipalId: athlete.sportPrincipalId } },
+        _count: { _all: true },
+        orderBy: { _count: { athleteId: "desc" } },
+        take: 20,
+      }),
+      prisma.seanceEntrainement.count({ where: { athleteId: athlete.id } }),
+      prisma.recordPersonnel.findMany({ where: { athleteId: athlete.id } }),
+      prisma.athleteProgramme.findFirst({
+        where: { athleteId: athlete.id, statut: "EN_COURS" },
+        include: { programme: true },
+        orderBy: { dateDebut: "desc" },
+      }),
+      prisma.seanceEntrainement.findMany({
+        where: { athleteId: athlete.id, date: { gte: new Date(Date.now() - QUATORZE_JOURS_MS) } },
+        select: { date: true },
+      }),
+      determinerSeanceDuJourProgramme(athlete.id),
+      calculerAssiduite(athlete.id),
+    ]);
 
   // Régularité de la semaine : nombre de jours distincts (sur les 7 derniers)
   // ayant au moins une séance, affiché comme anneau de progression. Réutilise
@@ -76,24 +86,6 @@ export default async function EntrainementPage() {
   const donneesProgressionJournaliere = activiteParJour(seancesRecentes, 14);
   const joursActifsSemaine = donneesProgressionJournaliere.slice(-7).filter((p) => p.nombreSeances > 0).length;
   const pourcentageRegularite = Math.round((joursActifsSemaine / 7) * 100);
-
-  let seanceDuJourProgramme = null;
-  if (programmeSuivi) {
-    const jour = calculerSeanceDuJour(programmeSuivi.dateDebut, programmeSuivi.programme.dureeSemaines);
-    if (jour) {
-      const programmeSeance = await prisma.programmeSeance.findFirst({
-        where: { programmeId: programmeSuivi.programmeId, numeroSemaine: jour.numeroSemaine, numeroJour: jour.numeroJour },
-        include: { exercicesPrevus: { include: { exercice: true } } },
-      });
-      if (programmeSeance) {
-        seanceDuJourProgramme = {
-          id: programmeSeance.id,
-          nomSeance: programmeSeance.nomSeance,
-          exercicesPrevus: programmeSeance.exercicesPrevus,
-        };
-      }
-    }
-  }
 
   // Un programme peut être suivi sans restriction de catégorie : ses
   // exercices ne sont donc pas garantis d'être dans la liste filtrée par la
@@ -109,33 +101,11 @@ export default async function EntrainementPage() {
       ]
     : exercices;
 
-  // Tâche du jour : la séance de programme prévue si elle existe, sinon un
-  // exercice suggéré (catégorie de l'athlète, le moins réalisé récemment).
-  let tacheDuJour: { titre: string; beneficePerformance: string | null; exerciceId: string } | null = null;
-  if (seanceDuJourProgramme) {
-    const premierExercicePrevu = seanceDuJourProgramme.exercicesPrevus[0];
-    tacheDuJour = {
-      titre: seanceDuJourProgramme.nomSeance,
-      beneficePerformance: premierExercicePrevu?.exercice.beneficePerformance ?? null,
-      exerciceId: premierExercicePrevu?.exerciceId ?? "",
-    };
-  } else if (exercices.length > 0) {
-    const septJoursAvant = new Date(Date.now() - 7 * 86_400_000);
-    const realisationsRecentes = await prisma.exerciceRealise.groupBy({
-      by: ["exerciceId"],
-      where: { seance: { athleteId: athlete.id, date: { gte: septJoursAvant } } },
-      _count: { _all: true },
-    });
-    const compteParExercice = new Map(realisationsRecentes.map((r) => [r.exerciceId, r._count._all]));
-    const exerciceSuggere = exercices.reduce((moins, e) =>
-      (compteParExercice.get(e.id) ?? 0) < (compteParExercice.get(moins.id) ?? 0) ? e : moins
-    );
-    tacheDuJour = {
-      titre: exerciceSuggere.nom,
-      beneficePerformance: exerciceSuggere.beneficePerformance,
-      exerciceId: exerciceSuggere.id,
-    };
-  }
+  const tacheDuJour = await determinerTacheDuJour(
+    athlete.id,
+    athlete.sportPrincipal.categoriePerformance,
+    seanceDuJourProgramme
+  );
 
   let evenementMascotte: EvenementMascotte = "TACHE_DUJOUR";
   let suggererReductionCharge = false;
@@ -216,6 +186,8 @@ export default async function EntrainementPage() {
         />
       )}
 
+      <ResumeHebdomadaire categorie={athlete.sportPrincipal.categoriePerformance} />
+
       <section className="hero-card flex items-center gap-4 p-5">
         <ProgressRing pourcentage={pourcentageRegularite} taille={84} epaisseur={8}>
           <span className="text-lg font-bold">{pourcentageRegularite}%</span>
@@ -231,11 +203,21 @@ export default async function EntrainementPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-3 gap-3">
-        <StatCard icon={Flame} valeur={totalSeances} label={t("statSeances")} />
-        <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
-        <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
-      </section>
+      <div className="flex flex-col gap-2">
+        <section className="grid grid-cols-3 gap-3">
+          <SerieAssiduite
+            serieActuelle={assiduite.serieActuelle}
+            recordSerie={assiduite.recordSerie}
+            label={t("statSerie")}
+            labelRecord={t("statSerieRecord", { n: assiduite.recordSerie })}
+          />
+          <StatCard icon={Medal} valeur={idsObtenus.size} label={t("statBadges")} />
+          <StatCard icon={Trophy} valeur={monRang ? `#${monRang}` : "—"} label={t("statRangLocal")} />
+        </section>
+        <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
+          {t("statSeancesTotal", { n: totalSeances })}
+        </p>
+      </div>
 
       <ProgressionJournaliere donnees={donneesProgressionJournaliere} />
 
@@ -306,6 +288,8 @@ export default async function EntrainementPage() {
           })}
         </div>
       </section>
+
+      <LigueHebdomadaire />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-semibold">{t("classementLocal", { ville: athlete.ville })}</h2>

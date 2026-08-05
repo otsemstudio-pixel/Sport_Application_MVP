@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { attribuerXp } from "@/lib/xp";
 
 type SerieAvecDate = {
   poidsKg: number | null;
@@ -150,6 +151,7 @@ export async function marquerObjectifsAtteints(
         where: { id: o.id },
         data: { atteint: true, dateAtteint: new Date() },
       });
+      await attribuerXp(athleteId, "OBJECTIF_ATTEINT");
     }
   }
 }

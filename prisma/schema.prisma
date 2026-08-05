@@ -53,6 +53,29 @@ enum StatutProgramme {
   ABANDONNE
 }
 
+enum PreferenceNotifications {
+  DESACTIVE
+  QUOTIDIEN
+  QUELQUES_FOIS_SEMAINE
+}
+
+enum TypeEvenementXp {
+  SEANCE_COMPLETEE
+  DEFI_DUJOUR
+  REPOS_PLANIFIE_RESPECTE
+  OBJECTIF_ATTEINT
+  RECORD_PERSONNEL
+  BADGE_DEBLOQUE
+  INSCRIPTION_TOURNOI
+  RESULTAT_TOURNOI
+}
+
+enum MouvementLigue {
+  PROMOTION
+  RELEGATION
+  STABLE
+}
+
 model Sport {
   id                   String               @id @default(cuid())
   nom                  String               @unique
@@ -65,9 +88,10 @@ model Sport {
   // chaque passage, pour ne pas épuiser le quota gratuit.
   derniereRechercheActualite DateTime?
 
-  athletes   Athlete[]
-  evenements Evenement[]
-  actualites Actualite[]
+  athletes     Athlete[]
+  evenements   Evenement[]
+  actualites   Actualite[]
+  ligueGroupes LigueGroupe[]
 }
 
 model Athlete {
@@ -99,6 +123,15 @@ model Athlete {
   bannerUrl               String?
   fondEcranUrl            String?
 
+  // Système d'engagement quotidien : total d'XP dénormalisé pour un
+  // affichage rapide (les gains détaillés vivent dans EvenementXp), jamais
+  // activé par défaut sans consentement explicite de l'athlète, et clé de
+  // semaine ISO (ex. "2026-W32") du dernier résumé hebdomadaire déjà vu pour
+  // ne l'afficher qu'une fois par semaine.
+  xpTotal                  Int                     @default(0)
+  preferenceNotifications  PreferenceNotifications @default(DESACTIVE)
+  derniereSemaineResumeVue String?
+
   consentement        ConsentementParental?
   seancesEntrainement SeanceEntrainement[]
   athleteBadges       AthleteBadge[]
@@ -109,6 +142,12 @@ model Athlete {
   objectifs           Objectif[]
   programmesSuivis    AthleteProgramme[]
   mensurations        Mensuration[]
+
+  preferenceAssiduite     PreferenceAssiduite?
+  jokersAssiduite         JokerAssiduite[]
+  evenementsXp            EvenementXp[]
+  ligueMembres            LigueMembre[]
+  abonnementsNotification AbonnementNotification[]
 }
 
 model ConsentementParental {
@@ -500,14 +539,14 @@ model PostHashtag {
 // PostVue/PostLike (mêmes champs auteur/spectateur polymorphes déjà utilisés
 // partout ailleurs dans l'app).
 model Mention {
-  id              String           @id @default(cuid())
-  postId          String?
-  post            Post?            @relation(fields: [postId], references: [id])
-  commentaireId   String?
-  commentaire     PostCommentaire? @relation(fields: [commentaireId], references: [id])
-  mentionneId     String
-  mentionneType   RoleSession
-  createdAt       DateTime         @default(now())
+  id            String           @id @default(cuid())
+  postId        String?
+  post          Post?            @relation(fields: [postId], references: [id])
+  commentaireId String?
+  commentaire   PostCommentaire? @relation(fields: [commentaireId], references: [id])
+  mentionneId   String
+  mentionneType RoleSession
+  createdAt     DateTime         @default(now())
 
   @@index([mentionneId, mentionneType])
   @@index([postId])
@@ -581,4 +620,102 @@ model Actualite {
   @@index([publieLe])
   @@index([categorie])
   @@index([sportId])
+}
+
+// Système d'engagement quotidien inspiré de Duolingo, adapté au risque
+// physique du sport : la série (streak) n'est PAS un compteur stocké à
+// incrémenter/casser par un job — elle est recalculée à la volée depuis
+// l'historique réel (voir lib/assiduite.ts), donc jamais désynchronisée et
+// sans dépendance à un cron pour "réinitialiser" quoi que ce soit. Nommé
+// "Assiduite" pour éviter toute collision avec le modèle Serie existant
+// (un set/une répétition d'entraînement, sans rapport).
+model PreferenceAssiduite {
+  id        String  @id @default(cuid())
+  athleteId String  @unique
+  athlete   Athlete @relation(fields: [athleteId], references: [id])
+
+  // Jours de la semaine (0=dimanche..6=samedi) où un repos planifié compte
+  // comme un jour normal de la série. Maximum 2, vérifié en application.
+  joursReposPlanifies Int[]
+
+  updatedAt DateTime @updatedAt
+}
+
+// Un jour non planifié manqué, couvert ponctuellement sans casser la série
+// — présenté comme un outil de gestion de la fatigue, pas un simple
+// bouclier anti-punition. Plafond de 2/mois vérifié en application (comptage
+// des lignes du mois en cours), même principe que l'unicité croisée du nom
+// d'utilisateur déjà en place ailleurs dans ce schéma.
+model JokerAssiduite {
+  id           String   @id @default(cuid())
+  athleteId    String
+  athlete      Athlete  @relation(fields: [athleteId], references: [id])
+  dateCouverte DateTime
+  createdAt    DateTime @default(now())
+
+  @@unique([athleteId, dateCouverte])
+}
+
+// Journal des gains d'XP (voir lib/xp.ts) — nécessaire en plus du total
+// dénormalisé sur Athlete.xpTotal pour pouvoir sommer l'XP sur une fenêtre
+// glissante (semaine de ligue en cours, résumé hebdomadaire).
+model EvenementXp {
+  id        String          @id @default(cuid())
+  athleteId String
+  athlete   Athlete         @relation(fields: [athleteId], references: [id])
+  type      TypeEvenementXp
+  montant   Int
+  createdAt DateTime        @default(now())
+
+  @@index([athleteId, createdAt])
+}
+
+// Cohorte hebdomadaire d'une ligue (regroupement ville+sport, par niveau de
+// XP de la semaine précédente). `niveau` permet plusieurs divisions
+// parallèles pour un même ville+sport quand la base d'utilisateurs grandit
+// au point de dépasser 20-30 personnes par groupe — à l'échelle actuelle,
+// reste à 1 pour toutes les combinaisons.
+model LigueGroupe {
+  id        String   @id @default(cuid())
+  semaine   String
+  ville     String
+  sportId   String
+  sport     Sport    @relation(fields: [sportId], references: [id])
+  niveau    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  membres LigueMembre[]
+
+  @@unique([semaine, ville, sportId, niveau])
+}
+
+model LigueMembre {
+  id        String          @id @default(cuid())
+  groupeId  String
+  groupe    LigueGroupe     @relation(fields: [groupeId], references: [id])
+  athleteId String
+  athlete   Athlete         @relation(fields: [athleteId], references: [id])
+  // Incrémenté en direct à chaque gain d'XP de la semaine (voir lib/xp.ts),
+  // pas recalculé après coup par agrégation à chaque chargement de page.
+  xpSemaine Int             @default(0)
+  // Renseignés uniquement à la clôture de la semaine (lib/ligues.ts) — null
+  // tant que la semaine est en cours.
+  rangFinal Int?
+  mouvement MouvementLigue?
+
+  @@unique([groupeId, athleteId])
+  @@index([athleteId])
+}
+
+// Souscription Web Push du navigateur d'un athlète (Web Push API +
+// service worker, voir public/sw.js) — jamais créée sans action explicite de
+// l'athlète dans ses réglages de notifications.
+model AbonnementNotification {
+  id        String   @id @default(cuid())
+  athleteId String
+  athlete   Athlete  @relation(fields: [athleteId], references: [id])
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
 }

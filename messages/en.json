@@ -72,6 +72,9 @@
   "entrainement": {
     "titre": "Training",
     "statSeances": "Sessions",
+    "statSerie": "Streak",
+    "statSerieRecord": "Record: {n}",
+    "statSeancesTotal": "{n} sessions total",
     "statBadges": "Badges",
     "statRangLocal": "Local rank",
     "enregistrerSeance": "Log a session",
@@ -380,7 +383,11 @@
     "imageIllisible": "Unreadable or corrupted image — try another photo.",
     "echecStockage": "Failed to connect to storage. Please try again shortly.",
     "nomUtilisateurInvalide": "Username must be 3 to 20 lowercase letters, digits or underscores.",
-    "nomUtilisateurPris": "This username is already taken."
+    "nomUtilisateurPris": "This username is already taken.",
+    "jokerDateInvalide": "This day can't be covered by a joker (too recent, too old, or already past).",
+    "jokerDejaCouvert": "This day is already covered (session, planned rest day, or existing joker).",
+    "jokerPlafondAtteint": "You've already used your jokers for this month.",
+    "joursReposInvalides": "Choose at most 2 planned rest days."
   },
   "apparence": {
     "titre": "Appearance",
@@ -420,7 +427,10 @@
     "nouveauRecord": "New personal record, well done!",
     "premierDefi": "Great job on your first challenge! You're ready to start.",
     "astuce": "Tip: log a session after every workout to track your progress.",
-    "suggestionReductionCharge": "The last few sessions seem to have been tough: consider easing off the load a bit next time."
+    "suggestionReductionCharge": "The last few sessions seem to have been tough: consider easing off the load a bit next time.",
+    "serieJourRepos": "Well-deserved rest day! Rest is part of the program, your streak continues as normal.",
+    "resumeHebdo": "Here's your weekly summary!",
+    "rappelQuotidien": "Just a quick nudge! A short session is enough to keep the rhythm today, if you have a moment."
   },
   "activiteProfil": {
     "titre": "Sports activity",
@@ -442,5 +452,43 @@
     "badgeReprise": "Easing back in",
     "badgeAujourdhui": "Today",
     "commencer": "Get started"
+  },
+  "assiduite": {
+    "titre": "Planned rest days",
+    "description": "Pick up to 2 fixed days per week where rest counts as a normal day of your streak — never an absence.",
+    "jour": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "jokersRestants": "{n} joker(s) left this month"
+  },
+  "notifications": {
+    "titre": "Notifications",
+    "description": "A small encouraging reminder if you haven't been active yet today. Never guilt-tripping, can be turned off anytime.",
+    "frequence": {
+      "DESACTIVE": "Off",
+      "QUOTIDIEN": "Daily",
+      "QUELQUES_FOIS_SEMAINE": "A few times/week"
+    },
+    "erreurActivation": "Couldn't enable notifications on this device."
+  },
+  "ligue": {
+    "titre": "Weekly league",
+    "description": "Ranking by XP earned this week, level {niveau}.",
+    "toi": "(you)",
+    "xp": "{n} XP"
+  },
+  "resumeHebdomadaire": {
+    "titre": "Weekly summary",
+    "fermer": "Close",
+    "nombreSeances": "{n} sessions this week",
+    "xpGagne": "{n} XP earned",
+    "nouveauxRecords": "{n} new personal record(s)",
+    "positionLigue": "{xp} XP in your league this week"
   }
 }

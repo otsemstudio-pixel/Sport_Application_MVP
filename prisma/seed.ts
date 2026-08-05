@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { recalculerRecordPersonnel } from "../lib/records";
 import { traiterHashtagsEtMentions } from "../lib/hashtagsMentions";
+import { cleSemaineISO } from "../lib/ligues";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -606,6 +607,12 @@ async function reinitialiserPostsDemo(
     select: { id: true },
   });
   const idsAnciens = anciensPosts.map((p) => p.id);
+  const idsAnciensCommentaires = (
+    await prisma.postCommentaire.findMany({ where: { postId: { in: idsAnciens } }, select: { id: true } })
+  ).map((c) => c.id);
+  await prisma.mention.deleteMany({ where: { commentaireId: { in: idsAnciensCommentaires } } });
+  await prisma.mention.deleteMany({ where: { postId: { in: idsAnciens } } });
+  await prisma.postHashtag.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postCommentaire.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postLike.deleteMany({ where: { postId: { in: idsAnciens } } });
   await prisma.postVue.deleteMany({ where: { postId: { in: idsAnciens } } });
@@ -1064,6 +1071,73 @@ async function reinitialiserActualitesDemo(sportParNom: Map<string, { id: string
   }
 }
 
+// Système d'engagement quotidien : un jour de repos planifié pour Mamadou
+// (dimanche), quelques EvenementXp réalistes donnant un xpTotal cohérent
+// pour Mamadou et Aïcha, et une ligue hebdomadaire de démonstration pour la
+// semaine en cours (Mamadou, seul dans son groupe ville+sport — reflète
+// fidèlement l'échelle réelle actuelle de la base, pas une donnée gonflée).
+async function reinitialiserEngagementDemo(athletes: { id: string; ville: string; sportPrincipalId: string }[]) {
+  const [mamadou, , aicha] = athletes;
+
+  await prisma.preferenceAssiduite.upsert({
+    where: { athleteId: mamadou.id },
+    update: { joursReposPlanifies: [0] },
+    create: { athleteId: mamadou.id, joursReposPlanifies: [0] },
+  });
+
+  await prisma.jokerAssiduite.deleteMany({ where: { athleteId: { in: [mamadou.id, aicha.id] } } });
+  await prisma.evenementXp.deleteMany({ where: { athleteId: { in: [mamadou.id, aicha.id] } } });
+
+  const evenementsMamadou: { type: "SEANCE_COMPLETEE" | "RECORD_PERSONNEL" | "BADGE_DEBLOQUE"; montant: number; joursAvant: number }[] = [
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 6 },
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 4 },
+    { type: "RECORD_PERSONNEL", montant: 15, joursAvant: 4 },
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 2 },
+    { type: "BADGE_DEBLOQUE", montant: 10, joursAvant: 2 },
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 1 },
+  ];
+  const evenementsAicha: { type: "SEANCE_COMPLETEE" | "OBJECTIF_ATTEINT"; montant: number; joursAvant: number }[] = [
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 5 },
+    { type: "OBJECTIF_ATTEINT", montant: 30, joursAvant: 3 },
+    { type: "SEANCE_COMPLETEE", montant: 10, joursAvant: 1 },
+  ];
+
+  await prisma.evenementXp.createMany({
+    data: [
+      ...evenementsMamadou.map((e) => ({
+        athleteId: mamadou.id,
+        type: e.type,
+        montant: e.montant,
+        createdAt: joursAvant(e.joursAvant),
+      })),
+      ...evenementsAicha.map((e) => ({
+        athleteId: aicha.id,
+        type: e.type,
+        montant: e.montant,
+        createdAt: joursAvant(e.joursAvant),
+      })),
+    ],
+  });
+
+  const xpTotalMamadou = evenementsMamadou.reduce((somme, e) => somme + e.montant, 0);
+  const xpTotalAicha = evenementsAicha.reduce((somme, e) => somme + e.montant, 0);
+  await prisma.athlete.update({ where: { id: mamadou.id }, data: { xpTotal: xpTotalMamadou } });
+  await prisma.athlete.update({ where: { id: aicha.id }, data: { xpTotal: xpTotalAicha } });
+
+  const semaine = cleSemaineISO(new Date());
+  await prisma.ligueMembre.deleteMany({ where: { athleteId: mamadou.id, groupe: { semaine } } });
+  const groupe = await prisma.ligueGroupe.upsert({
+    where: {
+      semaine_ville_sportId_niveau: { semaine, ville: mamadou.ville, sportId: mamadou.sportPrincipalId, niveau: 1 },
+    },
+    update: {},
+    create: { semaine, ville: mamadou.ville, sportId: mamadou.sportPrincipalId, niveau: 1 },
+  });
+  await prisma.ligueMembre.create({
+    data: { groupeId: groupe.id, athleteId: mamadou.id, xpSemaine: xpTotalMamadou },
+  });
+}
+
 async function main() {
   const sportParNom = await seedReferentiels();
   const { programmesParNom, seancesParCle } = await seedProgrammes();
@@ -1077,6 +1151,7 @@ async function main() {
   await reinitialiserMensurationsDemo(athletes);
   await reinitialiserAbonnementsDemo(athletes, organisateurs);
   await reinitialiserVuesDemo(athletes, organisateurs);
+  await reinitialiserEngagementDemo(athletes);
 
   console.log("Seed de démonstration terminé.");
   console.log(`Comptes démo (mot de passe partagé : ${MOT_DE_PASSE_DEMO}) :`);

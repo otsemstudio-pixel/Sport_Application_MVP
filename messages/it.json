@@ -72,6 +72,9 @@
   "entrainement": {
     "titre": "Allenamento",
     "statSeances": "Sedute",
+    "statSerie": "Serie",
+    "statSerieRecord": "Record: {n}",
+    "statSeancesTotal": "{n} sedute totali",
     "statBadges": "Badge",
     "statRangLocal": "Posizione locale",
     "enregistrerSeance": "Registra una seduta",
@@ -380,7 +383,11 @@
     "imageIllisible": "Immagine illeggibile o corrotta — prova un'altra foto.",
     "echecStockage": "Connessione all'archiviazione non riuscita. Riprova tra poco.",
     "nomUtilisateurInvalide": "Il nome utente deve contenere da 3 a 20 lettere minuscole, numeri o underscore.",
-    "nomUtilisateurPris": "Questo nome utente è già utilizzato."
+    "nomUtilisateurPris": "Questo nome utente è già utilizzato.",
+    "jokerDateInvalide": "Questo giorno non può essere coperto da un joker (troppo recente, troppo vecchio, o già passato).",
+    "jokerDejaCouvert": "Questo giorno è già coperto (seduta, riposo pianificato o joker esistente).",
+    "jokerPlafondAtteint": "Hai già usato i tuoi joker di questo mese.",
+    "joursReposInvalides": "Scegli al massimo 2 giorni di riposo pianificati."
   },
   "apparence": {
     "titre": "Aspetto",
@@ -420,7 +427,10 @@
     "nouveauRecord": "Nuovo record personale, bravo!",
     "premierDefi": "Complimenti per la tua prima sfida! Sei pronto per iniziare.",
     "astuce": "Consiglio: registra una sessione dopo ogni allenamento per seguire i tuoi progressi.",
-    "suggestionReductionCharge": "Le ultime sessioni sembrano essere state difficili: pensa a ridurre un po' il carico la prossima volta."
+    "suggestionReductionCharge": "Le ultime sessioni sembrano essere state difficili: pensa a ridurre un po' il carico la prossima volta.",
+    "serieJourRepos": "Giorno di riposo ben meritato! Il riposo fa parte del programma, la tua serie continua normalmente.",
+    "resumeHebdo": "Ecco il tuo riepilogo settimanale!",
+    "rappelQuotidien": "Un piccolo promemoria! Una sessione breve basta per mantenere il ritmo oggi, se hai un momento."
   },
   "activiteProfil": {
     "titre": "Attività sportiva",
@@ -442,5 +452,43 @@
     "badgeReprise": "Ripresa graduale",
     "badgeAujourdhui": "Oggi",
     "commencer": "Inizia"
+  },
+  "assiduite": {
+    "titre": "Giorni di riposo pianificati",
+    "description": "Scegli fino a 2 giorni fissi a settimana in cui il riposo conta come un giorno normale della tua serie — mai un'assenza.",
+    "jour": {
+      "0": "Dom",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mer",
+      "4": "Gio",
+      "5": "Ven",
+      "6": "Sab"
+    },
+    "jokersRestants": "{n} joker rimasti questo mese"
+  },
+  "notifications": {
+    "titre": "Notifiche",
+    "description": "Un piccolo promemoria incoraggiante se non sei ancora stato attivo oggi. Mai colpevolizzante, disattivabile in qualsiasi momento.",
+    "frequence": {
+      "DESACTIVE": "Disattivato",
+      "QUOTIDIEN": "Quotidiano",
+      "QUELQUES_FOIS_SEMAINE": "Alcune volte/settimana"
+    },
+    "erreurActivation": "Impossibile attivare le notifiche su questo dispositivo."
+  },
+  "ligue": {
+    "titre": "Lega settimanale",
+    "description": "Classifica per XP guadagnati questa settimana, livello {niveau}.",
+    "toi": "(tu)",
+    "xp": "{n} XP"
+  },
+  "resumeHebdomadaire": {
+    "titre": "Riepilogo della settimana",
+    "fermer": "Chiudi",
+    "nombreSeances": "{n} sedute questa settimana",
+    "xpGagne": "{n} XP guadagnati",
+    "nouveauxRecords": "{n} nuovo/i record personale/i",
+    "positionLigue": "{xp} XP nella tua lega questa settimana"
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { attribuerXp } from "@/lib/xp";
 
 // Seule route capable d'écrire dans la table Resultat. Aucun rôle athlète n'y a accès.
 export async function POST(
@@ -34,6 +35,14 @@ export async function POST(
     select: { athleteId: true },
   });
   const athletesInscrits = new Set(inscriptions.map((i) => i.athleteId));
+
+  // Requêté AVANT la transaction pour ne récompenser que la première saisie
+  // d'un résultat, pas une correction ultérieure.
+  const resultatsExistants = await prisma.resultat.findMany({
+    where: { evenementId, athleteId: { in: athleteIds } },
+    select: { athleteId: true },
+  });
+  const athletesDejaResultat = new Set(resultatsExistants.map((r) => r.athleteId));
 
   for (const r of resultats) {
     if (
@@ -72,6 +81,9 @@ export async function POST(
       })
     )
   );
+
+  const nouveauxAthleteIds = [...new Set(athleteIds)].filter((id) => !athletesDejaResultat.has(id));
+  await Promise.all(nouveauxAthleteIds.map((id) => attribuerXp(id, "RESULTAT_TOURNOI")));
 
   return NextResponse.json(misAJour, { status: 201 });
 }

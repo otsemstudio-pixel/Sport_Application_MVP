@@ -12,6 +12,7 @@ import MobileTopBar from "@/components/nav/MobileTopBar";
 import PublicHeader from "@/components/nav/PublicHeader";
 import type { NavLien } from "@/components/nav/NavLinks";
 import DetectionEffetsVisuels from "@/components/DetectionEffetsVisuels";
+import RegistreServiceWorker from "@/components/RegistreServiceWorker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -95,6 +96,7 @@ export default async function RootLayout({
       <body className="min-h-full">
         <NextIntlClientProvider messages={messages}>
           <DetectionEffetsVisuels preference={preferenceEffetsVisuels} />
+          <RegistreServiceWorker />
           {session ? (
             <div className="flex min-h-full">
               <Sidebar liens={liens} nom={nom} role={session.role} />

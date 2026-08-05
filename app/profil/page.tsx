@@ -8,10 +8,13 @@ import BasculeMensurations from "@/components/BasculeMensurations";
 import BandeauStatistiquesProfil from "@/components/BandeauStatistiquesProfil";
 import ParametresApparence from "@/components/ParametresApparence";
 import ParametresNomUtilisateur from "@/components/ParametresNomUtilisateur";
+import ParametresAssiduite from "@/components/ParametresAssiduite";
+import ParametresNotifications from "@/components/ParametresNotifications";
 import ResumeActiviteProfil from "@/components/ResumeActiviteProfil";
 import Avatar from "@/components/Avatar";
 import { activiteParJour, activiteParSemaine } from "@/lib/activite";
 import { fondSportPour } from "@/lib/sportBackgrounds";
+import { calculerAssiduite } from "@/lib/assiduite";
 import { AtSign, Calendar, MapPin, Mail, ShieldCheck, ShieldAlert, Activity, Scale } from "lucide-react";
 
 export default async function ProfilPage() {
@@ -23,6 +26,8 @@ export default async function ProfilPage() {
     include: { consentement: true, sportPrincipal: true },
   });
   if (!athlete) redirect("/connexion");
+
+  const assiduite = await calculerAssiduite(athlete.id);
 
   const locale = await getLocale();
   const t = await getTranslations("auth");
@@ -118,6 +123,13 @@ export default async function ProfilPage() {
       )}
 
       <ParametresNomUtilisateur nomUtilisateurInitial={athlete.nomUtilisateur} />
+
+      <ParametresAssiduite
+        joursReposPlanifiesInitial={assiduite.joursReposPlanifies}
+        jokersRestants={assiduite.jokersRestants}
+      />
+
+      <ParametresNotifications preferenceInitiale={athlete.preferenceNotifications} />
 
       <ParametresApparence
         themeFondInitial={athlete.themeFond}
